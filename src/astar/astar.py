@@ -22,7 +22,8 @@ class AStar:
             self.came_from = None
 
         def __lt__(self, other):
-            return self.fscore > other.fscore
+            # return self.fscore > other.fscore
+            return self.fscore < other.fscore
 
         def format_print(self, label):
             node_string = self.data.format_print(label)
