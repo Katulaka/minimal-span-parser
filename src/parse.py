@@ -460,6 +460,7 @@ class MyParser(object):
 
     @classmethod
     def from_spec(cls, spec, model):
+        import pdb; pdb.set_trace()
         return cls(model, **spec)
 
     def parse(self, sentence, gold=None, is_dev=False, predict_parms=None):
