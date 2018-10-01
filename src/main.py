@@ -140,7 +140,7 @@ def run_train(args):
             word_vocab,
             char_vocab,
             label_vocab,
-            args.use_char,
+            args.use_char_lstm,
             args.tag_embedding_dim,
             args.word_embedding_dim,
             args.char_embedding_dim,
@@ -429,7 +429,7 @@ def main():
     subparser.add_argument("--checks-per-epoch", type=int, default=4)
     subparser.add_argument("--print-vocabs", action="store_true")
     subparser.add_argument("--keep-valence-value", action="store_true")
-    subparser.add_argument("--use-char", action="store_true")
+    subparser.add_argument("--use-char-lstm", action="store_true")
 
     subparser = subparsers.add_parser("test")
     subparser.set_defaults(callback=run_test)

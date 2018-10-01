@@ -375,7 +375,7 @@ class MyParser(object):
             word_vocab,
             char_vocab,
             label_vocab,
-            use_char,
+            use_char_lstm,
             tag_embedding_dim,
             word_embedding_dim,
             char_embedding_dim,
@@ -399,7 +399,7 @@ class MyParser(object):
         self.keep_valence_value = keep_valence_value
         self.lstm_dim = lstm_dim
 
-        self.use_char = use_char
+        self.use_char_lstm = use_char_lstm
 
         self.tag_embeddings = self.model.add_lookup_parameters(
             (tag_vocab.size, tag_embedding_dim))
@@ -408,7 +408,7 @@ class MyParser(object):
 
         embedding_dim = tag_embedding_dim + word_embedding_dim
 
-        if use_char:
+        if use_char_lstm:
             self.char_vocab = char_vocab
             self.char_embeddings = self.model.add_lookup_parameters(
                 (char_vocab.size, char_embedding_dim))
@@ -466,7 +466,7 @@ class MyParser(object):
         is_train = gold is not None
         use_dropout = is_train and not is_dev
 
-        if self.use_char:
+        if self.use_char_lstm:
             char_lstm = self.char_lstm.initial_state()
             if use_dropout:
                 self.char_lstm.set_dropout(self.dropouts.lstm)
@@ -492,7 +492,7 @@ class MyParser(object):
                     word = UNK
             word_embedding = self.word_embeddings[self.word_vocab.index(word)]
             word_embedding = dy.dropout(word_embedding, dropouts)
-            if self.use_char:
+            if self.use_char_lstm:
                 chars_embedding = []
                 for c in [START] + list(word) + [STOP]:
                     char_embedding = self.char_embeddings[self.char_vocab.index(c)]
