@@ -76,7 +76,7 @@ def run_train(args):
     word_vocab.index(parse.STOP)
     word_vocab.index(parse.UNK)
 
-    if args.parser_type == 'my':
+    if args.parser_type == 'my' and args.use_char:
         char_vocab = vocabulary.Vocabulary()
         char_vocab.index(parse.START)
         char_vocab.index(parse.STOP)
@@ -107,8 +107,9 @@ def run_train(args):
                 else:
                     for l in node.labels:
                         label_vocab.index(l)
-                    for c in node.word:
-                        char_vocab.index(c)
+                    if args.use_char:
+                        for c in node.word:
+                            char_vocab.index(c)
                     tag_vocab.index(node.tag)
                     word_vocab.index(node.word)
 
@@ -116,7 +117,7 @@ def run_train(args):
     tag_vocab.freeze()
     word_vocab.freeze()
     label_vocab.freeze()
-    if args.parser_type == 'my':
+    if args.parser_type == 'my' and args.use_char:
         char_vocab.freeze()
 
     def print_vocabulary(name, vocab):
@@ -140,6 +141,7 @@ def run_train(args):
             word_vocab,
             char_vocab,
             label_vocab,
+            args.use_char,
             args.tag_embedding_dim,
             args.word_embedding_dim,
             args.char_embedding_dim,
@@ -429,6 +431,7 @@ def main():
     subparser.add_argument("--checks-per-epoch", type=int, default=4)
     subparser.add_argument("--print-vocabs", action="store_true")
     subparser.add_argument("--keep-valence-value", action="store_true")
+    subparser.add_argument("--use-char", action="store_true")
 
     subparser = subparsers.add_parser("test")
     subparser.set_defaults(callback=run_test)
