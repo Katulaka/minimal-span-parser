@@ -12,7 +12,7 @@ for i, (ld, ed) in enumerate(itertools.product(lstm_drouput, embedding_dropout))
     path = "model/char[+]_lstms[{}]_embeddings[{}]".format(ld, ed)
     device = 'GPU:{}'.format(i%n_gpus)
     command = ("python src/main.py train "
-                "--use-char-lstm --epochs 10 --parser-type my"
+                "--use-char-lstm --epochs 10 --parser-type my "
                  "--dynet-mem 2048 --dynet-autobatch 1 "
                  "--model-path-base {} "
                  "--dropouts {} {} "
