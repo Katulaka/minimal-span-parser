@@ -76,7 +76,7 @@ def run_train(args):
     word_vocab.index(parse.STOP)
     word_vocab.index(parse.UNK)
 
-    if args.parser_type == 'my' and args.use_char:
+    if args.parser_type == 'my':
         char_vocab = vocabulary.Vocabulary()
         char_vocab.index(parse.START)
         char_vocab.index(parse.STOP)
@@ -107,9 +107,8 @@ def run_train(args):
                 else:
                     for l in node.labels:
                         label_vocab.index(l)
-                    if args.use_char:
-                        for c in node.word:
-                            char_vocab.index(c)
+                    for c in node.word:
+                        char_vocab.index(c)
                     tag_vocab.index(node.tag)
                     word_vocab.index(node.word)
 
@@ -117,7 +116,7 @@ def run_train(args):
     tag_vocab.freeze()
     word_vocab.freeze()
     label_vocab.freeze()
-    if args.parser_type == 'my' and args.use_char:
+    if args.parser_type == 'my':
         char_vocab.freeze()
 
     def print_vocabulary(name, vocab):
