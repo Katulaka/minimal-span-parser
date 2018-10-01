@@ -141,7 +141,7 @@ def run_train(args):
             word_vocab,
             char_vocab,
             label_vocab,
-            # args.use_char,
+            args.use_char,
             args.tag_embedding_dim,
             args.word_embedding_dim,
             args.char_embedding_dim,
@@ -152,7 +152,6 @@ def run_train(args):
             args.dec_lstm_dim,
             args.attention_dim,
             args.label_hidden_dim,
-            args.dropout,
             args.keep_valence_value,
             args.dropouts
         )
@@ -348,7 +347,6 @@ def run_test(args):
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
     print("Loading model from {}...".format(args.model_path_base))
-    import pdb; pdb.set_trace()
     model = dy.ParameterCollection()
     [parser] = dy.load(args.model_path_base, model)
 
@@ -421,7 +419,7 @@ def main():
     subparser.add_argument("--char-lstm-dim", type=int, default=100)
     subparser.add_argument("--dec-lstm-dim", type=int, default=600)
     subparser.add_argument("--attention-dim", type=int, default=250)
-    subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.4, 0.4, 0., 0., 0.])
+    subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.4, 0.2])
     subparser.add_argument("--explore", action="store_true")
     subparser.add_argument("--model-path-base", required=True)
     subparser.add_argument("--evalb-dir", default="EVALB/")
