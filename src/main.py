@@ -348,6 +348,7 @@ def run_test(args):
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
     print("Loading model from {}...".format(args.model_path_base))
+    import pdb; pdb.set_trace()
     model = dy.ParameterCollection()
     [parser] = dy.load(args.model_path_base, model)
 
