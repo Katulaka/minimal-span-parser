@@ -9,7 +9,7 @@ embedding_dropout = np.arange(0, 0.5, 0.1)
 for i, (ld, ed) in enumerate(itertools.product(lstm_drouput, embedding_dropout)):
     ld = round(ld, 1)
     ed = round(ed, 1)
-    path = "model/char[+]_lstms[{}]_embeddings[{}]".format(ld, ed)
+    path = "models_grid_search/char[+]_lstms[{}]_embeddings[{}]".format(ld, ed)
     device = 'GPU:{}'.format(i%n_gpus)
     command = ("python src/main.py train "
                 "--use-char-lstm --epochs 10 --parser-type my "
@@ -19,5 +19,3 @@ for i, (ld, ed) in enumerate(itertools.product(lstm_drouput, embedding_dropout))
                 "--dynet-devices {} "
                  ).format(path, ld, ed, device)
     proc.append(Popen(command.split()))
-    # poll = [p.poll() for p in proc]
-    # if poll is None: still running
