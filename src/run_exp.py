@@ -4,8 +4,8 @@ import itertools
 
 proc = []
 n_gpus = 8
-lstm_drouput = np.arange(0.1, 0.2, 0.1)
-embedding_dropout = np.arange(0, 0.2, 0.1)
+lstm_drouput = np.arange(0.1, 0.5, 0.1)
+embedding_dropout = np.arange(0, 0.5, 0.1)
 for i, (ld, ed) in enumerate(itertools.product(lstm_drouput, embedding_dropout)):
     ld = round(ld, 1)
     ed = round(ed, 1)
@@ -18,7 +18,6 @@ for i, (ld, ed) in enumerate(itertools.product(lstm_drouput, embedding_dropout))
                  "--dropouts {} {} "
                 "--dynet-devices {} "
                  ).format(path, ld, ed, device)
-    import pdb; pdb.set_trace()
-    proc.append(Popen(command))
+    proc.append(Popen(command.split()))
     # poll = [p.poll() for p in proc]
     # if poll is None: still running
