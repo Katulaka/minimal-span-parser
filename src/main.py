@@ -141,7 +141,7 @@ def run_train(args):
             word_vocab,
             char_vocab,
             label_vocab,
-            args.use_char,
+            # args.use_char,
             args.tag_embedding_dim,
             args.word_embedding_dim,
             args.char_embedding_dim,
