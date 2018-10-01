@@ -18,6 +18,7 @@ for i, (ld, ed) in enumerate(itertools.product(lstm_drouput, embedding_dropout))
                  "--dropouts {} {} "
                 "--dynet-devices {} "
                  ).format(path, ld, ed, device)
+    import pdb; pdb.set_trace()
     proc.append(Popen(command))
     # poll = [p.poll() for p in proc]
     # if poll is None: still running
