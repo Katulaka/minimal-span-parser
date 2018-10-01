@@ -468,7 +468,7 @@ class MyParser(object):
 
         if self.use_char:
             char_lstm = self.char_lstm.initial_state()
-            if use_dropout
+            if use_dropout:
                 self.char_lstm.set_dropout(dropouts[-1])
             else:
                 self.char_lstm.disable_dropout()
