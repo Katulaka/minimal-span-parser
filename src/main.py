@@ -386,6 +386,9 @@ def run_test(args):
         )
     )
 
+    # test_diversity = evaluate.diversity(test_treebank, test_predicted)
+
+
 def main():
     dynet_args = [
         "--dynet-mem",

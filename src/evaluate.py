@@ -84,3 +84,20 @@ def evalb(evalb_dir, gold_trees, predicted_trees):
         print("Output path: {}".format(output_path))
 
     return fscore
+
+def diversity(gold_trees, predicted_trees):
+
+    def helper(tree):
+        nodes = tree if isinstance(tree, list) else [tree]
+        span = []
+        while nodes:
+            node = nodes.pop()
+            if isinstance(node, trees.InternalTreebankNode):
+                span.append(node.linearize())
+        return span
+
+    gold_spans = [helper(tree) for tree in gold_trees]
+    predicted_spans = [helper(trees) for trees in predicted_trees]
+
+    return [sum([g in predicted for g in gold])/len(gold)
+                for gold, predicted in zip(gold_spans, predicted_spans)]
