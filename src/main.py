@@ -299,8 +299,8 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            if epoch==1 and trainer.learning_rate<0.0057:
-                trainer.learning_rate += 0.0000014
+            if epoch==1 and trainer.learning_rate<0.005:
+                trainer.learning_rate += 0.0000012
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
