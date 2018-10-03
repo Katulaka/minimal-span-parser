@@ -289,7 +289,6 @@ def run_train(args):
             print("Saving new best model to {}...".format(best_dev_model_path))
             dy.save(best_dev_model_path, [parser])
 
-    learning_rate = 0
     learning_warmup = []
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
@@ -299,8 +298,8 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            if epoch==1 and trainer.learning_rate<0.005:
-                trainer.learning_rate += 0.0000012
+            if epoch==1 and trainer.learning_rate<0.001:
+                trainer.learning_rate += 0.00000025
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -347,11 +346,12 @@ def run_train(args):
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
                     learning_warmup.append(dev_loss)
-                    if len(learning_warmup) > 20:
-                         if learning_warmup[-2]<learning_warmup[-1]:
-                             trainer.learning_rate /=2
                 else:
                     check_dev()
+
+        if len(learning_warmup) > epoch*args.checks_per_epoch:
+             if learning_warmup[-2]<learning_warmup[-1]:
+                 trainer.learning_rate /=2
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
@@ -368,7 +368,8 @@ def run_test(args):
 
     test_predicted = []
     if args.parser_type == "my":
-        predict_parms = {'astar_parms': args.astar_parms, 'beam_parms':args.beam_size}
+        predict_parms = {'astar_parms': args.astar_parms,
+                            'beam_parms':args.beam_size}
     for i, tree in  enumerate(test_treebank):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
