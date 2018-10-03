@@ -319,6 +319,8 @@ def run_train(args):
             batch_loss = dy.average(batch_losses)
             batch_loss_value = batch_loss.scalar_value()
             batch_loss.backward()
+            if np.linalg.norm(batch_loss.gradient()) in (np.inf, np.nan):
+                import pdb; pdb.set_trace()
             trainer.update()
 
             print(
@@ -327,7 +329,8 @@ def run_train(args):
                 "processed {:,} "
                 "batch-loss {:.4f} "
                 "epoch-elapsed {} "
-                "total-elapsed {}".format(
+                "total-elapsed {} "
+                "learning rate {} ".format(
                     epoch,
                     start_index // args.batch_size + 1,
                     int(np.ceil(len(train_parse) / args.batch_size)),
@@ -335,6 +338,7 @@ def run_train(args):
                     batch_loss_value,
                     format_elapsed(epoch_start_time),
                     format_elapsed(start_time),
+                    trainer.learning_rate
                 )
             )
 
