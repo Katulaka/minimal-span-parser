@@ -318,10 +318,11 @@ def run_train(args):
 
             batch_loss = dy.average(batch_losses)
             batch_loss_value = batch_loss.scalar_value()
-            batch_loss.backward()
-            if np.linalg.norm(batch_loss.gradient()) in (np.inf, np.nan):
+            try:
+                batch_loss.backward()
+                trainer.update()
+            except:
                 import pdb; pdb.set_trace()
-            trainer.update()
 
             print(
                 "epoch {:,} "
