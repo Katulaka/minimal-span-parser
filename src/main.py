@@ -181,7 +181,7 @@ def run_train(args):
             args.label_hidden_dim,
             args.dropout,
         )
-    trainer = dy.AdamTrainer(model, alpha = 0)
+    trainer = dy.AdamTrainer(model, alpha = 0.0049)
 
     total_processed = 0
     current_processed = 0
@@ -299,7 +299,7 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            trainer.learning_rate += 0.00000125
+            trainer.learning_rate += 0.00000012
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
