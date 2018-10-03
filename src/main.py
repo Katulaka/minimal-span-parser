@@ -301,7 +301,7 @@ def run_train(args):
         for start_index in range(0, len(train_parse), args.batch_size):
             learning_rate += 0.000125
             trainer = dy.AdamTrainer(model, alpha=learning_rate)
-            dy.renew_cg(immediate_compute = True, check_validity = True)
+            dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
                 sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
