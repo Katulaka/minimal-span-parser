@@ -349,7 +349,7 @@ def run_train(args):
                 else:
                     check_dev()
 
-        if len(learning_warmup) > epoch*args.checks_per_epoch:
+        if len(learning_warmup) > 5*args.checks_per_epoch:
              if learning_warmup[-2]<learning_warmup[-1]:
                  trainer.learning_rate /=2
 
