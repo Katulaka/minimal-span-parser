@@ -204,7 +204,7 @@ def run_train(args):
             batch_losses = []
             for tree in dev_parse[start_index:start_index + args.batch_size]:
                 sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
-                _, losses = parser.parse(sentence, tree, True)
+                losses = parser.parse(sentence, tree, True)
                 batch_losses.extend(losses)
             batch_loss = dy.average(batch_losses)
             total_losses.append(batch_loss.scalar_value())
