@@ -181,7 +181,7 @@ def run_train(args):
             args.label_hidden_dim,
             args.dropout,
         )
-    trainer = dy.AdamTrainer(model, alpha = 0.0049)
+    trainer = dy.AdamTrainer(model, alpha = 0)
 
     total_processed = 0
     current_processed = 0
@@ -299,7 +299,8 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            trainer.learning_rate += 0.00000012
+            if epoch==1 and trainer.learning_rate<0.0057:
+                trainer.learning_rate += 0.0000014
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -318,11 +319,9 @@ def run_train(args):
 
             batch_loss = dy.average(batch_losses)
             batch_loss_value = batch_loss.scalar_value()
-            try:
-                batch_loss.backward()
-                trainer.update()
-            except:
-                import pdb; pdb.set_trace()
+
+            batch_loss.backward()
+            trainer.update()
 
             print(
                 "epoch {:,} "
@@ -347,10 +346,12 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
-                    learning_warmup.append((dev_loss, trainer.learning_rate))
+                    learning_warmup.append(dev_loss)
+                    if len(learning_warmup) > 20:
+                         if learning_warmup[-2]<learning_warmup[-1]:
+                             trainer.learning_rate /=2
                 else:
                     check_dev()
-    import pdb; pdb.set_trace()
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
