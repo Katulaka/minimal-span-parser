@@ -181,7 +181,7 @@ def run_train(args):
             args.label_hidden_dim,
             args.dropout,
         )
-    trainer = dy.AdamTrainer(model)
+    # trainer = dy.AdamTrainer(model)
 
     total_processed = 0
     current_processed = 0
@@ -247,6 +247,8 @@ def run_train(args):
             print("Saving new best model to {}...".format(best_dev_model_path))
             dy.save(best_dev_model_path, [parser])
 
+        return dev_loss
+
 
     def check_dev():
         nonlocal best_dev_fscore
@@ -287,6 +289,8 @@ def run_train(args):
             print("Saving new best model to {}...".format(best_dev_model_path))
             dy.save(best_dev_model_path, [parser])
 
+    learning_rate = 0
+    learning_warmup = []
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
             break
@@ -295,6 +299,8 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
+            learning_rate += 0.000125
+            trainer = dy.AdamTrainer(model, alpha=learning_rate)
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -336,9 +342,11 @@ def run_train(args):
             if current_processed >= check_every:
                 current_processed -= check_every
                 if args.parser_type == "my":
-                    my_check_dev()
+                    dev_loss = my_check_dev()
+                    learning_warmup.append((dev_loss, learning_rate))
                 else:
                     check_dev()
+    import pdb; pdb.set_trace()
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
@@ -421,7 +429,7 @@ def main():
     subparser.add_argument("--char-lstm-dim", type=int, default=100)
     subparser.add_argument("--dec-lstm-dim", type=int, default=600)
     subparser.add_argument("--attention-dim", type=int, default=250)
-    subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.4, 0.2])
+    subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.1, 0.4])
     subparser.add_argument("--explore", action="store_true")
     subparser.add_argument("--model-path-base", required=True)
     subparser.add_argument("--evalb-dir", default="EVALB/")
