@@ -299,13 +299,13 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            trainer.learning_rate += 0.000125
+            trainer.learning_rate += 0.0000125
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
                 sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
                 if args.parser_type == "my":
-                    _, losses = parser.parse(sentence, tree)
+                    losses = parser.parse(sentence, tree)
                     batch_losses.extend(losses)
                 elif args.parser_type == "top-down":
                     _, loss = parser.parse(sentence, tree, args.explore)

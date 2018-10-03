@@ -546,7 +546,7 @@ class MyParser(object):
                     log_prob.append(-dy.log(dy.pick(dy.pick(probs, id), i)))
                 losses.extend(log_prob)
 
-            return None, losses
+            return losses
 
         else:
             import cProfile
