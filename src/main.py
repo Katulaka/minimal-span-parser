@@ -347,7 +347,7 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
-                    learning_warmup.append((dev_loss, learning_rate))
+                    learning_warmup.append((dev_loss, trainer.learning_rate))
                 else:
                     check_dev()
     import pdb; pdb.set_trace()
