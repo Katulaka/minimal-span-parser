@@ -181,7 +181,7 @@ def run_train(args):
             args.label_hidden_dim,
             args.dropout,
         )
-    trainer = dy.AdamTrainer(model, alpha = 0)
+    trainer = dy.AdamTrainer(model)
 
     total_processed = 0
     current_processed = 0
@@ -298,8 +298,8 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            if epoch==1 and trainer.learning_rate<0.001:
-                trainer.learning_rate += 0.00000025
+            # if epoch==1 and trainer.learning_rate<0.001:
+            #     trainer.learning_rate += 0.00000025
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -350,7 +350,7 @@ def run_train(args):
                     check_dev()
 
         if len(learning_warmup) > 5*args.checks_per_epoch:
-             if learning_warmup[-2]<learning_warmup[-1]:
+             if best_dev_fscore<learning_warmup[-1]:
                  trainer.learning_rate /=2
 
 def run_test(args):
