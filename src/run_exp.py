@@ -5,7 +5,7 @@ import itertools
 proc = []
 n_gpus = 8
 embed_dim = [64, 128, 256, 512]
-embed_iter = itertools.product(embed_dim[:-1], embed_dim[:-1], embed_dim[1:], embed_dim[1:])
+embed_iter = itertools.product(embed_dim[:-2], embed_dim[:-2], embed_dim[2:], embed_dim[2:])
 for i, dims in enumerate(embed_iter):
     path = ("models_grid_search/char[-]_lstms[0.1]_embeddings[0.4]"
             "_temb[{}]_cemb[{}]_wemb[{}]_lemb[{}]").format(*dims)
