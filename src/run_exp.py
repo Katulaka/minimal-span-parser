@@ -11,10 +11,10 @@ for i, dims in enumerate(embed_iter):
             "_temb[{}]_cemb[{}]_wemb[{}]_lemb[{}]").format(*dims)
     device = 'GPU:{}'.format(i%n_gpus)
     command = ("python src/main.py train "
-                "--epochs 10 --parser-type my "
+                "--use-char-lstm --epochs 10 --parser-type my "
+                "--dropouts 0.1 0.4 "
                  "--dynet-mem 2048 --dynet-autobatch 1 "
                  "--model-path-base {} "
-                 "--dropouts 0.1 0.4 "
                 "--dynet-devices {} "
                 "--tag-embedding-dim {} "
                 "--char-embedding-dim {} "
