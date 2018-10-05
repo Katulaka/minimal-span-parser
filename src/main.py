@@ -349,9 +349,9 @@ def run_train(args):
                 else:
                     check_dev()
 
-        if len(learning_warmup) > 5*args.checks_per_epoch:
-             if best_dev_fscore<learning_warmup[-1]:
-                 trainer.learning_rate /=2
+        # if len(learning_warmup) > 5*args.checks_per_epoch:
+        #      if best_dev_fscore<learning_warmup[-1]:
+        #          trainer.learning_rate /=2
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
