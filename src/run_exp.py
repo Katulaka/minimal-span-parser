@@ -15,8 +15,6 @@ for i, drops in enumerate(iter):
                 "--use-char-lstm --epochs 10 --parser-type my "
                 "--dropouts {} {} "
                  "--dynet-mem 2048 --dynet-autobatch 1 "
-                 "--model-path-base {} "
-                "--dynet-devices {} "
                 "--tag-embedding-dim 64 "
                 "--char-embedding-dim 64 "
                 "--word-embedding-dim 256 "
@@ -26,5 +24,7 @@ for i, drops in enumerate(iter):
                 # "--dec-lstm-dim {600} "
                 # "--attention-dim {250} "
                 # "--label-hidden-dim {250} "
-                 ).format(path, *drops, device)
+                "--dynet-devices {} "
+                 "--model-path-base {} "
+                 ).format(*drops, device, path)
     proc.append(Popen(command.split()))
