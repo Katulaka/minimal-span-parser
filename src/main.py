@@ -290,7 +290,6 @@ def run_train(args):
             print("Saving new best model to {}...".format(best_dev_model_path))
             dy.save(best_dev_model_path, [parser])
 
-    learning_warmup = []
     # Connect to the server
     cc = CrayonClient(hostname="localhost", port=8889)
 
@@ -307,8 +306,6 @@ def run_train(args):
         epoch_start_time = time.time()
 
         for start_index in range(0, len(train_parse), args.batch_size):
-            # if epoch==1 and trainer.learning_rate<0.001:
-            #     trainer.learning_rate += 0.00000025
             dy.renew_cg()
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -338,8 +335,7 @@ def run_train(args):
                 "processed {:,} "
                 "batch-loss {:.4f} "
                 "epoch-elapsed {} "
-                "total-elapsed {} "
-                "learning rate {} ".format(
+                "total-elapsed {} ".format(
                     epoch,
                     start_index // args.batch_size + 1,
                     int(np.ceil(len(train_parse) / args.batch_size)),
@@ -347,7 +343,6 @@ def run_train(args):
                     batch_loss_value,
                     format_elapsed(epoch_start_time),
                     format_elapsed(start_time),
-                    trainer.learning_rate
                 )
             )
 
@@ -357,13 +352,8 @@ def run_train(args):
                     dev_loss = my_check_dev()
                     step = int(np.ceil(total_processed/args.batch_size))
                     dev_exp.add_scalar_value("loss", dev_loss, step=step)
-                    learning_warmup.append(dev_loss)
                 else:
                     check_dev()
-
-        # if len(learning_warmup) > 5*args.checks_per_epoch:
-        #      if best_dev_fscore<learning_warmup[-1]:
-        #          trainer.learning_rate /=2
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
