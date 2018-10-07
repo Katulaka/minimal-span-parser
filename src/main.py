@@ -3,6 +3,7 @@ import itertools
 import os.path
 import time
 from subprocess import Popen, DEVNULL, PIPE
+from pycrayon import CrayonClient
 
 import dynet as dy
 import numpy as np
@@ -290,6 +291,13 @@ def run_train(args):
             dy.save(best_dev_model_path, [parser])
 
     learning_warmup = []
+    # Connect to the server
+    cc = CrayonClient(hostname="localhost", port=8889)
+
+    #Create a new experiment
+    train_exp = cc.create_experiment('train_experiment')
+    dev_exp = cc.create_experiment('dev_experiment')
+
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
             break
@@ -318,6 +326,7 @@ def run_train(args):
 
             batch_loss = dy.average(batch_losses)
             batch_loss_value = batch_loss.scalar_value()
+            train_exp.add_scalar_value("loss", batch_loss_value)
 
             batch_loss.backward()
             trainer.update()
@@ -345,6 +354,7 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
+                    dev_exp.add_scalar_value("loss", dev_loss)
                     learning_warmup.append(dev_loss)
                 else:
                     check_dev()
