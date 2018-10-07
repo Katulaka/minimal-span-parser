@@ -354,7 +354,8 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
-                    dev_exp.add_scalar_value("loss", dev_loss)
+                    step = int(np.ceil(total_processed/args.batch_size))
+                    dev_exp.add_scalar_value("loss", dev_loss, step=step)
                     learning_warmup.append(dev_loss)
                 else:
                     check_dev()
