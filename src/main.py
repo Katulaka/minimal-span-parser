@@ -291,12 +291,13 @@ def run_train(args):
             dy.save(best_dev_model_path, [parser])
 
     # Connect to the server
-    cc = CrayonClient(hostname="localhost", port=8889)
+    cc = CrayonClient(hostname="localhost")
 
-    #Create a new experiment
     cc.remove_all_experiments()
-    train_exp = cc.create_experiment('train_experiment')
-    dev_exp = cc.create_experiment('dev_experiment')
+    #Create a new experiment
+    model_name = args.model_path_base.split('/')[-1]
+    train_exp = cc.create_experiment('train-'+model_name)
+    dev_exp = cc.create_experiment('dev-'+model_name)
 
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
