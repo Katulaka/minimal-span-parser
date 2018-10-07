@@ -295,6 +295,7 @@ def run_train(args):
     cc = CrayonClient(hostname="localhost", port=8889)
 
     #Create a new experiment
+    cc.remove_all_experiments()
     train_exp = cc.create_experiment('train_experiment')
     dev_exp = cc.create_experiment('dev_experiment')
 
