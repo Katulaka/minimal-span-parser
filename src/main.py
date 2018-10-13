@@ -314,8 +314,6 @@ def run_train(args):
 
         for start_index in range(0, len(train_parse), args.batch_size):
             dy.renew_cg()
-            # if args.parser_type == 'my' and epoch==1 and trainer.learning_rate<0.004:
-            #         trainer.learning_rate += 0.000001
 
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -369,7 +367,7 @@ def run_train(args):
         learning_warmup.append(dev_loss)
         if args.parser_type == "my" and len(learning_warmup) > 5:
             if learning_warmup[-2]<learning_warmup[-1]:
-                trainer.learning_rate /=2
+                trainer.learning_rate //=2
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
@@ -441,15 +439,15 @@ def main():
         subparser.add_argument(arg)
     subparser.add_argument("--numpy-seed", type=int)
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
-    subparser.add_argument("--tag-embedding-dim", type=int, default=64)
-    subparser.add_argument("--word-embedding-dim", type=int, default=32)
-    subparser.add_argument("--char-embedding-dim", type=int, default=32)
-    subparser.add_argument("--label-embedding-dim", type=int, default=128)
-    subparser.add_argument("--char-lstm-dim", type=int, default=128)
-    subparser.add_argument("--lstm-dim", type=int, default=256)
-    subparser.add_argument("--dec-lstm-dim", type=int, default=512)
-    subparser.add_argument("--label-hidden-dim", type=int, default=128)
-    subparser.add_argument("--attention-dim", type=int, default=256)
+    subparser.add_argument("--tag-embedding-dim", type=int, default=50)
+    subparser.add_argument("--word-embedding-dim", type=int, default=100)
+    subparser.add_argument("--char-embedding-dim", type=int, default=50)
+    subparser.add_argument("--label-embedding-dim", type=int, default=100)
+    subparser.add_argument("--char-lstm-dim", type=int, default=100)
+    subparser.add_argument("--lstm-dim", type=int, default=250)
+    subparser.add_argument("--dec-lstm-dim", type=int, default=600)
+    subparser.add_argument("--label-hidden-dim", type=int, default=100)
+    subparser.add_argument("--attention-dim", type=int, default=250)
     subparser.add_argument("--lstm-layers", type=int, default=2)
     subparser.add_argument("--split-hidden-dim", type=int, default=250)
     subparser.add_argument("--dropout", type=float, default=0.4)
