@@ -406,7 +406,7 @@ class MyParser(object):
         self.word_embeddings = self.model.add_lookup_parameters(
             (word_vocab.size, word_embedding_dim))
 
-        # embedding_dim = tag_embedding_dim + word_embedding_dim
+        embedding_dim = tag_embedding_dim + word_embedding_dim
 
         if use_char_lstm:
             self.char_vocab = char_vocab
@@ -417,13 +417,11 @@ class MyParser(object):
                 char_embedding_dim,
                 char_lstm_dim,
                 self.model)
-
-            # embedding_dim += char_lstm_dim
+            embedding_dim += char_lstm_dim
 
         self.enc_lstm = dy.BiRNNBuilder(
             lstm_layers,
-            # embedding_dim,
-            lstm_dim,
+            embedding_dim,
             2 * lstm_dim,
             self.model,
             dy.VanillaLSTMBuilder)
@@ -437,11 +435,7 @@ class MyParser(object):
             dec_lstm_dim,
             self.model)
 
-        # enc_out_dim = embedding_dim + 2 * lstm_dim
-        # dec_attend_dim = enc_out_dim + dec_lstm_dim
-        enc_out_dim = tag_embedding_dim + word_embedding_dim
-        if use_char_lstm:
-            enc_out_dim += char_lstm_dim
+        enc_out_dim = embedding_dim + 2 * lstm_dim
         dec_attend_dim = 2 * dec_lstm_dim
         Weights = collections.namedtuple('Weights', 'name prev_dim next_dim')
         ws = []
@@ -508,7 +502,6 @@ class MyParser(object):
                 embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
         lstm_outputs = self.enc_lstm.transduce(embeddings)
 
-        import pdb; pdb.set_trace()
         encode_outputs_list = [dy.affine_transform([*self.ws['c_dec'], dy.concatenate([e, l])])
                                     for e, l in zip(embeddings[1:-1], lstm_outputs[1:-1])]
 
