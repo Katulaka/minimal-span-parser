@@ -295,8 +295,9 @@ def run_train(args):
 
     # cc.remove_all_experiments()
     model_name = args.model_path_base.split('/')[-1]
-    for name in ['train-'+model_name, 'dev-'+model_name]:
-        cc.remove_experiment(name)
+    try:
+        for name in ['train-'+model_name, 'dev-'+model_name]:
+            cc.remove_experiment(name)
     #Create a new experiment
     train_exp = cc.create_experiment('train-'+model_name)
     dev_exp = cc.create_experiment('dev-'+model_name)
