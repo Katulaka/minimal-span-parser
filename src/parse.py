@@ -508,6 +508,7 @@ class MyParser(object):
                 embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
         lstm_outputs = self.enc_lstm.transduce(embeddings)
 
+        import pdb; pdb.set_trace()
         encode_outputs_list = [dy.affine_transform([*self.ws['c_dec'], dy.concatenate([e, l])])
                                     for e, l in zip(embeddings[1:-1], lstm_outputs[1:-1])]
 
