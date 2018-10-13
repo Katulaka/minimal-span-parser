@@ -304,6 +304,7 @@ def run_train(args):
     train_exp = cc.create_experiment('train-'+model_name)
     dev_exp = cc.create_experiment('dev-'+model_name)
 
+    learning_warmup = []
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
             break
@@ -313,6 +314,9 @@ def run_train(args):
 
         for start_index in range(0, len(train_parse), args.batch_size):
             dy.renew_cg()
+            if args.parser_type == 'my' and epoch==1 and trainer.learning_rate<0.004:
+                    trainer.learning_rate += 0.000001
+
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
                 sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
@@ -356,10 +360,16 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
+
                     step = int(np.ceil(total_processed/args.batch_size))
                     dev_exp.add_scalar_value("loss", dev_loss, step=step)
                 else:
                     check_dev()
+
+        learning_warmup.append(dev_loss)
+        if args.parser_type == "my" and len(learning_warmup) > 2:
+            if learning_warmup[-2]<learning_warmup[-1]:
+                trainer.learning_rate /=2
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
