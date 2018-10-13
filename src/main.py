@@ -293,9 +293,12 @@ def run_train(args):
     # Connect to the server
     cc = CrayonClient(hostname="localhost")
 
-    cc.remove_all_experiments()
-    #Create a new experiment
+    # cc.remove_all_experiments()
     model_name = args.model_path_base.split('/')[-1]
+    for name in ['train-'+model_name, 'dev-'+model_name]:
+        if name in cc.get_experiment_names():
+            cc.remove_experiment(name)
+    #Create a new experiment
     train_exp = cc.create_experiment('train-'+model_name)
     dev_exp = cc.create_experiment('dev-'+model_name)
 
