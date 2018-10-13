@@ -84,12 +84,16 @@ class BeamSearch(object):
          """
 
         hyps_per_sentence = []
-        #iterate over words in seq
-        encode_outputs = dy.concatenate_cols(encode_outputs_list)
-        key = dy.transpose(dy.rectify(dy.affine_transform([*ws['key'], encode_outputs])))
-        for encode_output in encode_outputs_list:
 
-            c_dec = dy.affine_transform([*ws['c_dec'], encode_output])
+        encode_outputs = dy.concatenate_cols(encode_outputs_list)
+
+        k = dy.affine_transform([*ws['key'], encode_outputs])
+        key = dy.transpose(dy.rectify(k))
+
+        #iterate over words in seq
+        for encode_output in encode_outputs_list:
+            # c_dec = dy.affine_transform([*ws['c_dec'], encode_output])
+            c_dec = encode_output
             h_dec = dy.zeros(c_dec.dim()[0])
             decode_init = dec_lstm.initial_state([c_dec, h_dec])
 
@@ -105,13 +109,18 @@ class BeamSearch(object):
                         label_embedding = label_embeddings[hyp.latest_token]
                         new_state = hyp.state.add_input(label_embedding)
                         decode_output = new_state.output()
-                        # key = dy.rectify(dy.affine_transform([*ws['key'], decode_output]))
-                        query = dy.affine_transform([*ws['query'], decode_output])
+
+                        q = dy.affine_transform([*ws['query'], decode_output])
+                        query = dy.rectify(q)
                         alpha = dy.softmax(key * query)
                         context = encode_outputs * alpha
                         x = dy.concatenate([decode_output, context])
-                        attention = dy.rectify(dy.affine_transform([*ws['attention'], x]))
-                        probs_expression = dy.softmax(dy.affine_transform([*ws['probs'], attention]))
+                        a = dy.affine_transform([*ws['attention'], x])
+                        attention = dy.rectify(a)
+
+                        p = dy.affine_transform([*ws['probs'], attention])
+                        probs_expression = dy.softmax(p)
+
                         probs = probs_expression.npvalue()
                         top_ids = np.argsort(probs)[-self._beam_size:]
                         top_probs = probs[top_ids]

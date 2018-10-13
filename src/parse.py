@@ -406,7 +406,7 @@ class MyParser(object):
         self.word_embeddings = self.model.add_lookup_parameters(
             (word_vocab.size, word_embedding_dim))
 
-        embedding_dim = tag_embedding_dim + word_embedding_dim
+        # embedding_dim = tag_embedding_dim + word_embedding_dim
 
         if use_char_lstm:
             self.char_vocab = char_vocab
@@ -418,11 +418,12 @@ class MyParser(object):
                 char_lstm_dim,
                 self.model)
 
-            embedding_dim += char_lstm_dim
+            # embedding_dim += char_lstm_dim
 
         self.enc_lstm = dy.BiRNNBuilder(
             lstm_layers,
-            embedding_dim,
+            # embedding_dim,
+            lstm_dim,
             2 * lstm_dim,
             self.model,
             dy.VanillaLSTMBuilder)
@@ -436,12 +437,16 @@ class MyParser(object):
             dec_lstm_dim,
             self.model)
 
-        enc_out_dim = embedding_dim + 2 * lstm_dim
-        dec_attend_dim = enc_out_dim + dec_lstm_dim
+        # enc_out_dim = embedding_dim + 2 * lstm_dim
+        # dec_attend_dim = enc_out_dim + dec_lstm_dim
+        enc_out_dim = tag_embedding_dim + word_embedding_dim
+        if use_char_lstm:
+            enc_out_dim += char_lstm_dim
+        dec_attend_dim = 2 * dec_lstm_dim
         Weights = collections.namedtuple('Weights', 'name prev_dim next_dim')
         ws = []
-        ws.append(Weights(name='key', prev_dim=enc_out_dim, next_dim=attention_dim))
         ws.append(Weights(name='c_dec', prev_dim=enc_out_dim, next_dim=dec_lstm_dim))
+        ws.append(Weights(name='key', prev_dim=dec_lstm_dim, next_dim=attention_dim))
         ws.append(Weights(name='query', prev_dim=dec_lstm_dim, next_dim=attention_dim))
         ws.append(Weights(name='attention', prev_dim=dec_attend_dim, next_dim=label_hidden_dim))
         ws.append(Weights(name='probs', prev_dim=label_hidden_dim, next_dim=label_vocab.size))
@@ -503,9 +508,8 @@ class MyParser(object):
                 embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
         lstm_outputs = self.enc_lstm.transduce(embeddings)
 
-        encode_outputs_list = []
-        for e, l in zip(embeddings[1:-1], lstm_outputs[1:-1]):
-            encode_outputs_list.append(dy.concatenate([e, l]))
+        encode_outputs_list = [dy.affine_transform([*self.ws['c_dec'], dy.concatenate([e, l])])
+                                    for e, l in zip(embeddings[1:-1], lstm_outputs[1:-1])]
 
         if is_train:
             decode_inputs = [(START,) + tuple(leaf.labels) + (STOP,) for leaf in gold.leaves()]
@@ -522,15 +526,16 @@ class MyParser(object):
                     e = self.label_embeddings[self.label_vocab.index(label)]
                     label_embedding.append(dy.dropout(e, dropouts))
 
-                c_dec = dy.affine_transform([*self.ws['c_dec'], encode_output])
+                # c_dec = dy.affine_transform([*self.ws['c_dec'], encode_output])
+                c_dec = encode_output
                 h_dec = dy.zeros(c_dec.dim()[0])
                 decode_init = self.dec_lstm.initial_state([c_dec, h_dec])
 
                 decode_output_list = decode_init.transduce(label_embedding)
                 decode_output = dy.concatenate_cols(decode_output_list)
 
-                query = dy.affine_transform([*self.ws['query'], decode_output])
-                query = dy.rectify(query)
+                q = dy.affine_transform([*self.ws['query'], decode_output])
+                query = dy.rectify(q)
                 alpha = dy.softmax(key * query)
                 context = encode_outputs * alpha
                 x = dy.concatenate([decode_output, context])
