@@ -304,7 +304,6 @@ def run_train(args):
     train_exp = cc.create_experiment('train-'+model_name)
     dev_exp = cc.create_experiment('dev-'+model_name)
 
-    learning_warmup = []
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
             break
@@ -358,16 +357,10 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
-
                     step = int(np.ceil(total_processed/args.batch_size))
                     dev_exp.add_scalar_value("loss", dev_loss, step=step)
                 else:
                     check_dev()
-
-        learning_warmup.append(dev_loss)
-        if args.parser_type == "my" and len(learning_warmup) > 5:
-            if learning_warmup[-2]<learning_warmup[-1]:
-                trainer.learning_rate //=2
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
@@ -451,7 +444,7 @@ def main():
     subparser.add_argument("--lstm-layers", type=int, default=2)
     subparser.add_argument("--split-hidden-dim", type=int, default=250)
     subparser.add_argument("--dropout", type=float, default=0.4)
-    subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.1, 0.4])
+    subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.4, 0.4])
     subparser.add_argument("--explore", action="store_true")
     subparser.add_argument("--model-path-base", required=True)
     subparser.add_argument("--evalb-dir", default="EVALB/")
