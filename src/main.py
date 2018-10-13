@@ -298,6 +298,8 @@ def run_train(args):
     try:
         for name in ['train-'+model_name, 'dev-'+model_name]:
             cc.remove_experiment(name)
+    except:
+        print('No experiments to remove')
     #Create a new experiment
     train_exp = cc.create_experiment('train-'+model_name)
     dev_exp = cc.create_experiment('dev-'+model_name)
