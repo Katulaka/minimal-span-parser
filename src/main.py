@@ -314,8 +314,8 @@ def run_train(args):
 
         for start_index in range(0, len(train_parse), args.batch_size):
             dy.renew_cg()
-            if args.parser_type == 'my' and epoch==1 and trainer.learning_rate<0.004:
-                    trainer.learning_rate += 0.000001
+            # if args.parser_type == 'my' and epoch==1 and trainer.learning_rate<0.004:
+            #         trainer.learning_rate += 0.000001
 
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
@@ -367,7 +367,7 @@ def run_train(args):
                     check_dev()
 
         learning_warmup.append(dev_loss)
-        if args.parser_type == "my" and len(learning_warmup) > 2:
+        if args.parser_type == "my" and len(learning_warmup) > 5:
             if learning_warmup[-2]<learning_warmup[-1]:
                 trainer.learning_rate /=2
 
