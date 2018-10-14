@@ -314,7 +314,7 @@ def run_train(args):
             dy.save(best_dev_model_path, [parser])
 
     # Connect to the server
-    cc = CrayonClient(hostname="localhost")
+    cc = CrayonClient(hostname="localhost", port=8888)
 
     # cc.remove_all_experiments()
     model_name = args.model_path_base.split('/')[-1]
