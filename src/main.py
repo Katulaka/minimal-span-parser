@@ -3,7 +3,7 @@ import itertools
 import os.path
 import time
 from subprocess import Popen, DEVNULL, PIPE
-from pycrayon import CrayonClient
+# from pycrayon import CrayonClient
 
 import dynet as dy
 import numpy as np
@@ -152,7 +152,7 @@ def run_train(args):
                     args.word_embedding_dim,
                     args.label_embedding_dim,
                     args.char_lstm_dim,
-                    args.lstm_layers,
+                    args.lstm_dim,
                     args.dec_lstm_dim,
                     args.attention_dim,
                     args.label_hidden_dim,
@@ -314,18 +314,18 @@ def run_train(args):
             dy.save(best_dev_model_path, [parser])
 
     # Connect to the server
-    cc = CrayonClient()
+    # cc = CrayonClient()
 
     # cc.remove_all_experiments()
-    model_name = args.model_path_base.split('/')[-1]
-    try:
-        for name in ['train-'+model_name, 'dev-'+model_name]:
-            cc.remove_experiment(name)
-    except:
-        print('No experiments to remove')
-    #Create a new experiment
-    train_exp = cc.create_experiment('train-'+model_name)
-    dev_exp = cc.create_experiment('dev-'+model_name)
+    # model_name = args.model_path_base.split('/')[-1]
+    # try:
+    #     for name in ['train-'+model_name, 'dev-'+model_name]:
+    #         cc.remove_experiment(name)
+    # except:
+    #     print('No experiments to remove')
+    # #Create a new experiment
+    # train_exp = cc.create_experiment('train-'+model_name)
+    # dev_exp = cc.create_experiment('dev-'+model_name)
 
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
@@ -354,7 +354,7 @@ def run_train(args):
 
             batch_loss = dy.average(batch_losses)
             batch_loss_value = batch_loss.scalar_value()
-            train_exp.add_scalar_value("loss", batch_loss_value)
+            # train_exp.add_scalar_value("loss", batch_loss_value)
 
             batch_loss.backward()
             trainer.update()
@@ -380,8 +380,8 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
-                    step = int(np.ceil(total_processed/args.batch_size))
-                    dev_exp.add_scalar_value("loss", dev_loss, step=step)
+                    # step = int(np.ceil(total_processed/args.batch_size))
+                    # dev_exp.add_scalar_value("loss", dev_loss, step=step)
                 else:
                     check_dev()
 
