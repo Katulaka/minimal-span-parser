@@ -27,7 +27,6 @@ def get_dependancies(fin, path_penn="src/pennconverter.jar"):
     """ Creates dependancy dictionary for each intput file"""
 
     command = 'java -jar {} < {} -splitSlash=false'.format(path_penn, fin)
-    # proc = Popen(command, shell=True, stdout=PIPE, stderr=DEVNULL)
     proc = Popen(command, shell=True, stdout=PIPE)
     results = proc.stdout.readlines()
     dependancies = []
@@ -135,6 +134,30 @@ def run_train(args):
     print("Initializing model...")
     model = dy.ParameterCollection()
     if args.parser_type == "my":
+        if args.model_path_base == 'run_exp':
+            args.model_path_base = ('models_grid_search/'
+                'char-dim({})_'
+                'tag-dim({})_'
+                'word-dim({})_'
+                'label-dim({})_'
+                'char-h({})_'
+                'word-h({})_'
+                'label-h({})_'
+                'attention-dim({})_'
+                'projection-dim({})_'
+                'dropouts({})'
+                ).format(
+                    args.char_embedding_dim,
+                    args.tag_embedding_dim,
+                    args.word_embedding_dim,
+                    args.label_embedding_dim,
+                    args.char_lstm_dim,
+                    args.lstm_layers,
+                    args.dec_lstm_dim,
+                    args.attention_dim,
+                    args.label_hidden_dim,
+                    args.dropouts
+                    )
         parser = parse.MyParser(
             model,
             tag_vocab,
