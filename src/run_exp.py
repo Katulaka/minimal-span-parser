@@ -20,4 +20,5 @@ for i, embeddings in enumerate(itertools.product([50, 100, 150], [100, 150, 200]
                     # "--label-hidden-dim {} "
                     "--dynet-devices {} "
                      ).format(*embeddings, device)
+        import pdb; pdb.set_trace()
         Popen(command.split())
