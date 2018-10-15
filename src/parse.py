@@ -548,8 +548,8 @@ class MyParser(object):
             return losses
 
         else:
-            import cProfile
-            profile = cProfile.Profile()
+            # import cProfile
+            # profile = cProfile.Profile()
 
             start = self.label_vocab.index(START)
             stop = self.label_vocab.index(STOP)
@@ -572,15 +572,14 @@ class MyParser(object):
                     grid.append(row)
 
 
-                profile.enable()
+                # profile.enable()
                 nodes = astar_search(grid, self.keep_valence_value, astar_parms)
-                profile.disable()
+                import pdb; pdb.set_trace()
+                # profile.disable()
                 # profile.print_stats()
-                profile.dump_stats('astar.prof')
+                # profile.dump_stats('astar.prof')
 
                 if nodes != []:
-                    return nodes[0].trees[0], None
+                    return nodes[0].trees[0]
 
-            children = [trees.LeafMyParseNode(i, *leaf) for i,leaf in enumerate(sentence)]
-            tree = trees.InternalMyParseNode('S', children)
-            return tree, None
+            return None

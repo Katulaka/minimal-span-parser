@@ -400,14 +400,16 @@ def run_test(args):
 
     test_predicted = []
     if args.parser_type == "my":
+        miss_predicted = []
         predict_parms = {'astar_parms': args.astar_parms,
                             'beam_parms':args.beam_size}
+
     for i, tree in  enumerate(test_treebank):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         if args.parser_type == "my":
             prediction_start_time = time.time()
-            predicted, _ = parser.parse(sentence, predict_parms=predict_parms)
+            predicted = parser.parse(sentence, predict_parms=predict_parms)
             print(
                 "processed {:,}/{:,} "
                 "prediction-elapsed {} "
@@ -418,6 +420,10 @@ def run_test(args):
                     format_elapsed(start_time),
                 )
             )
+            if predicted is None:
+                children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
+                predicted = trees.InternalMyParseNode('S', children)
+                miss_predicted.append(tree)
         else:
             predicted, _ = parser.parse(sentence)
         test_predicted.append(predicted.convert())
@@ -431,7 +437,7 @@ def run_test(args):
             format_elapsed(start_time),
         )
     )
-
+    import pdb; pdb.set_trace()
     # test_diversity = evaluate.diversity(test_treebank, test_predicted)
 
 
