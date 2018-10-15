@@ -415,7 +415,7 @@ def run_test(args):
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         if args.parser_type == "my":
             prediction_start_time = time.time()
-            predicted[i] = parser.parse(sentence, predict_parms=predict_parms)
+            test_predicted[i] = parser.parse(sentence, predict_parms=predict_parms)
             print(
                 "processed {:,}/{:,} "
                 "prediction-elapsed {} "
@@ -428,13 +428,13 @@ def run_test(args):
             )
             if predicted is None:
                 children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
-                predicted[i] = trees.InternalMyParseNode('S', children)
+                test_predicted[i] = trees.InternalMyParseNode('S', children)
                 # miss_predicted.append(i)
             else:
                 miss_predicted.pop(0)
         else:
             predicted, _ = parser.parse(sentence)
-        test_predicted.append(predicted.convert())
+        # test_predicted.append(predicted.convert())
 
     test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
