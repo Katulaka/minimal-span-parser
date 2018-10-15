@@ -397,7 +397,7 @@ def run_test(args):
     print("Parsing test sentences...")
 
     start_time = time.time()
-
+    import pickle
     # test_predicted = []
     with open('predicted', 'rb') as f:
         test_predicted = pickle.load(f)
