@@ -423,7 +423,7 @@ def run_test(args):
             if predicted is None:
                 children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
                 predicted = trees.InternalMyParseNode('S', children)
-                miss_predicted.append(tree)
+                miss_predicted.append(i)
         else:
             predicted, _ = parser.parse(sentence)
         test_predicted.append(predicted.convert())
