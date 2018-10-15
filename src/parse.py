@@ -574,7 +574,6 @@ class MyParser(object):
 
                 # profile.enable()
                 nodes = astar_search(grid, self.keep_valence_value, astar_parms)
-                import pdb; pdb.set_trace()
                 # profile.disable()
                 # profile.print_stats()
                 # profile.dump_stats('astar.prof')
