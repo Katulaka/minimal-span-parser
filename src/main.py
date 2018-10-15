@@ -398,18 +398,24 @@ def run_test(args):
 
     start_time = time.time()
 
-    test_predicted = []
+    # test_predicted = []
+    with open('predicted', 'rb') as f:
+        test_predicted = pickle.load(f)
     if args.parser_type == "my":
-        miss_predicted = []
+        # miss_predicted = []
+        with open('miss_predicted', 'rb') as f:
+            miss_predicted = pickle.load(f)
         predict_parms = {'astar_parms': args.astar_parms,
                             'beam_parms':args.beam_size}
 
-    for i, tree in  enumerate(test_treebank):
+    # for i, tree in  enumerate(test_treebank):
+    for i in miss_predicted:
+        tree = test_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         if args.parser_type == "my":
             prediction_start_time = time.time()
-            predicted = parser.parse(sentence, predict_parms=predict_parms)
+            predicted[i] = parser.parse(sentence, predict_parms=predict_parms)
             print(
                 "processed {:,}/{:,} "
                 "prediction-elapsed {} "
@@ -422,8 +428,10 @@ def run_test(args):
             )
             if predicted is None:
                 children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
-                predicted = trees.InternalMyParseNode('S', children)
-                miss_predicted.append(i)
+                predicted[i] = trees.InternalMyParseNode('S', children)
+                # miss_predicted.append(i)
+            else:
+                miss_predicted.pop(0)
         else:
             predicted, _ = parser.parse(sentence)
         test_predicted.append(predicted.convert())
