@@ -94,7 +94,7 @@ class Solver(AStar):
         def helper(lst):
             return np.array(lst) + np.eye(len(lst), dtype=int)
 
-        return [AstarNode(node.left, node.right, node.split, list(rank)
+        return [AstarNode(node.left, node.right, node.split, list(rank))
                     for rank in helper(node.rank)]
         # neighbors = []
         # for i in np.eye(3, dtype=int):
