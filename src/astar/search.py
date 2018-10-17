@@ -167,8 +167,11 @@ def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
     start = [AstarNode(idx, idx+1, [0], [grid[idx][0][0]]) for idx in range(n_words)]
     goal = AstarNode(0, n_words, [])
     # let's solve it
-    nodes = Solver(grid, keep_valence_value).astar(start, goal, *astar_parms, verbose)
+    solver = Solver(grid, keep_valence_value)
+    nodes = solver.astar(start, goal, *astar_parms, verbose)
 
+    if nodes == []:
+        import pdb; pdb.set_trace()
     return nodes
     # if nodes == []:
     #      # return trees.LeafMyParseNode(0, '', '')
