@@ -610,7 +610,8 @@ class MyParser(object):
                 # profile.disable()
                 # profile.print_stats()
                 # profile.dump_stats('astar.prof')
-
+                if nodes[0].right - nodes[0].left < len(sentence):
+                    import pdb; pdb.set_trace()
                 if nodes != []:
                     return nodes[0].trees[0]
 
