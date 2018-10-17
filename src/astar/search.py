@@ -171,7 +171,8 @@ def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
     nodes = solver.astar(start, goal, *astar_parms, verbose)
 
     if nodes == []:
-        nodes = [sorted(solver.seen, key = lambda x: x.right-x.left)[-1]]
+        sort_seen = sorted(solver.seen, key = lambda x: x.right-x.left)
+        seen_top = list(filter(lambda x: len(x.rank) == len(sort_seen[-1].rank), sort_seen))
         import pdb; pdb.set_trace()
     return nodes
     # if nodes == []:
