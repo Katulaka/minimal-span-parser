@@ -76,7 +76,7 @@ class AStar:
     #     else:
     #         return reversed(list(_gen()))
 
-    def astar(self, start, goal, n_goals, time_out, n_cost_reductions, cost_reduction_rate, verbose):
+    def astar(self, start, goal, n_goals, time_out=60., n_cost_reductions=1, cost_reduction_rate=0.2, verbose=0):
 
         cost_coefficient = 1.
         searchNodes = AStar.SearchNodeDict()

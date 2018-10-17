@@ -7,6 +7,7 @@ import numpy as np
 import trees
 from beam.search import BeamSearch
 from astar.search import astar_search
+from astar.search_chart import AstarNode, Solver
 
 START = "<START>"
 STOP = "<STOP>"
@@ -259,7 +260,7 @@ class ChartParser(object):
     def from_spec(cls, spec, model):
         return cls(model, **spec)
 
-    def parse(self, sentence, gold=None):
+    def parse(self, sentence, gold=None, k=1):
         is_train = gold is not None
 
         if is_train:
@@ -364,6 +365,38 @@ class ChartParser(object):
             correct = tree.convert().linearize() == gold.convert().linearize()
             loss = dy.zeros(1) if correct else score - oracle_score
             return tree, loss
+        elif k > 1:
+            grid, chart = {}, {}
+            for length in range(1, len(sentence) + 1):
+                for left in range(0, len(sentence) + 1 - length):
+                    right = left + length
+                    np_label_scores = get_label_scores(left, right).npvalue()
+                    label_indecies = (np_label_scores.argsort()[-k:][::-1]
+                                        if length < len(sentence) else
+                                        np_label_scores[1:].argsort()[-k:][::-1] + 1)
+                    grid[left, right] = [(self.label_vocab.value(idx), np_label_scores[idx])
+                                                for idx in label_indecies]
+                    if length == 1:
+                        tag, word = sentence[left]
+                        children = [trees.LeafParseNode(left, tag, word)]
+                        for label, score in grid[left, right]:
+                            if label:
+                                children = trees.InternalParseNode(label, children)
+                            chart.setdefault((left, right), []).append(([children], score))
+                    else:
+                        start = [AstarNode(left, right, split) for split in range(left + 1, right)]
+                        goal = AstarNode(left, right)
+                        for node in Solver(grid, chart).astar(start, goal, k):
+                            left_rank, right_rank, label_rank = node.rank
+                            left_trees, _ = chart[node.left, node.split][left_rank]
+                            right_trees, _ = chart[node.split, node.right][right_rank]
+                            children = left_trees + right_trees
+                            label, _ = grid[label_rank]
+                            if label:
+                                children = [trees.InternalParseNode(label, children)]
+                            chart.setdefault((left, right), []).append((children, node.score)))
+                    # assert len(children) == 1
+            return [children[0] for children, _ in chart[0, len(sentence)]]
         else:
             return tree, score
 

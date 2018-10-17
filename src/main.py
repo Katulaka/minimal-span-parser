@@ -404,7 +404,6 @@ def run_test(args):
                             'beam_parms':args.beam_size}
 
     for i, tree in  enumerate(test_treebank):
-        tree = test_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         if args.parser_type == "my":
