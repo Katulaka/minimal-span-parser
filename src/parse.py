@@ -394,7 +394,7 @@ class ChartParser(object):
                             label, _ = grid[label_rank]
                             if label:
                                 children = [trees.InternalParseNode(label, children)]
-                            chart.setdefault((left, right), []).append((children, node.score)))
+                            chart.setdefault((left, right), []).append((children, node.score))
                     # assert len(children) == 1
             return [children[0] for children, _ in chart[0, len(sentence)]]
         else:
