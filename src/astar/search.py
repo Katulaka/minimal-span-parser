@@ -171,7 +171,7 @@ def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
     nodes = solver.astar(start, goal, *astar_parms, verbose)
 
     if nodes == []:
-        import pdb; pdb.set_trace()
+        nodes = [sorted(solver.seen, key = lambda x: x.right-x.left)[-1]]
     return nodes
     # if nodes == []:
     #      # return trees.LeafMyParseNode(0, '', '')
