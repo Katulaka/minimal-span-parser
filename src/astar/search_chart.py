@@ -94,43 +94,6 @@ class Solver(AStar):
 
         return [AstarNode(node.left, node.right, node.split, list(rank))
                     for rank in helper(node.rank)]
-        # neighbors = []
-        # for i in np.eye(3, dtype=int):
-        #     rank = list(np.array(node.rank) + i)
-        #     nb_node = AstarNode(node.left, node.right, node.split, rank)
-        #     if nb_node not in self.seen:
-        #         self.seen.append(nb_node)
-        #         neighbors.append(nb_node)
-        # return neighbors
 
     def is_goal_reached(self, node, goal):
         return (node.left, node.right) == (goal.left, goal.right)
-
-# def astar_search(grid, sentence, k, verbose=0):
-#
-#     chart = {}
-#     for length in range(1, len(sentence) + 1):
-#         for left in range(0, len(sentence) + 1 - length):
-#             right = left + length
-#             if length == 1:
-#                 tag, word = sentence[left]
-#                 children = [trees.LeafParseNode(left, tag, word)]
-#                 for label, score in grid[left, right]:
-#                     if label:
-#                         children = trees.InternalParseNode(label, children)
-#                     chart.setdefault((left, right), []).append(([children], score))
-#             else:
-#                 start = [AstarNode(left, right, split) for split in range(left + 1, right)]
-#                 goal = AstarNode(left, right)
-#                 for node in Solver(grid, chart).astar(start, goal, k, verbose):
-#                     left_trees, _ = chart[node.left, node.split][node.rank[0]]
-#                     right_trees, _ = chart[node.split, node.right][node.rank[1]]
-#                     children = left_trees + right_trees
-#                     label, _ = grid[node.rank[2]]
-#                     if label:
-#                         children = [trees.InternalParseNode(label, children)]
-#                     chart.setdefault((left, right), []).append((children, node.score)))
-#
-#     children, score = chart[0, len(sentence)]
-#     # assert len(children) == 1
-#     return [child[0] for child in children]
