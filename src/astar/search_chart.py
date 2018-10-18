@@ -27,7 +27,7 @@ class AstarNode(object):
                     self.split == other.split])
 
     def __hash__(self):
-        return id(self)
+        return hash((self.left, self.right, self.split, self.rank))
 
     def format_print(self):
         return 'left: {}, right: {}, split: {}'.format(self.left,
@@ -35,38 +35,12 @@ class AstarNode(object):
                                                         self.split
                                                     )
 
-# class ClosedList(object):
-#
-#     def __init__(self):
-#         self.lindex = {}
-#         self.rindex = {}
-#
-#     def put(self, node):
-#         if node.left in self.lindex:
-#             if node not in self.lindex[node.left]:
-#                 self.lindex[node.left].append(node)
-#         else:
-#             self.lindex[node.left] = [node]
-#
-#         if node.right in self.rindex:
-#             if node not in self.rindex[node.right]:
-#                 self.rindex[node.right].append(node)
-#         else:
-#             self.rindex[node.right] = [node]
-#
-#     def getr(self, idx):
-#         return self.rindex.get(idx, [])
-#
-#     def getl(self, idx):
-#         return self.lindex.get(idx, [])
-
 class Solver(AStar):
 
     def __init__(self, grid, chart):
         self.chart = chart
         self.grid = grid
-        # self.cl = ClosedList()
-        # self.seen = []
+        self.cl = []
 
     def heuristic_cost(self, node, goal, cost_coefficient):
         return 0
@@ -85,16 +59,32 @@ class Solver(AStar):
         return real_cost + heuristic_cost
 
     def move_to_closed(self, node):
-        # self.cl.put(node)
+        self.cl.append(node)
         return True
 
     def neighbors(self, node):
-        def helper(lst):
-            return np.array(lst) + np.eye(len(lst), dtype=int)
-        res = [AstarNode(node.left, node.right, node.split, list(rank))
-                    for rank in helper(node.rank)]
-        import pdb; pdb.set_trace()
-        return res
+
+        neighbors = []
+
+        rank = list(np.array(node.rank) + np.array([1, 0, 0]))
+        if rank[0] < len(self.chart[node.left, node.split]):
+            neighbor = AstarNode(node.left, node.right, node.split, rank)
+            if neighbor not in self.cl:
+                neighbors.append(neighbor)
+
+        rank = list(np.array(node.rank) + np.array([0, 1, 0]))
+        if rank[1] < len(self.chart[node.split, node.right]):
+            neighbor = AstarNode(node.left, node.right, node.split, rank)
+            if neighbor not in self.cl:
+                neighbors.append(neighbor)
+
+        rank = list(np.array(node.rank) + np.array([0, 0, 1]))
+        if rank[2] < len(self.grid[node.left, node.right]):
+            neighbor = AstarNode(node.left, node.right, node.split, rank)
+            if neighbor not in self.cl:
+                neighbors.append(neighbor)
+
+        return neighbors
 
     def is_goal_reached(self, node, goal):
         return (node.left, node.right) == (goal.left, goal.right)
