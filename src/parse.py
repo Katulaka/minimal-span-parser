@@ -611,7 +611,7 @@ class MyParser(object):
             n = nodes[-1]
             nodes = list(filter(lambda x: (x.right, x.left) == (n.right, n.left), nodes))
             nodes = sorted(nodes,
-                        key = lambda x: abs(n_words - (x.right - x.left) - len(list(x.trees[0].missing_leaves()))))
+                        key = lambda x: abs(len(sentence) - (x.right - x.left) - len(list(x.trees[0].missing_leaves()))))
             node = nodes[0]
             if node.right - node.left < len(sentence) or len(list(node.trees[0].missing_leaves())):
                 left_children = [trees.LeafMyParseNode(i, *leaf)
