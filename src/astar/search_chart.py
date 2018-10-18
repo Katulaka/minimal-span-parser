@@ -91,11 +91,10 @@ class Solver(AStar):
     def neighbors(self, node):
         def helper(lst):
             return np.array(lst) + np.eye(len(lst), dtype=int)
-        try:
-            res = [AstarNode(node.left, node.right, node.split, list(rank))
+        res = [AstarNode(node.left, node.right, node.split, list(rank))
                     for rank in helper(node.rank)]
-        except:
-            import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        return res
 
     def is_goal_reached(self, node, goal):
         return (node.left, node.right) == (goal.left, goal.right)
