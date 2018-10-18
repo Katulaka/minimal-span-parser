@@ -388,7 +388,7 @@ class ChartParser(object):
                             if label:
                                 children = [trees.InternalParseNode(label, children)]
                             chart.setdefault((left, right), []).append((children, node.score))
-                        import pdb; pdb.set_trace()
+                        # import pdb; pdb.set_trace()
             return [children[0] for children, _ in chart[0, len(sentence)]], None
         else:
             tree, score = helper(False)

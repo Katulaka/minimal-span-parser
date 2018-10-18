@@ -47,8 +47,8 @@ class Solver(AStar):
 
     def real_cost(self, node):
         rank_left, rank_right, rank_label = node.rank
-        _, left_score = self.chart[node.left, node.split][rank_left]
-        _, right_score = self.chart[node.split, node.right][rank_right]
+        _, left_score = self.grid[node.left, node.split][rank_left]
+        _, right_score = self.grid[node.split, node.right][rank_right]
         label_score = self.grid[node.left, node.right][rank_label][1]
         node.score = (left_score + right_score + label_score)
         return node.score
@@ -67,13 +67,13 @@ class Solver(AStar):
         neighbors = []
 
         rank = list(np.array(node.rank) + np.array([1, 0, 0]))
-        if rank[0] < len(self.chart[node.left, node.split]):
+        if rank[0] < len(self.grid[node.left, node.split]):
             neighbor = AstarNode(node.left, node.right, node.split, rank)
             if neighbor not in self.cl:
                 neighbors.append(neighbor)
 
         rank = list(np.array(node.rank) + np.array([0, 1, 0]))
-        if rank[1] < len(self.chart[node.split, node.right]):
+        if rank[1] < len(self.grid[node.split, node.right]):
             neighbor = AstarNode(node.left, node.right, node.split, rank)
             if neighbor not in self.cl:
                 neighbors.append(neighbor)
