@@ -27,7 +27,7 @@ class AstarNode(object):
                     self.split == other.split])
 
     def __hash__(self):
-        return hash((self.left, self.right, self.split, self.rank))
+        return hash((self.left, self.right, self.split, tuple(self.rank)))
 
     def format_print(self):
         return 'left: {}, right: {}, split: {}'.format(self.left,
