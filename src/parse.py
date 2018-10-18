@@ -358,19 +358,13 @@ class ChartParser(object):
             assert len(children) == 1
             return children[0], score
 
-        tree, score = helper(False)
-        if is_train:
-            oracle_tree, oracle_score = helper(True)
-            assert oracle_tree.convert().linearize() == gold.convert().linearize()
-            correct = tree.convert().linearize() == gold.convert().linearize()
-            loss = dy.zeros(1) if correct else score - oracle_score
-            return tree, loss
-        elif k > 1:
+        if not is_train and k > 1:
             grid, chart = {}, {}
             for length in range(1, len(sentence) + 1):
                 for left in range(0, len(sentence) + 1 - length):
                     right = left + length
                     np_label_scores = get_label_scores(left, right).npvalue()
+                    import pdb; pdb.set_trace()
                     label_indecies = (np_label_scores.argsort()[-k:][::-1]
                                         if length < len(sentence) else
                                         np_label_scores[1:].argsort()[-k:][::-1] + 1)
@@ -395,10 +389,17 @@ class ChartParser(object):
                             if label:
                                 children = [trees.InternalParseNode(label, children)]
                             chart.setdefault((left, right), []).append((children, node.score))
-                    # assert len(children) == 1
-            return [children[0] for children, _ in chart[0, len(sentence)]]
+            return [children[0] for children, _ in chart[0, len(sentence)]], None
         else:
-            return tree, score
+            tree, score = helper(False)
+            if is_train:
+                oracle_tree, oracle_score = helper(True)
+                assert oracle_tree.convert().linearize() == gold.convert().linearize()
+                correct = tree.convert().linearize() == gold.convert().linearize()
+                loss = dy.zeros(1) if correct else score - oracle_score
+                return tree, loss
+            else:
+                return tree, score
 
 class MyParser(object):
     def __init__(

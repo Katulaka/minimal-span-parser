@@ -400,7 +400,7 @@ def run_test(args):
     test_predicted = []
     if args.parser_type == "my":
         miss_predicted = []
-        predict_parms = {'astar_parms': args.astar_parms,
+        predict_parms = {'astar_parms': [args.n_trees] + args.astar_parms,
                             'beam_parms':args.beam_size}
 
     for i, tree in  enumerate(test_treebank):
@@ -424,7 +424,7 @@ def run_test(args):
             #     predicted = trees.InternalMyParseNode('S', children)
             #     miss_predicted.append(i)
         else:
-            predicted, _ = parser.parse(sentence)
+            predicted, _ = parser.parse(sentence, k = args.n_trees)
         test_predicted.append(predicted.convert())
 
     test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
@@ -493,8 +493,9 @@ def main():
     subparser.add_argument("--evalb-dir", default="EVALB/")
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
-    subparser.add_argument("--astar-parms", nargs=4, default=[1, 100., 2, 0.2], type=float)
-    subparser.add_argument("--beam-size", nargs='+', default=[5, 15], type=int)
+    subparser.add_argument("--n-trees", default=1, type=int)
+    subparser.add_argument("--astar-parms", nargs=3, default=[60., 1, 0.2], type=float)
+    subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
 
 
     args = parser.parse_args()
