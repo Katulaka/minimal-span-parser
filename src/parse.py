@@ -374,6 +374,7 @@ class ChartParser(object):
                         children = [trees.LeafParseNode(left, tag, word)]
                         for label, score in grid[left, right]:
                             if label:
+                                import pdb; pdb.set_trace()
                                 children = trees.InternalParseNode(label, children)
                             chart.setdefault((left, right), []).append(([children], score))
                     else:
