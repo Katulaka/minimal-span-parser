@@ -371,14 +371,12 @@ class ChartParser(object):
                                                 for idx in label_indecies]
                     if length == 1:
                         tag, word = sentence[left]
-                        children = [trees.LeafParseNode(left, tag, word)]
+                        tree = [trees.LeafParseNode(left, tag, word)]
                         for label, score in grid[left, right]:
                             if label:
-                                try:
-                                    children = trees.InternalParseNode(label, children)
-                                except:
-                                    import pdb; pdb.set_trace()
+                                children = trees.InternalParseNode(label, [tree])
                             chart.setdefault((left, right), []).append(([children], score))
+                            import pdb; pdb.set_trace()
                     else:
                         start = [AstarNode(left, right, split) for split in range(left + 1, right)]
                         goal = AstarNode(left, right)
