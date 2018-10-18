@@ -39,7 +39,7 @@ class Solver(AStar):
 
     def __init__(self, grid, chart):
         self.grid = grid
-        self.char = chart
+        self.chart = chart
         self.cl = []
 
     def heuristic_cost(self, node, goal, cost_coefficient):
