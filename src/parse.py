@@ -364,7 +364,6 @@ class ChartParser(object):
                 for left in range(0, len(sentence) + 1 - length):
                     right = left + length
                     np_label_scores = get_label_scores(left, right).npvalue()
-                    import pdb; pdb.set_trace()
                     label_indecies = (np_label_scores.argsort()[-k:][::-1]
                                         if length < len(sentence) else
                                         np_label_scores[1:].argsort()[-k:][::-1] + 1)
