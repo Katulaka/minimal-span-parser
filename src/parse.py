@@ -371,7 +371,7 @@ class ChartParser(object):
                                                 for idx in label_indecies]
                     if length == 1:
                         tag, word = sentence[left]
-                        tree = [trees.LeafParseNode(left, tag, word)]
+                        tree = trees.LeafParseNode(left, tag, word)
                         for label, score in grid[left, right]:
                             if label:
                                 children = trees.InternalParseNode(label, [tree])
