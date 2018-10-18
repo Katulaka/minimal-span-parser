@@ -419,10 +419,10 @@ def run_test(args):
                     format_elapsed(start_time),
                 )
             )
-            if predicted is None:
-                children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
-                predicted = trees.InternalMyParseNode('S', children)
-                miss_predicted.append(i)
+            # if predicted is None:
+            #     children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
+            #     predicted = trees.InternalMyParseNode('S', children)
+            #     miss_predicted.append(i)
         else:
             predicted, _ = parser.parse(sentence)
         test_predicted.append(predicted.convert())
@@ -493,8 +493,8 @@ def main():
     subparser.add_argument("--evalb-dir", default="EVALB/")
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
-    subparser.add_argument("--astar-parms", nargs=4, default=[1, 60., 1, 0.2], type=float)
-    subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
+    subparser.add_argument("--astar-parms", nargs=4, default=[1, 45., 1, 0.2], type=float)
+    subparser.add_argument("--beam-size", nargs='+', default=[5, 10, 15], type=int)
 
 
     args = parser.parse_args()

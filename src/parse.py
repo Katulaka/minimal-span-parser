@@ -581,13 +581,10 @@ class MyParser(object):
             return losses
 
         else:
-            # import cProfile
-            # profile = cProfile.Profile()
-
             start = self.label_vocab.index(START)
             stop = self.label_vocab.index(STOP)
             astar_parms = predict_parms['astar_parms']
-            for beam_size in predict_parms['beam_parms']:
+            for beam_size in predict_parms['beam_parms'] + [self.label_vocab.size]:
                 hyps = BeamSearch(start, stop, beam_size).beam_search(
                                                             encode_outputs_list,
                                                             self.label_embeddings,
@@ -605,22 +602,23 @@ class MyParser(object):
                     grid.append(row)
 
 
-                # profile.enable()
-                nodes = astar_search(grid, self.keep_valence_value, astar_parms)
-                # profile.disable()
-                # profile.print_stats()
-                # profile.dump_stats('astar.prof')
-                node = nodes[0]
-                if node.right - node.left < len(sentence) or len(list(node.trees[0].missing_leaves())):
-                    left_children = [trees.LeafMyParseNode(i, *leaf)
-                        for i, leaf in zip(range(node.left),sentence[:node.left])]
-                    right_children = [trees.LeafMyParseNode(i, *leaf)
-                        for i, leaf in zip(range(node.right, len(sentence)), sentence[node.right:])]
-                    node.trees[0].children = tuple(left_children) + node.trees[0].children + tuple(right_children)
-                    for l in node.trees[0].missing_leaves():
-                        l.parent.children = tuple(filter(lambda x: x != l, l.parent.children))
-                # elif len(list(node.trees[0].missing_leaves())):
-                # else:
-                return node.trees[0]
+                nodes, seen = astar_search(grid, self.keep_valence_value, astar_parms)
 
-            # return None
+                if nodes != []:
+                    return node.trees[0]
+
+            nodes = sorted(seen, key = lambda x: x.right-x.left)
+            n = nodes[-1]
+            nodes = list(filter(lambda x: (x.right, x.left) == (n.right, n.left), nodes))
+            nodes = sorted(nodes,
+                        key = lambda x: abs(n_words - (x.right - x.left) - len(list(x.trees[0].missing_leaves()))))
+            node = nodes[0]
+            if node.right - node.left < len(sentence) or len(list(node.trees[0].missing_leaves())):
+                left_children = [trees.LeafMyParseNode(i, *leaf)
+                    for i, leaf in zip(range(node.left),sentence[:node.left])]
+                right_children = [trees.LeafMyParseNode(i, *leaf)
+                    for i, leaf in zip(range(node.right, len(sentence)), sentence[node.right:])]
+                node.trees[0].children = tuple(left_children) + node.trees[0].children + tuple(right_children)
+                for l in node.trees[0].missing_leaves():
+                    l.parent.children = tuple(filter(lambda x: x != l, l.parent.children))
+            return node.trees[0]
