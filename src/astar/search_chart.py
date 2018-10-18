@@ -37,8 +37,7 @@ class AstarNode(object):
 
 class Solver(AStar):
 
-    def __init__(self, grid, chart):
-        self.chart = chart
+    def __init__(self, grid):
         self.grid = grid
         self.cl = []
 
