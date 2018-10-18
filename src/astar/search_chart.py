@@ -75,6 +75,7 @@ class Solver(AStar):
         rank_left, rank_right, rank_label = node.rank
         _, left_score = self.chart[node.left, node.split][rank_left]
         _, right_score = self.chart[node.split, node.right][rank_right]
+        import pdb; pdb.set_trace()
         node.score = (left_score
                         + right_score
                         + self.grid[node.left, node.right][rank_label]
