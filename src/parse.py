@@ -376,10 +376,10 @@ class ChartParser(object):
                             if label:
                                 tree = trees.InternalParseNode(label, [tree])
                             chart.setdefault((left, right), []).append(([tree], score))
-                        import pdb; pdb.set_trace()
                     else:
                         start = [AstarNode(left, right, split) for split in range(left + 1, right)]
                         goal = AstarNode(left, right)
+                        import pdb; pdb.set_trace()
                         for node in Solver(grid, chart).astar(start, goal, k):
                             left_rank, right_rank, label_rank = node.rank
                             left_trees, _ = chart[node.left, node.split][left_rank]
