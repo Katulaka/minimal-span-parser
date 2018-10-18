@@ -421,7 +421,7 @@ def run_test(args):
                 format_elapsed(start_time),
             )
         )
-
+        import pdb; pdb.set_trace()
         test_predicted.append(predicted[0].convert())
 
     test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
