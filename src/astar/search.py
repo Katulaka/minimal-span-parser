@@ -171,10 +171,7 @@ def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
     nodes = solver.astar(start, goal, *astar_parms, verbose)
 
     if nodes == []:
-        sort_seen = sorted(solver.seen, key = lambda x: x.right-x.left)
-        seen_top = list(filter(lambda x: len(x.rank) == len(sort_seen[-1].rank), sort_seen))
-        seen_top_correct = list(filter(lambda x: len(list(x.trees[0].leaves())) <= len(grid), seen_top))
-        nodes = [seen_top_correct[-1]]
+        nodes = [sorted(solver.seen, key = lambda x: x.right-x.left)[-1]]
     return nodes
     # if nodes == []:
     #      # return trees.LeafMyParseNode(0, '', '')
