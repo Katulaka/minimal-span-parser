@@ -385,7 +385,10 @@ class ChartParser(object):
                             left_trees, _ = chart[node.left, node.split][left_rank]
                             right_trees, _ = chart[node.split, node.right][right_rank]
                             children = left_trees + right_trees
-                            label, _ = grid[label_rank]
+                            try:
+                                label, _ = grid[label_rank]
+                            except:
+                                import pdb; pdb.set_trace()
                             if label:
                                 children = [trees.InternalParseNode(label, children)]
                             chart.setdefault((left, right), []).append((children, node.score))
