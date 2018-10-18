@@ -611,9 +611,11 @@ class MyParser(object):
                 # profile.print_stats()
                 # profile.dump_stats('astar.prof')
                 node = nodes[0]
-                if node.right - node.left < len(sentence) or len(list(node.trees[0].missing_leaves())):
+                for l in node.trees[0].missing_leaves():
+                    l.parent.children = tuple(filter(lambda x: x != l, l.parent.children))
+                if node.right - node.left < len(sentence):
                     import pdb; pdb.set_trace()
-                # if nodes != []:
+                # elif len(list(node.trees[0].missing_leaves())):
                 else:
                     return node.trees[0]
 
