@@ -409,22 +409,18 @@ def run_test(args):
         if args.parser_type == "my":
             prediction_start_time = time.time()
             predicted = parser.parse(sentence, predict_parms=predict_parms)
-            print(
-                "processed {:,}/{:,} "
-                "prediction-elapsed {} "
-                "total-elapsed {}".format(
-                    i+1,
-                    len(test_treebank),
-                    format_elapsed(prediction_start_time),
-                    format_elapsed(start_time),
-                )
-            )
-            # if predicted is None:
-            #     children = [trees.LeafMyParseNode(j, *leaf) for j,leaf in enumerate(sentence)]
-            #     predicted = trees.InternalMyParseNode('S', children)
-            #     miss_predicted.append(i)
         else:
             predicted, _ = parser.parse(sentence, k = args.n_trees)
+        print(
+            "processed {:,}/{:,} "
+            "prediction-elapsed {} "
+            "total-elapsed {}".format(
+                i+1,
+                len(test_treebank),
+                format_elapsed(prediction_start_time),
+                format_elapsed(start_time),
+            )
+        )
         import pdb; pdb.set_trace()
         test_predicted.append(predicted.convert())
 
