@@ -406,8 +406,8 @@ def run_test(args):
     for i, tree in  enumerate(test_treebank):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
+        prediction_start_time = time.time()
         if args.parser_type == "my":
-            prediction_start_time = time.time()
             predicted = parser.parse(sentence, predict_parms=predict_parms)
         else:
             predicted, _ = parser.parse(sentence, k = args.n_trees)
