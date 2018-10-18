@@ -425,10 +425,10 @@ def run_test(args):
             #     miss_predicted.append(i)
         else:
             predicted, _ = parser.parse(sentence, k = args.n_trees)
-
+        import pdb; pdb.set_trace()
         test_predicted.append(predicted.convert())
 
-    import pdb; pdb.set_trace()
+
     test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
     print(
