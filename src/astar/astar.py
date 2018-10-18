@@ -92,7 +92,6 @@ class AStar:
         total_time_out = time_out * n_cost_reductions
         current_time = start_time = time.clock()
         while (time.clock() - start_time < total_time_out) and openSet and len(goals) < int(n_goals):
-            import pdb; pdb.set_trace()
             current = heappop(openSet)
             if (time.clock() - current_time >= time_out):
                 cost_coefficient *= cost_reduction_rate
