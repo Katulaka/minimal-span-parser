@@ -176,4 +176,7 @@ def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms, verbose)
 
+    if nodes != []:
+        import pdb; pdb.set_trace()
+
     return nodes, solver.seen

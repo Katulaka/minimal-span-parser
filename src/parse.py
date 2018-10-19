@@ -605,7 +605,6 @@ class MyParser(object):
                 if nodes != []:
                     return nodes[0].tree
 
-            import pdb; pdb.set_trace()
             nodes = sorted(seen, key = lambda x: x.right-x.left)
             n = nodes[-1]
             nodes = list(filter(lambda x: (x.right, x.left) == (n.right, n.left), nodes))
