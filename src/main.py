@@ -491,7 +491,7 @@ def main():
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
-    subparser.add_argument("--astar-parms", nargs=3, default=[60., 1, 0.2], type=float)
+    subparser.add_argument("--astar-parms", nargs=3, default=[20., 1, 0.2], type=float)
     subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
 
 
