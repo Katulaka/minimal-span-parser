@@ -422,8 +422,10 @@ def run_test(args):
             )
         )
         # import pdb; pdb.set_trace()
-        test_predicted.append(predicted.convert())
+        test_predicted.append([p.convert() for p in predicted])
+        # test_predicted.append(predicted.convert())
 
+    import pdb; pdb.set_trace()
     test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
     print(
@@ -433,7 +435,6 @@ def run_test(args):
             format_elapsed(start_time),
         )
     )
-    import pdb; pdb.set_trace()
     # test_diversity = evaluate.diversity(test_treebank, test_predicted)
 
 
