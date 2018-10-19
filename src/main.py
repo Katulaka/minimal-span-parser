@@ -415,7 +415,7 @@ def run_test(args):
             "processed {:,}/{:,} "
             "prediction-elapsed {} "
             "total-elapsed {}".format(
-                i,
+                i + 1,
                 len(test_treebank),
                 format_elapsed(prediction_start_time),
                 format_elapsed(start_time),
