@@ -624,9 +624,9 @@ class MyParser(object):
                      l.parent.children = list(filter(lambda x: x != l, l.parent.children))
                 left_miss = [trees.MissMyParseNode('', left) for left in range(node.left)]
                 right_miss = [trees.MissMyParseNode('', left) for left in range(node.right, len(sentence))]
+                import pdb; pdb.set_trace()
                 node.tree.children = tuple(left_miss) + node.tree.children + tuple(right_miss)
 
-                import pdb; pdb.set_trace()
             left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
                             zip(range(node.left), sentence[:node.left])]
             right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
