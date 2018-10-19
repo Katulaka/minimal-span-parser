@@ -608,7 +608,7 @@ class MyParser(object):
                 nodes, seen = astar_search(grid, self.keep_valence_value, astar_parms)
 
                 if nodes != []:
-                    return nodes[0].trees[0]
+                    return nodes[0].tree
 
             nodes = sorted(seen, key = lambda x: x.right-x.left)
             n = nodes[-1]
