@@ -611,12 +611,21 @@ class MyParser(object):
                 return (len(leaves) == len(sentence) and
                         leaves[node.right - 1].right == node.right and
                         leaves[node.left].left == node.left)
-
+            def sort_fn(node):
+                return abs(len(list(node.tree.leaves())) - len(sentence))
             nodes = list(filter(lambda x: filter_fn(x), seen))
             nodes = sorted(nodes, key = lambda x: x.right - x.left)
-            try:
+            if nodes != []:
                 node = nodes[-1]
-            except:
+            else:
+                nodes = sorted(seen, key = lambda x: sort_fn(x), reverse = True)
+                node = nodes[-1]
+                for l in node.tree.missing_leaves():
+                     l.parent.children = list(filter(lambda x: x != l, l.parent.children))
+                left_miss = [trees.MissMyParseNode('', left) for left in range(node.left)]
+                right_miss = [trees.MissMyParseNode('', left) for left in range(node.right, len(sentence))]
+                node.tree.children = tuple(left_miss) + node.tree.children + tuple(right_miss)
+
                 import pdb; pdb.set_trace()
             left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
                             zip(range(node.left), sentence[:node.left])]
