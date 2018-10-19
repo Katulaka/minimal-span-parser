@@ -123,7 +123,10 @@ class Solver(AStar):
     def heuristic_cost(self, node, goal, cost_coefficient):
         left = list(range(node.left))
         right = list(range(node.right, goal.right))
-        return cost_coefficient * sum([self.grid[i,0].score for i in chain(left, right)])
+        def helper(i):
+            lst = list(filter(lambda x: x[0] == i, self.grid.keys()))
+            return max(lst, key = lambda x : x[1])[1]
+        return cost_coefficient * sum([self.grid[i,helper(i)].score for i in chain(left, right)])
 
     def real_cost(self, node):
         position = zip(range(node.left, node.right), node.rank)
