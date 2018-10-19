@@ -46,14 +46,16 @@ class AstarNode(object):
 
         return node_string
 
-    def is_valid(self, keep_valence_value, c_trees):
-        assert isinstance(c_trees, list)
-        assert len(c_trees) == 2
+    def is_valid(self, keep_valence_value, left_tree, right_tree):
+        # assert isinstance(c_trees, list)
+        # assert len(c_trees) == 2
+        assert isinstance(left_tree, trees.InternalMyParseNode)
+        assert isinstance(right_tree, trees.InternalMyParseNode)
 
         # @functools.lru_cache(maxsize=None)
         def helper(_trees, comb_side, miss_side):
 
-            assert isinstance(_trees[0], trees.InternalMyParseNode)
+            # assert isinstance(_trees[0], trees.InternalMyParseNode)
             assert (_trees[0].label in [trees.CR, trees.CL])
             assert len(_trees[0].children) == 1
             #TODO fix combination order --> incorrect order
@@ -68,20 +70,20 @@ class AstarNode(object):
                         leaves.append(leaf)
             return leaves
 
-        if all(isinstance(tree, trees.InternalMyParseNode) for tree in c_trees):
-            #Trying to combine Left Tree --> Right Tree
-            if c_trees[0].label == trees.CR and not len(list(c_trees[0].missing_leaves())):
-                leaves = helper(c_trees, trees.CR, trees.L)
-                if leaves != []:
-                    self.tree = c_trees[1].combine(c_trees[0].children[0], leaves[-1])
-                    return True
+        # if all(isinstance(tree, trees.InternalMyParseNode) for tree in c_trees):
+        #Trying to combine Left Tree --> Right Tree
+        if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
+            leaves = helper([left_tree, right_tree], trees.CR, trees.L)
+            if leaves != []:
+                self.tree = right_tree.combine(left_tree.children[0], leaves[-1])
+                return True
 
-            #Trying to combine Right Tree --> Left Tree
-            if c_trees[1].label == trees.CL and not len(list(c_trees[1].missing_leaves())):
-                leaves = helper(c_trees[::-1], trees.CL, trees.R)
-                if leaves != []:
-                    self.tree = c_trees[0].combine(c_trees[1].children[0], leaves[0])
-                    return True
+        #Trying to combine Right Tree --> Left Tree
+        if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
+            leaves = helper([right_tree, left_tree], trees.CL, trees.R)
+            if leaves != []:
+                self.tree = left_tree.combine(right_tree.children[0], leaves[0])
+                return True
         return False
 
 
@@ -123,10 +125,7 @@ class Solver(AStar):
     def heuristic_cost(self, node, goal, cost_coefficient):
         left = list(range(node.left))
         right = list(range(node.right, goal.right))
-        def helper(i):
-            lst = list(filter(lambda x: x[0] == i, self.grid.keys()))
-            return max(lst, key = lambda x : x[1])
-        return cost_coefficient * sum([self.grid[helper(i)].score for i in chain(left, right)])
+        return cost_coefficient * sum([self.grid[i,0].score for i in chain(left, right)])
 
     def real_cost(self, node):
         position = zip(range(node.left, node.right), node.rank)
@@ -144,13 +143,13 @@ class Solver(AStar):
         neighbors = []
         for nb in self.cl.getl(node.right):
             nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
-            if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, [node.tree, nb.tree]):
+            if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, node.tree, nb.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
         for nb in self.cl.getr(node.left):
             # nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank, nb.trees + node.trees)
             nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
-            if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, [nb.tree,  node.tree]):
+            if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, nb.tree,  node.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
         # if len(node.rank) == 1 and node.rank[0] + 1 < len(self.grid[node.left]):
@@ -164,7 +163,6 @@ class Solver(AStar):
 
     def is_goal_reached(self, node, goal):
         if (node.left, node.right) == (goal.left, goal.right):
-            # if len(node.trees) == 1:
             return not len(list(node.tree.missing_leaves()))
         return False
 
