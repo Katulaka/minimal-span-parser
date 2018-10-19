@@ -598,8 +598,7 @@ class MyParser(object):
                     # row = []
                     for rank, hyp in enumerate(leaf_hyps):
                         # labels = np.array(self.label_vocab.values)[hyp[0]].tolist()
-                        import pdb; pdb.set_trace()
-                        labels = [self.label_vocab.index(h) for h in hyp[0]]
+                        labels = [self.label_vocab.value(h) for h in hyp[0]]
                         partial_tree = trees.LeafMyParseNode(left, *leaf).deserialize(labels)
                         if partial_tree is not None:
                             grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
