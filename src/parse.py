@@ -613,7 +613,7 @@ class MyParser(object):
                         leaves[node.left].left == node.left)
 
             nodes = list(filter(lambda x: filter_fn(x), seen))
-            nodes = sorted(nodes, key = lambda x: node.right - node.left)
+            nodes = sorted(nodes, key = lambda x: x.right - x.left)
             node = nodes[-1]
             left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
                             zip(range(node.left), sentence[:node.left])]
@@ -622,4 +622,5 @@ class MyParser(object):
             leaves = left_leaves + right_leaves
             for miss_leaf, leaf in zip(node.tree.missing_leaves(), leaves):
                 node.tree = node.tree.combine(leaf, miss_leaf)
+            import pdb; pdb.set_trace()
             return node.tree
