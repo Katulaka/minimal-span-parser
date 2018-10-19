@@ -422,7 +422,7 @@ def run_test(args):
             )
         )
         import pdb; pdb.set_trace()
-        test_predicted.append(predicted[0].convert())
+        test_predicted.append(predicted.convert())
 
     test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
