@@ -617,24 +617,27 @@ class MyParser(object):
             nodes = sorted(nodes, key = lambda x: x.right - x.left)
             if nodes != []:
                 node = nodes[-1]
+                left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                                zip(range(node.left), sentence[:node.left])]
+                right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                                zip(range(node.right, len(sentence)), sentence[node.right:])]
+                leaves = left_leaves + right_leaves
+                for leaf in leaves:
+                    miss_leaf = list(node.tree.missing_leaves())[0]
+                    node.tree = node.tree.combine(leaf, miss_leaf)
             else:
                 nodes = sorted(seen, key = lambda x: sort_fn(x), reverse = True)
                 node = nodes[-1]
                 for l in node.tree.missing_leaves():
                      l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-                left_miss = [trees.MissMyParseNode('', left) for left in range(node.left)]
-                right_miss = [trees.MissMyParseNode('', left) for left in range(node.right, len(sentence))]
+                left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                                zip(range(node.left), sentence[:node.left])]
+                right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                                zip(range(node.right, len(sentence)), sentence[node.right:])]
                 import pdb; pdb.set_trace()
-                node.tree.children = left_miss + node.tree.children + right_miss
+                children =  left_leaves + node.tree.children + right_leaves
+                node.tree = trees.InternalMyParseNode(node.tree.label, children)
 
-            left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                            zip(range(node.left), sentence[:node.left])]
-            right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                            zip(range(node.right, len(sentence)), sentence[node.right:])]
-            leaves = left_leaves + right_leaves
-            for leaf in leaves:
-                miss_leaf = list(node.tree.missing_leaves())[0]
-                node.tree = node.tree.combine(leaf, miss_leaf)
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
             import pdb; pdb.set_trace()
