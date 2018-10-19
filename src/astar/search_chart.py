@@ -6,7 +6,7 @@ from .astar import AStar
 
 class AstarNode(object):
 
-    def __init__(self, left, right, split=0, rank=[0,0,0], chart, grid):
+    def __init__(self, left, right, split, rank, chart, grid):
 
         assert isinstance(left, int)
         self.left = left
