@@ -634,11 +634,9 @@ class MyParser(object):
                                 zip(range(node.left), sentence[:node.left])]
                 right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
                                 zip(range(node.right, len(sentence)), sentence[node.right:])]
-                import pdb; pdb.set_trace()
                 children =  left_leaves + list(node.tree.children) + right_leaves
                 node.tree = trees.InternalMyParseNode(node.tree.label, children)
 
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
-            import pdb; pdb.set_trace()
             return node.tree
