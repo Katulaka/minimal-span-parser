@@ -581,6 +581,8 @@ class MyParser(object):
             return losses
 
         else:
+            Cell = collections.namedtuple('Cell', 'tree score')
+
             start = self.label_vocab.index(START)
             stop = self.label_vocab.index(STOP)
             astar_parms = predict_parms['astar_parms']
@@ -591,16 +593,17 @@ class MyParser(object):
                                                             self.dec_lstm,
                                                             self.ws)
 
-                grid = []
-                for i, (leaf_hyps, leaf) in enumerate(zip(hyps, sentence)):
-                    row = []
-                    for hyp in leaf_hyps:
-                        labels = np.array(self.label_vocab.values)[hyp[0]].tolist()
-                        partial_tree = trees.LeafMyParseNode(i, *leaf).deserialize(labels)
+                grid = {}
+                for left, (leaf_hyps, leaf) in enumerate(zip(hyps, sentence)):
+                    # row = []
+                    for rank, hyp in enumerate(leaf_hyps):
+                        # labels = np.array(self.label_vocab.values)[hyp[0]].tolist()
+                        labels = [self.label_vocab.index(h) for h in hyp[0]]
+                        partial_tree = trees.LeafMyParseNode(left, *leaf).deserialize(labels)
                         if partial_tree is not None:
-                            row.append((partial_tree, hyp[1]))
-                    grid.append(row)
-
+                            grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
+                            # row.append((partial_tree, hyp[1]))
+                    # grid.append(row)
 
                 nodes, seen = astar_search(grid, self.keep_valence_value, astar_parms)
 
