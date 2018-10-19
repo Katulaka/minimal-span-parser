@@ -91,11 +91,11 @@ class AStar:
         current_time = start_time = time.clock()
         while (time.clock() - start_time < total_time_out) and openSet and len(goals) < int(n_goals):
             current = heappop(openSet)
-            # if (time.clock() - current_time >= time_out):
-            #     cost_coefficient *= cost_reduction_rate
-            #     for t in openSet:
-            #         t.fscore = self.fscore(t.data, goal, cost_coefficient)
-            #     current_time = time.clock()
+            if (time.clock() - current_time >= time_out):
+                cost_coefficient *= cost_reduction_rate
+                for t in openSet:
+                    t.fscore = self.fscore(t.data, goal, cost_coefficient)
+                current_time = time.clock()
             # if verbose > 0: print(current.format_print('current'))
 
             if self.is_goal_reached(current.data, goal):
@@ -108,16 +108,14 @@ class AStar:
                     continue
                 neighbor.fscore = self.fscore(neighbor.data, goal, cost_coefficient)
 
-                if self.is_goal_reached(neighbor.data, goal):
-                    goals.append(neighbor.data)
-                    neighbor.out_openset = False
+                # if self.is_goal_reached(neighbor.data, goal):
+                #     goals.append(neighbor.data)
+                #     neighbor.out_openset = False
                 # neighbor.came_from = current
 
                 if neighbor.out_openset:
                     neighbor.out_openset = False
                     heappush(openSet, neighbor)
                 # if verbose > 1: print(neighbor.print_fn('neighbor'))
-        # if goals == []:
-        #     import pdb; pdb.set_trace()
 
         return goals
