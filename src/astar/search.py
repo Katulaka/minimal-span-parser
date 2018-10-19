@@ -73,14 +73,14 @@ class AstarNode(object):
             if c_trees[0].label == trees.CR and not len(list(c_trees[0].missing_leaves())):
                 leaves = helper(c_trees, trees.CR, trees.L)
                 if leaves != []:
-                    self.tree = [c_trees[1].combine(c_trees[0].children[0], leaves[-1])]
+                    self.tree = c_trees[1].combine(c_trees[0].children[0], leaves[-1])
                     return True
 
             #Trying to combine Right Tree --> Left Tree
-            if c_trees[1].label == trees.CL and not len(list(self.trees[1].missing_leaves())):
+            if c_trees[1].label == trees.CL and not len(list(c_trees[1].missing_leaves())):
                 leaves = helper(c_trees[::-1], trees.CL, trees.R)
                 if leaves != []:
-                    self.tree = [c_trees[0].combine(c_trees[1].children[0], leaves[0])]
+                    self.tree = c_trees[0].combine(c_trees[1].children[0], leaves[0])
                     return True
         return False
 
