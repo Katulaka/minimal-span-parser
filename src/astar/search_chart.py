@@ -32,10 +32,12 @@ class AstarNode(object):
         self.score = (left_score + right_score + label_score)
 
     def __eq__(self, other):
-        return self.children == other.children
+        # return self.children == other.children
+        return self.children.convert().linerize() == other.children.convert().linerize()
 
     def __hash__(self):
-        return hash(tuple(self.children))
+        # return hash(tuple(self.children))
+        return hash(self.children.convert().linerize())
 
     def format_print(self):
         return 'left: {}, right: {}, split: {}'.format(self.left,
