@@ -107,6 +107,10 @@ class AStar:
                 if neighbor.closed:
                     continue
                 neighbor.fscore = self.fscore(neighbor.data, goal, cost_coefficient)
+
+                if self.is_goal_reached(neighbor.data, goal):
+                    goals.append(neighbor.data)
+                    neighbor.out_openset = False
                 # neighbor.came_from = current
 
                 if neighbor.out_openset:
