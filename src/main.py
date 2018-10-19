@@ -403,7 +403,7 @@ def run_test(args):
         predict_parms = {'astar_parms': [args.n_trees] + args.astar_parms,
                             'beam_parms':args.beam_size}
 
-    for i, tree in  enumerate(test_treebank[1784:]):
+    for i, tree in  enumerate(test_treebank):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
@@ -415,7 +415,7 @@ def run_test(args):
             "processed {:,}/{:,} "
             "prediction-elapsed {} "
             "total-elapsed {}".format(
-                i+1785,
+                i,
                 len(test_treebank),
                 format_elapsed(prediction_start_time),
                 format_elapsed(start_time),
@@ -424,7 +424,7 @@ def run_test(args):
         # import pdb; pdb.set_trace()
         test_predicted.append(predicted.convert())
 
-    test_fscore = evaluate.evalb(args.evalb_dir, test_treebank[1784:], test_predicted)
+    test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
     print(
         "test-fscore {} "
@@ -491,7 +491,7 @@ def main():
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
-    subparser.add_argument("--astar-parms", nargs=3, default=[60., 1, 0.2], type=float)
+    subparser.add_argument("--astar-parms", nargs=3, default=[100., 1, 0.2], type=float)
     subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
 
 
