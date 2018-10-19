@@ -140,7 +140,7 @@ class InternalParseNode(ParseNode):
         return isinstance(other, InternalParseNode) and self.label == other.label and self.children == other.children
 
     def __hash__(self):
-        return hash((self.label, self.children))
+        return hash((self.label, tuple(self.children)))
 
 class LeafParseNode(ParseNode):
     def __init__(self, index, tag, word):

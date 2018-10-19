@@ -35,7 +35,7 @@ class AstarNode(object):
         return self.children == other.children
 
     def __hash__(self):
-        return hash((self.children))
+        return hash(tuple(self.children))
 
     def format_print(self):
         return 'left: {}, right: {}, split: {}'.format(self.left,
