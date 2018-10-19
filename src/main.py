@@ -457,7 +457,7 @@ def main():
         subparser.add_argument(arg)
     subparser.add_argument("--numpy-seed", type=int)
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
-    subparser.add_argument("--tag-embedding-dim", type=int, default=50)
+    subparser.add_argument("--tag-embedding-dim", type=int, default=150)
     subparser.add_argument("--word-embedding-dim", type=int, default=100)
     subparser.add_argument("--char-embedding-dim", type=int, default=50)
     subparser.add_argument("--label-embedding-dim", type=int, default=100)
