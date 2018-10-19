@@ -1,7 +1,7 @@
 import numpy as np
 
 from .astar import AStar
-# import trees
+import trees
 
 
 class AstarNode(object):
