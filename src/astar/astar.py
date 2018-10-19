@@ -117,7 +117,7 @@ class AStar:
                     neighbor.out_openset = False
                     heappush(openSet, neighbor)
                 # if verbose > 1: print(neighbor.print_fn('neighbor'))
-        if goals == []:
-            import pdb; pdb.set_trace()
+        # if goals == []:
+        #     import pdb; pdb.set_trace()
 
         return goals
