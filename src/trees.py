@@ -136,6 +136,12 @@ class InternalParseNode(ParseNode):
             if left < child.left < right
         ]
 
+    def __eq__(self, other):
+        return isinstance(other, InternalParseNode) and self.label == other.label and self.children == other.children
+
+    def __hash__(self):
+        return hash((self.label, self.children))
+
 class LeafParseNode(ParseNode):
     def __init__(self, index, tag, word):
         assert isinstance(index, int)
@@ -154,6 +160,12 @@ class LeafParseNode(ParseNode):
 
     def convert(self):
         return LeafTreebankNode(self.tag, self.word)
+
+    def __eq__(self, other):
+        return isinstance(other, LeafParseNode) and self.tag == other.tag and self.word == other.word
+
+    def __hash__(self):
+        return hash((self.tag, self.word))
 
 
 class MyParseNode(object):

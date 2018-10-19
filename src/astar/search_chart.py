@@ -6,7 +6,7 @@ from .astar import AStar
 
 class AstarNode(object):
 
-    def __init__(self, left, right, split=0, rank=[0,0,0]):
+    def __init__(self, left, right, split=0, rank=[0,0,0], chart, grid):
 
         assert isinstance(left, int)
         self.left = left
@@ -20,11 +20,19 @@ class AstarNode(object):
         assert isinstance(rank, list)
         self.rank = rank
 
+        left_rank, right_rank, label_rank = rank
+        left_trees, left_score = chart[left, split][left_rank]
+        right_trees, right_score = chart[split, right][right_rank]
+        children = left_trees + right_trees
+        label, label_score = grid[left, right][label_rank]
+        if label:
+            children = [trees.InternalParseNode(label, children)]
+
+        self.children = children
+        self.score = (left_score + right_score + label_score)
+
     def __eq__(self, other):
-        return all([self.rank == other.rank,
-                    self.left == other.left,
-                    self.right == other.right,
-                    self.split == other.split])
+        return self.children == other.children
 
     def __hash__(self):
         return hash((self.left, self.right, self.split, tuple(self.rank)))
@@ -46,11 +54,6 @@ class Solver(AStar):
         return 0
 
     def real_cost(self, node):
-        rank_left, rank_right, rank_label = node.rank
-        _, left_score = self.chart[node.left, node.split][rank_left]
-        _, right_score = self.chart[node.split, node.right][rank_right]
-        label_score = self.grid[node.left, node.right][rank_label][1]
-        node.score = (left_score + right_score + label_score)
         return node.score
 
     def fscore(self, node, goal, cost_coefficient):
@@ -68,23 +71,23 @@ class Solver(AStar):
 
         rank = list(np.array(node.rank) + np.array([1, 0, 0]))
         if rank[0] < len(self.chart[node.left, node.split]):
-            neighbor = AstarNode(node.left, node.right, node.split, rank)
+            neighbor = AstarNode(node.left, node.right, node.split, rank, self.chart, self.grid)
             if neighbor not in self.cl:
                 neighbors.append(neighbor)
 
         rank = list(np.array(node.rank) + np.array([0, 1, 0]))
         if rank[1] < len(self.chart[node.split, node.right]):
-            neighbor = AstarNode(node.left, node.right, node.split, rank)
+            neighbor = AstarNode(node.left, node.right, node.split, rank, self.chart, self.grid)
             if neighbor not in self.cl:
                 neighbors.append(neighbor)
 
         rank = list(np.array(node.rank) + np.array([0, 0, 1]))
         if rank[2] < len(self.grid[node.left, node.right]):
-            neighbor = AstarNode(node.left, node.right, node.split, rank)
+            neighbor = AstarNode(node.left, node.right, node.split, rank, self.chart, self.grid)
             if neighbor not in self.cl:
                 neighbors.append(neighbor)
 
         return neighbors
 
     def is_goal_reached(self, node, goal):
-        return (node.left, node.right) == (goal.left, goal.right)
+        return (node.left, node.right) == goal
