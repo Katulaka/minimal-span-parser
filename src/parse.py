@@ -605,18 +605,21 @@ class MyParser(object):
                 if nodes != []:
                     return nodes[0].tree
 
-            nodes = sorted(seen, key = lambda x: x.right-x.left)
-            n = nodes[-1]
-            nodes = list(filter(lambda x: (x.right, x.left) == (n.right, n.left), nodes))
-            nodes = sorted(nodes,
-                        key = lambda x: abs(len(sentence) - (x.right - x.left) - len(list(x.tree.missing_leaves()))))
-            node = nodes[0]
-            if node.right - node.left < len(sentence) or len(list(node.tree.missing_leaves())):
-                left_children = [trees.LeafMyParseNode(i, *leaf)
-                    for i, leaf in zip(range(node.left),sentence[:node.left])]
-                right_children = [trees.LeafMyParseNode(i, *leaf)
-                    for i, leaf in zip(range(node.right, len(sentence)), sentence[node.right:])]
-                node.tree.children = tuple(left_children) + node.tree.children + tuple(right_children)
-                for l in node.tree.missing_leaves():
-                    l.parent.children = tuple(filter(lambda x: x != l, l.parent.children))
+
+            def filter_fn(node):
+                leaves = list(node.tree.leaves())
+                return (len(leaves) == len(sentence) and
+                        leaves[node.right - 1].right == node.right and
+                        leaves[node.left].left == node.left)
+
+            nodes = list(filter(lambda x: filter_fn(x), seen))
+            nodes = sorted(nodes, key = lambda x: node.right - node.left)
+            node = nodes[-1]
+            left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                            zip(range(node.left), sentence[:node.left])]
+            right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                            zip(range(node.right, len(sentence)), sentence[node.right:])]
+            leaves = left_leaves + right_leaves
+            for miss_leaf, leaf in zip(node.tree.missing_leaves(), leaves):
+                node.tree = node.tree.combine(leaf, miss_leaf)
             return node.tree
