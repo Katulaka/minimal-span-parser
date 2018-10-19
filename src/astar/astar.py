@@ -83,8 +83,6 @@ class AStar:
         openSet = []
         goals = []
         for strt in start:
-            # if self.is_goal_reached(strt, goal):
-            #     goals.append(strt)
             cost = self.fscore(strt, goal, cost_coefficient)
             startNode = searchNodes[strt] = AStar.SearchNode(strt, fscore=cost)
             heappush(openSet, startNode)
@@ -109,7 +107,7 @@ class AStar:
                 if neighbor.closed:
                     continue
                 neighbor.fscore = self.fscore(neighbor.data, goal, cost_coefficient)
-                neighbor.came_from = current
+                # neighbor.came_from = current
 
                 if neighbor.out_openset:
                     neighbor.out_openset = False
