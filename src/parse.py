@@ -377,7 +377,7 @@ class ChartParser(object):
                                 tree = trees.InternalParseNode(label, [tree])
                             chart.setdefault((left, right), []).append(([tree], score))
                     else:
-                        start = [AstarNode(left, right, split, chart, grid) for split in range(left + 1, right)]
+                        start = [AstarNode(left, right, split, [0,0,0], chart, grid) for split in range(left + 1, right)]
                         goal = (left, right)
                         for node in Solver(grid, chart).astar(start, goal, k):
                             chart.setdefault((left, right), []).append((node.chidren, node.score))
