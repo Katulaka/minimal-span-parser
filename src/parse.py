@@ -602,10 +602,10 @@ class MyParser(object):
                             grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
 
                 nodes, seen = astar_search(grid, self.keep_valence_value, astar_parms)
-                import pdb; pdb.set_trace()
                 if nodes != []:
                     return nodes[0].tree
 
+            import pdb; pdb.set_trace()
             nodes = sorted(seen, key = lambda x: x.right-x.left)
             n = nodes[-1]
             nodes = list(filter(lambda x: (x.right, x.left) == (n.right, n.left), nodes))
