@@ -33,11 +33,12 @@ class AstarNode(object):
 
     def __eq__(self, other):
         # return self.children == other.children
-        return self.children.convert().linerize() == other.children.convert().linerize()
+        return (str([child.convert().linerize() for child in self.children])
+                == str([child.convert().linerize() for child in other.children]))
 
     def __hash__(self):
         # return hash(tuple(self.children))
-        return hash(self.children.convert().linerize())
+        return hash(str([child.convert().linerize() for child in self.children]))
 
     def format_print(self):
         return 'left: {}, right: {}, split: {}'.format(self.left,
