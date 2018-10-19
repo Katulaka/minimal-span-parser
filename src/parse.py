@@ -620,8 +620,8 @@ class MyParser(object):
             right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
                             zip(range(node.right, len(sentence)), sentence[node.right:])]
             leaves = left_leaves + right_leaves
-            missing_leaves = node.tree.missing_leaves()
-            import pdb; pdb.set_trace()
-            for miss_leaf, leaf in zip(missing_leaves, leaves):
+            for leaf in leaves:
+                miss_leaf = list(node.tree.missing_leaves())[0]
                 node.tree = node.tree.combine(leaf, miss_leaf)
+            import pdb; pdb.set_trace()
             return node.tree
