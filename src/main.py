@@ -400,8 +400,8 @@ def run_test(args):
     test_predicted = []
     if args.parser_type == "my":
         miss_predicted = []
-        predict_parms = {'astar_parms': [args.n_trees] + args.astar_parms,
-                            'beam_parms':args.beam_size}
+        astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
+        predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : args.beam_size}
 
     for i, tree in  enumerate(test_treebank[:1]):
         dy.renew_cg()
@@ -492,7 +492,9 @@ def main():
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
-    subparser.add_argument("--astar-parms", nargs=3, default=[100., 1, 0.2], type=float)
+    subparser.add_argument("--time-out", default=60., type=float)
+    subparser.add_argument("--n-discounts", default=1, type=int)
+    subparser.add_argument("--discount-factor", default=0.2, type=float)
     subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
 
 
