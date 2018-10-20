@@ -463,7 +463,7 @@ def main():
     subparser.add_argument("--char-embedding-dim", type=int, default=50)
     subparser.add_argument("--label-embedding-dim", type=int, default=100)
     subparser.add_argument("--char-lstm-dim", type=int, default=100)
-    subparser.add_argument("--lstm-dim", type=int, default=250)
+    subparser.add_argument("--lstm-dim", type=int, default=350)
     subparser.add_argument("--dec-lstm-dim", type=int, default=600)
     subparser.add_argument("--label-hidden-dim", type=int, default=100)
     subparser.add_argument("--attention-dim", type=int, default=250)
