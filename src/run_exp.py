@@ -16,9 +16,9 @@ for i, embedding in enumerate([500,700,800,900,1000]):
                 # "--label-embedding-dim {} "
                 # "--char-lstm-dim {} "
                 # "--lstm-dim {} "
-                # "--dec-lstm-dim {} "
+                "--dec-lstm-dim {} "
                 # "--attention-dim {} "
                 # "--label-hidden-dim {} "
                 "--dynet-devices {} "
-                 ).format(*embeddings, device)
+                 ).format(embedding, device)
     Popen(command.split())
