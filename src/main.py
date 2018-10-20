@@ -466,7 +466,7 @@ def main():
     subparser.add_argument("--lstm-dim", type=int, default=350)
     subparser.add_argument("--dec-lstm-dim", type=int, default=600)
     subparser.add_argument("--label-hidden-dim", type=int, default=100)
-    subparser.add_argument("--attention-dim", type=int, default=250)
+    subparser.add_argument("--attention-dim", type=int, default=200)
     subparser.add_argument("--lstm-layers", type=int, default=2)
     subparser.add_argument("--split-hidden-dim", type=int, default=250)
     subparser.add_argument("--dropout", type=float, default=0.4)
