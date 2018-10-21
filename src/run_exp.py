@@ -5,7 +5,7 @@ n_gpus = 8
 # for i, embeddings in enumerate(itertools.product([200, 250, 300], [100, 150, 200])):
 #     if embeddings != (250, 100):
 # for i, embedding in enumerate([500,700,800,900,1000]):
-for i, dropouts in  enumerate(itertools.product([0.4], [0, 0.1, 0.2, 0.3, 0.5])):
+for i, dropouts in  enumerate(itertools.product([0.1, 0.2, 0.3, 0.5], [0, 0.1, 0.2, 0.3, 0.4, 0.5])):
     device = 'GPU:{}'.format(i%n_gpus)
     command = ("python src/main.py train "
                 "--use-char-lstm --parser-type my --model-path-base run_exp "
