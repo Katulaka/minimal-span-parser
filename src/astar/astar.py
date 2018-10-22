@@ -100,7 +100,7 @@ class AStar:
 
             if self.is_goal_reached(current.data, goal):
                 goals.append(current.data)
-                print("goal: {}".format(current.data.tree.convert().linearize()))
+                print("goal: {}".format(str([child.convert().linearize() for child in current.data.children()])))
             current.out_openset = True
             current.closed = True
             self.move_to_closed(current.data)
