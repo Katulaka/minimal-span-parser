@@ -103,8 +103,8 @@ class AStar:
                 # import pdb; pdb.set_trace()
                 print("goal[{},{},{}]: {}".format(
                                     current.data.left,
+                                    current.data.split,
                                     current.data.right,
-                                    current.data.split, 
                                     str([child.convert().linearize() for child in current.data.children])))
             current.out_openset = True
             current.closed = True
