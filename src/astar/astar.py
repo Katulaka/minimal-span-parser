@@ -101,12 +101,11 @@ class AStar:
             if self.is_goal_reached(current.data, goal):
                 if current.data not in goals:
                     goals.append(current.data)
-                # import pdb; pdb.set_trace()
-                print("goal[{},{},{}]: {}".format(
-                                    current.data.left,
-                                    current.data.split,
-                                    current.data.right,
-                                    str([child.convert().linearize() for child in current.data.children])))
+                    print("goal[{},{},{}]: {}".format(
+                                        current.data.left,
+                                        current.data.split,
+                                        current.data.right,
+                                        str([child.convert().linearize() for child in current.data.children])))
             current.out_openset = True
             current.closed = True
             self.move_to_closed(current.data)
