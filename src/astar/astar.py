@@ -99,7 +99,8 @@ class AStar:
             # if verbose > 0: print(current.format_print('current'))
 
             if self.is_goal_reached(current.data, goal):
-                goals.append(current.data)
+                if current.data not in goals:
+                    goals.append(current.data)
                 # import pdb; pdb.set_trace()
                 print("goal[{},{},{}]: {}".format(
                                     current.data.left,
