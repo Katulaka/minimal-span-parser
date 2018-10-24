@@ -166,7 +166,7 @@ class Solver(AStar):
             return not len(list(node.tree.missing_leaves()))
         return False
 
-def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
+def astar_search(grid, keep_valence_value, astar_parms):
 
     # n_words = len(grid)
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
@@ -174,6 +174,6 @@ def astar_search(grid, keep_valence_value, astar_parms, verbose=0):
     goal = AstarNode(0, n_words)
     # let's solve it
     solver = Solver(grid, keep_valence_value)
-    nodes = solver.astar(start, goal, *astar_parms, verbose)
+    nodes = solver.astar(start, goal, *astar_parms)
 
     return nodes, solver.seen

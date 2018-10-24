@@ -76,7 +76,7 @@ class AStar:
     #     else:
     #         return reversed(list(_gen()))
 
-    def astar(self, start, goal, n_goals, time_out=60., n_cost_reductions=1, cost_reduction_rate=0.2, verbose=0):
+    def astar(self, start, goal, n_goals, time_out=60., n_cost_reductions=1, cost_reduction_rate=0.2):
 
         cost_coefficient = 1.
         searchNodes = AStar.SearchNodeDict()
@@ -96,16 +96,10 @@ class AStar:
                 for t in openSet:
                     t.fscore = self.fscore(t.data, goal, cost_coefficient)
                 current_time = time.clock()
-            # if verbose > 0: print(current.format_print('current'))
 
             if self.is_goal_reached(current.data, goal):
                 if current.data not in goals:
                     goals.append(current.data)
-                    print("goal[{},{},{}]: {}".format(
-                                        current.data.left,
-                                        current.data.split,
-                                        current.data.right,
-                                        str([child.convert().linearize() for child in current.data.children])))
             current.out_openset = True
             current.closed = True
             self.move_to_closed(current.data)
@@ -114,14 +108,8 @@ class AStar:
                     continue
                 neighbor.fscore = self.fscore(neighbor.data, goal, cost_coefficient)
 
-                # if self.is_goal_reached(neighbor.data, goal):
-                #     goals.append(neighbor.data)
-                #     neighbor.out_openset = False
-                # neighbor.came_from = current
-
                 if neighbor.out_openset:
                     neighbor.out_openset = False
                     heappush(openSet, neighbor)
-                # if verbose > 1: print(neighbor.print_fn('neighbor'))
 
         return goals
