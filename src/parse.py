@@ -598,23 +598,26 @@ class MyParser(object):
                 if nodes != []:
                     return nodes[0].tree
 
-            nodes = sorted(filter(lambda x: x.left == 0 and x.right == len(sentence), seen), key = lambda x: x.score)
-            if nodes != []:
-                node = nodes[-1]
-                for l in node.tree.missing_leaves():
-                    l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-            else:
-                nodes = sorted(seen, key = lambda x: abs(len(list(x.tree.leaves())) - len(sentence)), reverse = True)
-                node = nodes[-1]
-                for l in node.tree.missing_leaves():
-                     l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-                left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                                zip(range(node.left), sentence[:node.left])]
-                right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                                zip(range(node.right, len(sentence)), sentence[node.right:])]
-                children =  left_leaves + list(node.tree.children) + right_leaves
-                node.tree = trees.InternalMyParseNode(node.tree.label, children)
+            if astar_parms[0] == 1:
+                nodes = sorted(filter(lambda x: x.left == 0 and x.right == len(sentence), seen), key = lambda x: x.score)
+                if nodes != []:
+                    node = nodes[-1]
+                    for l in node.tree.missing_leaves():
+                        l.parent.children = list(filter(lambda x: x != l, l.parent.children))
+                else:
+                    nodes = sorted(seen, key = lambda x: abs(len(list(x.tree.leaves())) - len(sentence)), reverse = True)
+                    node = nodes[-1]
+                    for l in node.tree.missing_leaves():
+                         l.parent.children = list(filter(lambda x: x != l, l.parent.children))
+                    left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                                    zip(range(node.left), sentence[:node.left])]
+                    right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                                    zip(range(node.right, len(sentence)), sentence[node.right:])]
+                    children =  left_leaves + list(node.tree.children) + right_leaves
+                    node.tree = trees.InternalMyParseNode(node.tree.label, children)
 
-            if node.tree.label in [trees.CL, trees.CR]:
-                node.tree.label = 'S'
-            return node.tree
+                if node.tree.label in [trees.CL, trees.CR]:
+                    node.tree.label = 'S'
+                return node.tree
+            else:
+                return None

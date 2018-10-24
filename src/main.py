@@ -423,11 +423,15 @@ def run_test(args):
         )
         if args.n_trees > 1:
             test_predicted.append([p.convert() for p in predicted])
+            miss_predicted.append(i)
         else:
             test_predicted.append(predicted.convert())
 
-    import pdb; pdb.set_trace()
-    test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
+    if args.n_trees == 1:
+        test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
+    else:
+        import pdb; pdb.set_trace()
+        # test_diversity = evaluate.diversity(test_treebank, test_predicted)
 
     print(
         "test-fscore {} "
@@ -436,7 +440,8 @@ def run_test(args):
             format_elapsed(start_time),
         )
     )
-    # test_diversity = evaluate.diversity(test_treebank, test_predicted)
+    import pdb; pdb.set_trace()
+
 
 
 def main():
