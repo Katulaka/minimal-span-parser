@@ -599,27 +599,32 @@ class MyParser(object):
                     return nodes[0].tree
 
 
-            def filter_fn(node):
-                leaves = list(node.tree.leaves())
-                return (len(leaves) == len(sentence) and
-                        leaves[node.right - 1].right == node.right and
-                        leaves[node.left].left == node.left)
+            # def filter_fn(node):
+            #     leaves = list(node.tree.leaves())
+            #     return (len(leaves) == len(sentence) and
+            #             leaves[node.right - 1].right == node.right and
+            #             leaves[node.left].left == node.left)
+
             def sort_fn(node):
                 return abs(len(list(node.tree.leaves())) - len(sentence))
-            import pdb; pdb.set_trace()
-            nodes = list(filter(lambda x: filter_fn(x), seen))
-            nodes = sorted(nodes, key = lambda x: x.right - x.left)
+            # nodes = list(filter(lambda x: filter_fn(x), seen))
+            # nodes = sorted(nodes, key = lambda x: x.right - x.left)
+            nodes = sorted(filter(lambda x: x.left == 0 and x.right == len(sentence), seen), key = lambda x: x.score)
             if nodes != []:
                 node = nodes[-1]
-                left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                                zip(range(node.left), sentence[:node.left])]
-                right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                                zip(range(node.right, len(sentence)), sentence[node.right:])]
-                leaves = left_leaves + right_leaves
-                for leaf in leaves:
-                    miss_leaf = list(node.tree.missing_leaves())[0]
-                    node.tree = node.tree.combine(leaf, miss_leaf)
+                for l in node.tree.missing_leaves():
+                    l.parent.children = list(filter(lambda x: x != l, l.parent.children))
+                # node = nodes[-1]
+                # left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                #                 zip(range(node.left), sentence[:node.left])]
+                # right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+                #                 zip(range(node.right, len(sentence)), sentence[node.right:])]
+                # leaves = left_leaves + right_leaves
+                # for leaf in leaves:
+                #     miss_leaf = list(node.tree.missing_leaves())[0]
+                #     node.tree = node.tree.combine(leaf, miss_leaf)
             else:
+                import pdb; pdb.set_trace()
                 nodes = sorted(seen, key = lambda x: sort_fn(x), reverse = True)
                 node = nodes[-1]
                 for l in node.tree.missing_leaves():
