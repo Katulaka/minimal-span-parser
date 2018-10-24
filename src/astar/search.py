@@ -134,7 +134,9 @@ class Solver(AStar):
     def fscore(self, node, goal, cost_coefficient):
         real_cost = self.real_cost(node)
         heuristic_cost = self.heuristic_cost(node, goal, cost_coefficient)
-        return real_cost + heuristic_cost
+        node.score = real_cost + heuristic_cost
+        # return real_cost + heuristic_cost
+        return node.score
 
     def move_to_closed(self, node):
         self.cl.put(node)
