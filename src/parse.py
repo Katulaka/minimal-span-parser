@@ -606,6 +606,7 @@ class MyParser(object):
                         leaves[node.left].left == node.left)
             def sort_fn(node):
                 return abs(len(list(node.tree.leaves())) - len(sentence))
+            import pdb; pdb.set_trace()
             nodes = list(filter(lambda x: filter_fn(x), seen))
             nodes = sorted(nodes, key = lambda x: x.right - x.left)
             if nodes != []:
