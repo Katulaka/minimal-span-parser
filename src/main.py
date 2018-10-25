@@ -444,6 +444,44 @@ def run_test(args):
     )
     import pdb; pdb.set_trace()
 
+def run_print_results(args):
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    import pickle
+
+    with open(args.predict_path, 'rb') as f:
+        test_predicted = pickle.load(f)
+
+    import pdb; pdb.set_trace()
+
+    N = 2
+    ind = np.arange(N)
+    width = 0.27
+
+    fig = plt.figure()
+    ax = fig.add_suplot(111)
+
+    yvals = [4,9,2]
+    rects1 = ax.bar(ind, yvals, width, color='r')
+
+    zval = [1,2,3]
+    rects2 = ax.bar(ind+width, zval, width, color='g')
+
+    ax.set_ylabel('F-score')
+    ax.set_xticks(ind+width)
+    ax.set_xticklabels('5', '10', '15')
+
+    ax.legend( (rects1[0], rects2[0]), ('chart', 'my') )
+
+    def autolabel(rects):
+    for rect in rects:
+        h = rect.get_height()
+        ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h),
+                ha='center', va='bottom')
+
+    autolabel(rects1)
+    autolabel(rects2)
 
 
 def main():
@@ -504,6 +542,10 @@ def main():
     subparser.add_argument("--n-discounts", default=1, type=int)
     subparser.add_argument("--discount-factor", default=0.2, type=float)
     subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
+
+    subparser = subparsers.add_parser("print")
+    subparser.set_defaults(callback=run_print_results)
+    subparser.add_argument("--predict-path", required=True)
 
 
     args = parser.parse_args()
