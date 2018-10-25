@@ -472,7 +472,7 @@ def run_print_results(args):
 
 
     fig, ax = plt.subplots()
-    xvals = hist.keys()
+    xvals = hist_5.keys()
 
     ind = np.arange(len(xvals))
     width = 0.27
