@@ -508,7 +508,7 @@ def run_print_results(args):
     #
     # autolabel(rects1)
     # autolabel(rects2)
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
 def main():
     dynet_args = [
