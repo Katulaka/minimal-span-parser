@@ -456,12 +456,11 @@ def run_print_results(args):
     hist = {}
     ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
     for tree in test_predicted:
+        import pdb; pdb.set_trace()
         for key in ranges:
             if len(list(tree.leaves())) in key:
                 hist.setdefault(key,[]).append(tree)
-                break
-
-    import pdb; pdb.set_trace()
+                # break
 
     N = 2
     ind = np.arange(N)
