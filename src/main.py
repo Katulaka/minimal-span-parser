@@ -454,16 +454,20 @@ def run_print_results(args):
     test_treebank = trees.load_trees(args.test_path)
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
-    with open(args.predict_path, 'rb') as f:
-        test_predicted = pickle.load(f)
+    with open('predict_5', 'rb') as f:
+        test_predicted_5 = pickle.load(f)
 
-    hist = {}
+    with open('predict_10', 'rb') as f:
+        test_predicted_10 = pickle.load(f)
+
+    hist_5, hist_10 = {}, {}
     ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
-    for gold, tree in zip(test_treebank, test_predicted):
-        num_leaves = len(list(tree.leaves()))
+    for gold, tree_5, tree_10 in zip(test_treebank, test_predicted_5, test_predicted_10):
+        num_leaves = len(list(tree_5.leaves()))
         for key in ranges:
             if num_leaves in range(*key):
-                hist.setdefault(key[1],[]).append((gold, tree))
+                hist_5.setdefault(key[1],[]).append((gold, tree_5))
+                hist_10.setdefault(key[1],[]).append((gold, tree_10))
                 break
 
 
@@ -474,18 +478,21 @@ def run_print_results(args):
     width = 0.27
     opacity = 0.8
 
-    yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in hist.items()]
+    yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in hist_5.items()]
+    zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in hist_10.items()]
 
 
     rects1 = plt.bar(ind, yvals, width,
                  alpha=opacity,
                  color='b',
-                 label='My')
+                 label='Beam 5')
 
-    zval = [1,2,3]
-    rects2 = ax.bar(ind+width, zval, width, color='g')
+    rects2 = plt.bar(ind + width, zvals, width,
+                 alpha=opacity,
+                 color='g',
+                 label='Beam 10')
 
-    plt.xlabel('Beam Size')
+    plt.xlabel('Sentence length')
     plt.ylabel('F-score')
     plt.xticks(ind+width, xvals)
     plt.legend()
