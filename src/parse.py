@@ -600,7 +600,7 @@ class MyParser(object):
                         return nodes[0].tree
                     else:
                         import pdb; pdb.set_trace()
-                        return [node.tree for node in return nodes[0].tree]
+                        return [node.tree for node in nodes]
 
             if astar_parms[0] == 1:
                 nodes = sorted(filter(lambda x: x.left == 0 and x.right == len(sentence), seen), key = lambda x: x.score)
