@@ -456,8 +456,8 @@ def run_print_results(args):
     hist = {}
     ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
     for tree in test_predicted:
-        import pdb; pdb.set_trace()
         for key in ranges:
+            import pdb; pdb.set_trace()
             if len(list(tree.leaves())) in key:
                 hist.setdefault(key,[]).append(tree)
                 # break
