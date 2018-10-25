@@ -465,38 +465,43 @@ def run_print_results(args):
             if num_leaves in range(*key):
                 hist.setdefault(key[1],[]).append((gold, tree))
                 break
-    import pdb; pdb.set_trace()
 
-    # test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
-    N = 2
-    ind = np.arange(N)
+    fig, ax = plt.subplots()
+    xvals = hist.keys()
+
+    ind = np.arange(len(xvals))
     width = 0.27
+    opacity = 0.8
 
-    fig = plt.figure()
-    ax = fig.add_suplot(111)
+    yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in hist.items()]
 
-    yvals = [4,9,2]
-    rects1 = ax.bar(ind, yvals, width, color='r')
+
+    rects1 = plt.bar(ind, yvals, width,
+                 alpha=opacity,
+                 color='b',
+                 label='My')
 
     zval = [1,2,3]
     rects2 = ax.bar(ind+width, zval, width, color='g')
 
-    ax.set_ylabel('F-score')
-    ax.set_xticks(ind+width)
-    ax.set_xticklabels('5', '10', '15')
+    plt.xlabel('Beam Size')
+    plt.ylabel('F-score')
+    plt.xticks(ind+width, xvals)
+    plt.legend()
 
-    ax.legend( (rects1[0], rects2[0]), ('chart', 'my') )
+    plt.tight_layout()
+    plt.show()
 
-    def autolabel(rects):
-        for rect in rects:
-            h = rect.get_height()
-            ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h),
-                    ha='center', va='bottom')
-
-    autolabel(rects1)
-    autolabel(rects2)
-
+    # def autolabel(rects):
+    #     for rect in rects:
+    #         h = rect.get_height()
+    #         ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h),
+    #                 ha='center', va='bottom')
+    #
+    # autolabel(rects1)
+    # autolabel(rects2)
+    import pdb; pdb.set_trace()
 
 def main():
     dynet_args = [
