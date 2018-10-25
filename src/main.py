@@ -424,7 +424,6 @@ def run_test(args):
         if args.n_trees > 1:
             if predicted is None:
                 miss_predicted.append(i)
-                import pdb; pdb.set_trace()
             else:
                 test_predicted.append([p.convert() for p in predicted])
         else:
