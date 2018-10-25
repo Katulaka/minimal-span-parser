@@ -475,10 +475,10 @@ def run_print_results(args):
     ax.legend( (rects1[0], rects2[0]), ('chart', 'my') )
 
     def autolabel(rects):
-    for rect in rects:
-        h = rect.get_height()
-        ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h),
-                ha='center', va='bottom')
+        for rect in rects:
+            h = rect.get_height()
+            ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h),
+                    ha='center', va='bottom')
 
     autolabel(rects1)
     autolabel(rects2)
