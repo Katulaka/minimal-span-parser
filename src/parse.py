@@ -599,7 +599,6 @@ class MyParser(object):
                     if astar_parms[0] == 1:
                         return nodes[0].tree
                     else:
-                        import pdb; pdb.set_trace()
                         return [node.tree for node in nodes]
 
             if astar_parms[0] == 1:
