@@ -450,18 +450,24 @@ def run_print_results(args):
 
     import pickle
 
+    print("Loading test trees from {}...".format(args.test_path))
+    test_treebank = trees.load_trees(args.test_path)
+    print("Loaded {:,} test examples.".format(len(test_treebank)))
+
     with open(args.predict_path, 'rb') as f:
         test_predicted = pickle.load(f)
 
     hist = {}
     ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
-    for tree in test_predicted:
+    for gold, tree in zip(test_treebank, test_predicted):
         num_leaves = len(list(tree.leaves()))
         for key in ranges:
             if num_leaves in range(*key):
-                hist.setdefault(key[1],[]).append(tree)
+                hist.setdefault(key[1],[]).append((gold, tree))
                 break
     import pdb; pdb.set_trace()
+
+    # test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
     N = 2
     ind = np.arange(N)
@@ -554,7 +560,8 @@ def main():
     subparser = subparsers.add_parser("print")
     subparser.set_defaults(callback=run_print_results)
     subparser.add_argument("--predict-path", required=True)
-
+    subparser.add_argument("--test-path", default="data/23.auto.clean")
+    subparser.add_argument("--evalb-dir", default="EVALB/")
 
     args = parser.parse_args()
     args.callback(args)
