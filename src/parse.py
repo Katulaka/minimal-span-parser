@@ -220,6 +220,7 @@ class ChartParser(object):
             word_vocab,
             char_vocab,
             label_vocab,
+            use_char_lstm,
             tag_embedding_dim,
             word_embedding_dim,
             char_embedding_dim,
@@ -269,6 +270,7 @@ class ChartParser(object):
             self.model, 2 * lstm_dim, [label_hidden_dim], label_vocab.size - 1)
 
         self.dropout = dropout
+        self.use_char_lstm = use_char_lstm
 
 
     def param_collection(self):
