@@ -469,14 +469,14 @@ def run_print_results(args):
 
 
     fig, ax = plt.subplots()
-    xvals = hist_5.keys()
+    xvals = sorted(hist_5.keys())
 
     ind = np.arange(len(xvals))
-    width = 0.27
+    width = 0.45
     opacity = 0.8
 
-    yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in hist_5.items()]
-    zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in hist_10.items()]
+    yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_5.items())]
+    zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_10.items())]
 
 
     rects1 = plt.bar(ind, yvals, width,
@@ -491,20 +491,25 @@ def run_print_results(args):
 
     plt.xlabel('Sentence length')
     plt.ylabel('F-score')
-    plt.xticks(ind+width, xvals)
+    plt.title('F-Scores by Sentence length')
+    plt.xticks(ind+width/2., xvals)
     plt.legend()
+
+    def autolabel(rects):
+        for rect in rects:
+            h = rect.get_height()
+            ax.text(rect.get_x()+rect.get_width()/2., 1.01*h, '%.2f'%float(h),
+                ha='center', va='bottom')
+
+    autolabel(rects1)
+    autolabel(rects2)
 
     plt.tight_layout()
     plt.show()
 
-    # def autolabel(rects):
-    #     for rect in rects:
-    #         h = rect.get_height()
-    #         ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h),
-    #                 ha='center', va='bottom')
+
     #
-    # autolabel(rects1)
-    # autolabel(rects2)
+
     # import pdb; pdb.set_trace()
 
 def main():
