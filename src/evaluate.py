@@ -85,7 +85,7 @@ def evalb(evalb_dir, gold_trees, predicted_trees):
 
     return fscore
 
-def diversity(gold_trees, predicted_trees):
+def recall(gold_trees, predicted_trees):
 
     def helper(tree):
         nodes = tree if isinstance(tree, list) else [tree]
