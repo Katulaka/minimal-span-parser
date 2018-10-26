@@ -76,12 +76,12 @@ def run_train(args):
     word_vocab.index(parse.STOP)
     word_vocab.index(parse.UNK)
 
-    if args.parser_type == 'my':
-        char_vocab = vocabulary.Vocabulary()
-        char_vocab.index(parse.START)
-        char_vocab.index(parse.STOP)
-        for c in parse.START+parse.STOP+parse.UNK:
-            char_vocab.index(c)
+    # if args.parser_type == 'my':
+    char_vocab = vocabulary.Vocabulary()
+    char_vocab.index(parse.START)
+    char_vocab.index(parse.STOP)
+    for c in parse.START+parse.STOP+parse.UNK:
+        char_vocab.index(c)
 
     label_vocab = vocabulary.Vocabulary()
     if args.parser_type != 'my':
@@ -94,30 +94,24 @@ def run_train(args):
         nodes = [tree]
         while nodes:
             node = nodes.pop()
-            if args.parser_type != 'my':
-                if isinstance(node, trees.InternalParseNode):
-                    label_vocab.index(node.label)
-                    nodes.extend(reversed(node.children))
-                else:
-                    tag_vocab.index(node.tag)
-                    word_vocab.index(node.word)
+            if isinstance(node, trees.InternalParseNode):
+                label_vocab.index(node.label)
+                nodes.extend(reversed(node.children))
+            elif isinstance(node, trees.InternalMyParseNode):
+                nodes.extend(reversed(node.children))
             else:
-                if isinstance(node, trees.InternalMyParseNode):
-                    nodes.extend(reversed(node.children))
-                else:
+                tag_vocab.index(node.tag)
+                word_vocab.index(node.word)
+                for c in node.word:
+                    char_vocab.index(c)
+                if args.parser_type == 'my':
                     for l in node.labels:
                         label_vocab.index(l)
-                    for c in node.word:
-                        char_vocab.index(c)
-                    tag_vocab.index(node.tag)
-                    word_vocab.index(node.word)
-
 
     tag_vocab.freeze()
     word_vocab.freeze()
     label_vocab.freeze()
-    if args.parser_type == 'my':
-        char_vocab.freeze()
+    char_vocab.freeze()
 
     def print_vocabulary(name, vocab):
         special = {parse.START, parse.STOP, parse.UNK}
@@ -197,11 +191,14 @@ def run_train(args):
             model,
             tag_vocab,
             word_vocab,
+            char_vocab,
             label_vocab,
             args.tag_embedding_dim,
             args.word_embedding_dim,
+            args.char_embedding_dim,
             args.lstm_layers,
             args.lstm_dim,
+            args.char_lstm_dim,
             args.label_hidden_dim,
             args.dropout,
         )

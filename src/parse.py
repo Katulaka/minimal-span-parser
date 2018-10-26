@@ -218,11 +218,14 @@ class ChartParser(object):
             model,
             tag_vocab,
             word_vocab,
+            char_vocab,
             label_vocab,
             tag_embedding_dim,
             word_embedding_dim,
+            char_embedding_dim,
             lstm_layers,
             lstm_dim,
+            char_lstm_dim,
             label_hidden_dim,
             dropout,
     ):
@@ -233,6 +236,7 @@ class ChartParser(object):
         self.model = model.add_subcollection("Parser")
         self.tag_vocab = tag_vocab
         self.word_vocab = word_vocab
+        self.char_vocab = char_vocab
         self.label_vocab = label_vocab
         self.lstm_dim = lstm_dim
 
@@ -241,9 +245,22 @@ class ChartParser(object):
         self.word_embeddings = self.model.add_lookup_parameters(
             (word_vocab.size, word_embedding_dim))
 
+        embedding_dim = tag_embedding_dim + word_embedding_dim
+        if use_char_lstm:
+            self.char_vocab = char_vocab
+            self.char_embeddings = self.model.add_lookup_parameters(
+                (char_vocab.size, char_embedding_dim))
+            self.char_lstm = dy.LSTMBuilder(
+                1,
+                char_embedding_dim,
+                char_lstm_dim,
+                self.model)
+            embedding_dim += char_lstm_dim
+
         self.lstm = dy.BiRNNBuilder(
             lstm_layers,
-            tag_embedding_dim + word_embedding_dim,
+            # tag_embedding_dim + word_embedding_dim,
+            embedding_dim,
             2 * lstm_dim,
             self.model,
             dy.VanillaLSTMBuilder)
@@ -252,6 +269,7 @@ class ChartParser(object):
             self.model, 2 * lstm_dim, [label_hidden_dim], label_vocab.size - 1)
 
         self.dropout = dropout
+
 
     def param_collection(self):
         return self.model
@@ -263,20 +281,41 @@ class ChartParser(object):
     def parse(self, sentence, gold=None, k=1):
         is_train = gold is not None
 
+        if self.use_char_lstm:
+            char_lstm = self.char_lstm.initial_state()
+            if is_train:
+                self.char_lstm.set_dropout(self.dropouts.lstm)
+            else:
+                self.char_lstm.disable_dropout()
+
         if is_train:
+            embedding_dropout = self.dropout
             self.lstm.set_dropout(self.dropout)
         else:
+            embedding_dropout = 0
             self.lstm.disable_dropout()
 
         embeddings = []
         for tag, word in [(START, START)] + sentence + [(STOP, STOP)]:
             tag_embedding = self.tag_embeddings[self.tag_vocab.index(tag)]
+            tag_embedding = dy.dropout(tag_embedding, dropouts)
             if word not in (START, STOP):
                 count = self.word_vocab.count(word)
                 if not count or (is_train and np.random.rand() < 1 / (1 + count)):
                     word = UNK
             word_embedding = self.word_embeddings[self.word_vocab.index(word)]
-            embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
+            word_embedding = dy.dropout(word_embedding, dropouts)
+            if self.use_char_lstm:
+                chars_embedding = []
+                for c in [START] + list(word) + [STOP]:
+                    char_embedding = self.char_embeddings[self.char_vocab.index(c)]
+                    char_embedding = dy.dropout(char_embedding, dropouts)
+                    chars_embedding.append(char_embedding)
+                word_char_embedding = char_lstm.transduce(chars_embedding)[-1]
+                embeddings.append(dy.concatenate([tag_embedding, word_embedding, word_char_embedding]))
+            else:
+                embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
+            # embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
 
         lstm_outputs = self.lstm.transduce(embeddings)
 
