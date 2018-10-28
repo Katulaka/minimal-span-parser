@@ -563,7 +563,7 @@ def main():
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
-    subparser.add_argument("--time-out", default=60., type=float)
+    subparser.add_argument("--time-out", default=np.inf, type=float)
     subparser.add_argument("--n-discounts", default=1, type=int)
     subparser.add_argument("--discount-factor", default=0.2, type=float)
     subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
