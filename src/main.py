@@ -420,10 +420,10 @@ def run_test(args):
             )
         )
         if args.n_trees > 1:
-            if predicted is None:
-                miss_predicted.append(i)
-            else:
-                test_predicted.append([p.convert() for p in predicted])
+            # if predicted is None:
+                # miss_predicted.append(i)
+            # else:
+            test_predicted.append([p.convert() for p in predicted])
         else:
             test_predicted.append(predicted.convert())
 
@@ -455,17 +455,17 @@ def run_print_results(args):
     with open('predict_5', 'rb') as f:
         test_predicted_5 = pickle.load(f)
 
-    with open('predict_10', 'rb') as f:
-        test_predicted_10 = pickle.load(f)
+    with open('predict_chart', 'rb') as f:
+        test_predicted_chart = pickle.load(f)
 
-    hist_5, hist_10 = {}, {}
+    hist_5, hist_chart = {}, {}
     ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
-    for gold, tree_5, tree_10 in zip(test_treebank, test_predicted_5, test_predicted_10):
+    for gold, tree_5, tree_chart in zip(test_treebank, test_predicted_5, test_predicted_chart):
         num_leaves = len(list(tree_5.leaves()))
         for key in ranges:
             if num_leaves in range(*key):
                 hist_5.setdefault(key[1],[]).append((gold, tree_5))
-                hist_10.setdefault(key[1],[]).append((gold, tree_10))
+                hist_chart.setdefault(key[1],[]).append((gold, tree_chart))
                 break
 
 
@@ -479,7 +479,6 @@ def run_print_results(args):
     yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_5.items())]
     zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_10.items())]
 
-
     rects1 = plt.bar(ind, yvals, width,
                  alpha=opacity,
                  color='b',
@@ -488,7 +487,7 @@ def run_print_results(args):
     rects2 = plt.bar(ind + width, zvals, width,
                  alpha=opacity,
                  color='g',
-                 label='Beam 10')
+                 label='Chart')
 
     plt.xlabel('Sentence length')
     plt.ylabel('F-score')
@@ -507,9 +506,6 @@ def run_print_results(args):
 
     plt.tight_layout()
     plt.show()
-
-
-    #
 
     # import pdb; pdb.set_trace()
 
