@@ -419,10 +419,8 @@ def run_test(args):
                 format_elapsed(start_time),
             )
         )
-        if args.n_trees > 1:
-            # if predicted is None:
-                # miss_predicted.append(i)
-            # else:
+
+        if isinstance(predicted, list):
             test_predicted.append([p.convert() for p in predicted])
         else:
             test_predicted.append(predicted.convert())
