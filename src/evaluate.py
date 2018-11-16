@@ -3,6 +3,7 @@ import os.path
 import re
 import subprocess
 import tempfile
+import numpy as np
 
 import trees
 
@@ -15,6 +16,17 @@ class FScore(object):
     def __str__(self):
         return "(Recall={:.2f}, Precision={:.2f}, FScore={:.2f})".format(
             self.recall, self.precision, self.fscore)
+
+class Bracket(object):
+    def __init__(self, length, match_bracket, gold_bracket, test_bracket):
+        self.length = length
+        self.match_bracket = match_bracket
+        self.gold_bracket = gold_bracket
+        self.test_bracket = test_bracket
+        recall = min(self.match_bracket/self.gold_bracket, 1.) * 100
+        precision = min(self.match_bracket/self.test_bracket, 1.) * 100
+        fscore = 2./(1/recall + 1/precision) if (recall > 0 and precision > 0) else np.nan
+        self.Fscore = FScore(round(recall, 2), round(precision, 2), round(fscore, 2))
 
 def evalb(evalb_dir, gold_trees, predicted_trees):
     assert os.path.exists(evalb_dir)
@@ -69,7 +81,6 @@ def evalb(evalb_dir, gold_trees, predicted_trees):
             if match:
                 fscore.fscore = float(match.group(1))
                 break
-
     success = (
         not math.isnan(fscore.fscore) or
         fscore.recall == 0.0 or
@@ -85,19 +96,71 @@ def evalb(evalb_dir, gold_trees, predicted_trees):
 
     return fscore
 
-def recall(gold_trees, predicted_trees):
 
-    def helper(tree):
-        nodes = tree if isinstance(tree, list) else [tree]
-        span = []
-        while nodes:
-            node = nodes.pop()
-            if isinstance(node, trees.InternalTreebankNode):
-                span.append(node.linearize())
-        return span
+def evalb_full(evalb_dir, gold_trees, predicted_trees):
+    assert os.path.exists(evalb_dir)
+    evalb_program_path = os.path.join(evalb_dir, "evalb")
+    evalb_param_path = os.path.join(evalb_dir, "COLLINS.prm")
+    assert os.path.exists(evalb_program_path)
+    assert os.path.exists(evalb_param_path)
 
-    gold_spans = [helper(tree) for tree in gold_trees]
-    predicted_spans = [helper(trees) for trees in predicted_trees]
+    assert len(gold_trees) == len(predicted_trees)
+    for gold_tree, predicted_tree in zip(gold_trees, predicted_trees):
+        assert isinstance(gold_tree, trees.TreebankNode)
+        assert isinstance(predicted_tree, trees.TreebankNode)
+        gold_leaves = list(gold_tree.leaves())
+        predicted_leaves = list(predicted_tree.leaves())
+        assert len(gold_leaves) == len(predicted_leaves)
+        assert all(
+            gold_leaf.word == predicted_leaf.word
+            for gold_leaf, predicted_leaf in zip(gold_leaves, predicted_leaves))
 
-    return [sum([g in predicted for g in gold])/len(gold)
-                for gold, predicted in zip(gold_spans, predicted_spans)]
+    temp_dir = tempfile.TemporaryDirectory(prefix="evalb-")
+    gold_path = os.path.join(temp_dir.name, "gold.txt")
+    predicted_path = os.path.join(temp_dir.name, "predicted.txt")
+    output_path = os.path.join(temp_dir.name, "output.txt")
+
+    with open(gold_path, "w") as outfile:
+        for tree in gold_trees:
+            outfile.write("{}\n".format(tree.linearize()))
+
+    with open(predicted_path, "w") as outfile:
+        for tree in predicted_trees:
+            outfile.write("{}\n".format(tree.linearize()))
+
+    command = "{} -p {} {} {} > {}".format(
+        evalb_program_path,
+        evalb_param_path,
+        gold_path,
+        predicted_path,
+        output_path,
+    )
+    subprocess.run(command, shell=True)
+
+    # fscore = FScore(math.nan, math.nan, math.nan)
+    start =  False
+    results = []
+    with open(output_path) as infile:
+        for line in infile:
+            match = re.match(r"====", line)
+            if not start and match:
+                start = True
+            elif start and match:
+                break
+            elif start:
+                # length, match_bracket, gold_bracket, test_bracket = np.array(line.split())[[1,5,6,7]]
+                line = line.split()
+                length = int(line[1])
+                match_bracket, gold_bracket, test_bracket = line[5:8]
+                result = Bracket(length, float(match_bracket), float(gold_bracket), float(test_bracket))
+                results.append(result)
+    temp_dir.cleanup()
+    return results
+
+
+def recall(gold_trees, predicted_trees, k):
+
+    def helper(predict):
+        return [p.linearize() for p in predict]
+
+    return np.mean([g.linearize() in helper(p[:k]) for g, p in zip(gold_trees, predicted_trees)])
