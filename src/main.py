@@ -427,6 +427,8 @@ def run_test(args):
             test_predicted.append([p.convert() for p in predicted])
         else:
             test_predicted.append(predicted.convert())
+        
+        test_rank.append(ranks)    
 
         test_rank.append(ranks)
 
@@ -434,7 +436,6 @@ def run_test(args):
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
     else:
         import pdb; pdb.set_trace()
-        # test_diversity = evaluate.diversity(test_treebank, test_predicted)
 
     print(
         "test-fscore {} "
