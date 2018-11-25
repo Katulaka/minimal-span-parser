@@ -475,34 +475,49 @@ def run_print_results(args):
     chart_recall = [round(np.mean([int(100.0 in y[:(k+1)]) for y in chart_fscores]), 3)*100. for k in range(20)]
     # chart_recall = [evaluate.recall(test_treebank, predicted_chart, k) for k in range(1, 21)]
 
-    plt.style.use('seaborn-deep')
+    # plt.style.use('seaborn-pastel')
     fig, ax = plt.subplots()
     delta = 2
-    plt.plot(range(1, 21), chart_recall, label='chart')
-    plt.plot(range(1, 21), beam_5_recall, label='beam 5')
+    outline_b, = plt.plot(range(1, 21), beam_5_recall, ':', label='beam 5')
+    outline_c, = plt.plot(range(1, 21), chart_recall, label='chart')
     min_y = min(chart_recall + beam_5_recall) - delta
     max_y = max(chart_recall + beam_5_recall) + delta
     plt.axis([0, 21, min_y, max_y])
+    ax.set_yticklabels(['{:0.2f}%'.format(x) for x in ax.get_yticks()])
     plt.xlabel('Top-K')
     plt.ylabel('Percentage excat match')
     plt.title('Top-K by Percentage excat match')
     plt.legend(loc='upper left')
+    plt.savefig('top_k_vs_match.png', bbox_inches='tight')
 
     fig, ax = plt.subplots()
-    beam_5_max_fscore = [max(filter(lambda v: v==v, y)) for y in beam_5_fscores]
-    chart_max_fscore = [max(filter(lambda v: v==v, y)) for y in chart_fscores]
+    beam_5_max_fscore = [y[0] for y in beam_5_fscores]
+    chart_max_fscore = [y[0] for y in chart_fscores]
     min_x = math.floor(min(beam_5_max_fscore+chart_max_fscore))
-    bins = np.linspace(min_x, 100, (100 - min_x))
+    bins = np.linspace(min_x, 100, 40)
     plt.hist([beam_5_max_fscore, chart_max_fscore],
-            bins=bins,
-            density=True,
+            bins = bins,
+            density = True,
             cumulative = -1,
-            label=['beam 5', 'chart'])
-    plt.xticks(bins, rotation='vertical', fontsize=6)
-    plt.legend(loc='upper left')
+            histtype = 'step',
+            linestyle = ':',
+            edgecolor=outline_b.get_color(),
+            label = 'beam 5')
+    plt.hist(chart_max_fscore,
+            bins = bins,
+            density = True,
+            cumulative = -1,
+            linestyle = 'solid',
+            histtype = 'step',
+            edgecolor=outline_c.get_color(),
+            label = 'chart')
+    # plt.xticks(bins, rotation='vertical', fontsize=6)
+    plt.legend(loc='lower left')
     plt.xlabel('F-score')
     plt.ylabel('Density')
+    plt.ylim((0,1.05))
     plt.title('F-Scores by Density')
+    plt.savefig('fscore_vs_density.png', bbox_inches='tight')
 
     hist_5 = {}
     test_predicted_5 = sorted(beam_5_evalb[0], key = lambda x: x.length)
@@ -526,7 +541,7 @@ def run_print_results(args):
         for rect in rects:
             h = rect.get_height()
             ax.text(rect.get_x()+rect.get_width()/2., 1.01 * h, '%.2f'%float(h),
-                ha='center', va='bottom')
+                ha='center', va='bottom', fontsize=6)
 
     fig, ax = plt.subplots()
 
@@ -537,8 +552,22 @@ def run_print_results(args):
     width = 4.5
     opacity = 0.8
 
-    rects1 = plt.bar(xvals, yvals, width, alpha=opacity, label='Beam 5')
-    rects2 = plt.bar(xvals + width, zvals, width, alpha=opacity, label='Chart')
+    rects1 = plt.bar(xvals,
+                    yvals,
+                    width,
+                    alpha = opacity,
+                    facecolor = 'none',
+                    label = 'Beam 5',
+                    hatch = '\\\\',
+                    edgecolor = outline_b.get_color())
+    rects2 = plt.bar(xvals + width,
+                    zvals,
+                    width,
+                    alpha = opacity,
+                    facecolor = 'none',
+                    label = 'Chart',
+                    hatch = '//',
+                    edgecolor=outline_c.get_color())
 
     plt.xlabel('Sentence length')
     plt.ylabel('F-score')
@@ -550,45 +579,47 @@ def run_print_results(args):
     autolabel(ax, rects2)
 
     plt.tight_layout()
+    plt.savefig('fscore_vs_sentence_len.png', bbox_inches='tight')
 
-    with open('predict_5', 'rb') as f:
-        test_predicted_5 = pickle.load(f)
+    # with open('predict_5', 'rb') as f:
+    #     test_predicted_5 = pickle.load(f)
+    #
+    # with open('predict_chart', 'rb') as f:
+    #     test_predicted_chart = pickle.load(f)
+    #
+    # hist_5, hist_chart = {}, {}
+    # ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
+    # for gold, tree_5, tree_chart in zip(test_treebank, test_predicted_5, test_predicted_chart):
+    #     num_leaves = len(list(tree_5.leaves()))
+    #     for key in ranges:
+    #         if num_leaves in range(*key):
+    #             hist_5.setdefault(key[1],[]).append((gold, tree_5))
+    #             hist_chart.setdefault(key[1],[]).append((gold, tree_chart))
+    #             break
+    #
+    # xvals = np.array(sorted(hist_5.keys()))
+    # yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_5.items())]
+    # zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_chart.items())]
+    #
+    # fig, ax = plt.subplots()
+    #
+    # rects1 = plt.bar(xvals, yvals, width, alpha=opacity, label='Beam 5')
+    # rects2 = plt.bar(xvals + width, zvals, width, alpha=opacity, label='Chart')
+    #
+    # plt.xlabel('Sentence length')
+    # plt.ylabel('F-score')
+    # plt.title('F-Scores by Sentence length')
+    # plt.xticks(xvals + 1.5 * width, xvals)
+    # plt.legend(loc='lower left')
+    #
+    # autolabel(ax, rects1)
+    # autolabel(ax, rects2)
+    #
+    # plt.tight_layout()
+    # # plt.savefig('foo3.png', bbox_inches='tight')
 
-    with open('predict_chart', 'rb') as f:
-        test_predicted_chart = pickle.load(f)
-
-    hist_5, hist_chart = {}, {}
-    ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
-    for gold, tree_5, tree_chart in zip(test_treebank, test_predicted_5, test_predicted_chart):
-        num_leaves = len(list(tree_5.leaves()))
-        for key in ranges:
-            if num_leaves in range(*key):
-                hist_5.setdefault(key[1],[]).append((gold, tree_5))
-                hist_chart.setdefault(key[1],[]).append((gold, tree_chart))
-                break
-
-    xvals = np.array(sorted(hist_5.keys()))
-    yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_5.items())]
-    zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_chart.items())]
-
-    fig, ax = plt.subplots()
-
-    rects1 = plt.bar(xvals, yvals, width, alpha=opacity, label='Beam 5')
-    rects2 = plt.bar(xvals + width, zvals, width, alpha=opacity, label='Chart')
-
-    plt.xlabel('Sentence length')
-    plt.ylabel('F-score')
-    plt.title('F-Scores by Sentence length')
-    plt.xticks(xvals + 1.5 * width, xvals)
-    plt.legend(loc='lower left')
-
-    autolabel(ax, rects1)
-    autolabel(ax, rects2)
-
-    plt.tight_layout()
-
-    plt.show()
-    import pdb; pdb.set_trace()
+    # plt.show()
+    # import pdb; pdb.set_trace()
 
 
 def main():
