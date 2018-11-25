@@ -25,7 +25,7 @@ class Bracket(object):
         self.test_bracket = test_bracket
         recall = min(self.match_bracket/self.gold_bracket, 1.) * 100
         precision = min(self.match_bracket/self.test_bracket, 1.) * 100
-        fscore = 2./(1/recall + 1/precision) if (recall > 0 and precision > 0) else np.nan
+        fscore = 2./(1/recall + 1/precision) if (recall > 0 and precision > 0) else 0.0
         self.Fscore = FScore(round(recall, 2), round(precision, 2), round(fscore, 2))
 
 def evalb(evalb_dir, gold_trees, predicted_trees):
