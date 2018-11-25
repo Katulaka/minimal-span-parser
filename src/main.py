@@ -400,7 +400,7 @@ def run_test(args):
     start_time = time.time()
     test_predicted = []
     if args.parser_type == "my":
-        miss_predicted = []
+        test_rank = []
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : args.beam_size}
 
@@ -409,7 +409,7 @@ def run_test(args):
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
         if args.parser_type == "my":
-            predicted = parser.parse(sentence, predict_parms=predict_parms)
+            predicted, ranks = parser.parse(sentence, predict_parms=predict_parms)
         else:
             predicted, _ = parser.parse(sentence, k = args.n_trees)
         print(
@@ -427,6 +427,8 @@ def run_test(args):
             test_predicted.append([p.convert() for p in predicted])
         else:
             test_predicted.append(predicted.convert())
+
+        test_rank.append(ranks)
 
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
