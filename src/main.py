@@ -427,15 +427,16 @@ def run_test(args):
             test_predicted.append([p.convert() for p in predicted])
         else:
             test_predicted.append(predicted.convert())
-        
-        test_rank.append(ranks)    
 
         test_rank.append(ranks)
 
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
     else:
-        import pdb; pdb.set_trace()
+        with open('test_rank', 'wb') as f:
+            pickle.dump(test_rank, f)
+        with open('test_predicted' ,'wb') as f:
+            pickle.dump(test_predicted, f)
 
     print(
         "test-fscore {} "
