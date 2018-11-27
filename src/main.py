@@ -92,6 +92,16 @@ def run_train(args):
     else:
         label_vocab.index(parse.START)
         label_vocab.index(parse.STOP)
+        if args.keep_valence_value:
+            for tree in dev_parse:
+                nodes = [tree]
+                while nodes:
+                    node = nodes.pop()
+                    if isinstance(node, trees.InternalMyParseNode):
+                        nodes.extend(reversed(node.children))
+                    else:
+                        for l in node.labels:
+                            label_vocab.index(l)
 
     for tree in train_parse:
         nodes = [tree]
