@@ -61,13 +61,13 @@ class AstarNode(object):
             #TODO fix combination order --> incorrect order
             leaves = []
             label = _trees[0].children[-1].bracket_label()
-            for leaf in _trees[1].missing_leaves():
-                if leaf.label.startswith(miss_side):
-                    missing_label = leaf.label.split(miss_side)[-1]
-                    if not keep_valence_value:
-                        leaves.append(leaf)
-                    elif missing_label == label:
-                        leaves.append(leaf)
+            for leaf in _trees[1].missing_leaves(miss_side):
+                # if leaf.label.startswith(miss_side):
+                missing_label = leaf.label.split(miss_side)[-1]
+                if not keep_valence_value:
+                    leaves.append(leaf)
+                elif missing_label == label:
+                    leaves.append(leaf)
             return leaves
 
         if not len(list(right_tree.missing_leaves())) and not len(list(left_tree.missing_leaves())):

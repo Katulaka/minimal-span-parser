@@ -203,9 +203,9 @@ class InternalMyParseNode(MyParseNode):
         for child in self.children:
             yield from child.leaves()
 
-    def missing_leaves(self):
+    def missing_leaves(self, side=None):
         for child in self.children:
-            yield from child.missing_leaves()
+            yield from child.missing_leaves(side)
 
     def convert(self):
         children = [child.convert() for child in self.children]
@@ -282,7 +282,7 @@ class LeafMyParseNode(MyParseNode):
     def leaves(self):
         yield self
 
-    def missing_leaves(self):
+    def missing_leaves(self, side):
         yield from ()
 
     def convert(self):
@@ -329,8 +329,12 @@ class MissMyParseNode(MyParseNode):
     def leaves(self):
         yield self
 
-    def missing_leaves(self):
-        yield self
+    def missing_leaves(self, side):
+        if side is None or self.label.startswith(side):
+            yield self
+        else:
+            yield from ()
+
 
     def siblings(self):
         for child in self.parent.children:
