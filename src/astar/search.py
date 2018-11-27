@@ -60,7 +60,6 @@ class AstarNode(object):
             assert len(_trees[0].children) == 1
             #TODO fix combination order --> incorrect order
             leaves = []
-            import pdb; pdb.set_trace()
             label = _trees[0].children[-1].bracket_label()
             for leaf in _trees[1].missing_leaves():
                 if leaf.label.startswith(miss_side):
@@ -71,7 +70,9 @@ class AstarNode(object):
                         leaves.append(leaf)
             return leaves
 
-        # if all(isinstance(tree, trees.InternalMyParseNode) for tree in c_trees):
+        if not len(list(right_tree.missing_leaves())) and not len(list(left_tree.missing_leaves())):
+            return False
+
         #Trying to combine Left Tree --> Right Tree
         if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
             leaves = helper([left_tree, right_tree], trees.CR, trees.L)
