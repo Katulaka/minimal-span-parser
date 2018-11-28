@@ -479,12 +479,18 @@ class MyParser(object):
             self.char_vocab = char_vocab
             self.char_embeddings = self.model.add_lookup_parameters(
                 (char_vocab.size, char_embedding_dim))
-            self.char_lstm = dy.LSTMBuilder(
-                1,
-                char_embedding_dim,
-                char_lstm_dim,
-                self.model)
-            embedding_dim += char_lstm_dim
+            # self.char_lstm = dy.LSTMBuilder(
+            #     1,
+            #     char_embedding_dim,
+            #     char_lstm_dim,
+            #     self.model)
+            self.char_lstm = dy.BiRNNBuilder(
+            1,
+            char_embedding_dim,
+            2 * char_lstm_dim,
+            self.model,
+            dy.VanillaLSTMBuilder)
+            embedding_dim += 2 * char_lstm_dim
 
         self.enc_lstm = dy.BiRNNBuilder(
             lstm_layers,
