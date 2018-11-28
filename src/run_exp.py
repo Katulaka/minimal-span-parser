@@ -23,4 +23,4 @@ for i, embeddings in enumerate(itertools.product(tag_embedding, word_embedding, 
                     # "--label-hidden-dim {} "
                     "--dynet-devices {} "
                      ).format(*embeddings, device)
-    Popen(command.split())
+        Popen(command.split())
