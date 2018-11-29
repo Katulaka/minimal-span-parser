@@ -4,7 +4,7 @@ import itertools
 n_gpus = 8
 label_embedding = [100, 150, 200]
 char_lstm = [100, 150, 200]
-for i, dims in enumerate(itertools.product(label_embedding, char_lstmg)):
+for i, dims in enumerate(itertools.product(label_embedding, char_lstm)):
     if dims != (100, 100):
         device = 'GPU:{}'.format(i%n_gpus)
         command = ("python src/main.py train "
