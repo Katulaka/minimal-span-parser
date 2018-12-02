@@ -21,9 +21,9 @@ for i, dims in enumerate(itertools.product(label_embedding, label_dim)):
                     "--label-embedding-dim {} "
                     # "--char-lstm-dim {} "
                     # "--lstm-dim {} "
-                    # "--dec-lstm-dim {} "
+                    "--dec-lstm-dim {} "
                     # "--attention-dim {} "
-                    "--label-hidden-dim {} "
+                    # "--label-hidden-dim {} "
                     "--dynet-devices {} "
                      ).format(*dims, device)
         Popen(command.split())
