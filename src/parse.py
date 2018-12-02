@@ -479,18 +479,19 @@ class MyParser(object):
             self.char_vocab = char_vocab
             self.char_embeddings = self.model.add_lookup_parameters(
                 (char_vocab.size, char_embedding_dim))
-            # self.char_lstm = dy.LSTMBuilder(
-            #     1,
-            #     char_embedding_dim,
-            #     char_lstm_dim,
-            #     self.model)
-            self.char_lstm = dy.BiRNNBuilder(
-            1,
-            char_embedding_dim,
-            2 * char_lstm_dim,
-            self.model,
-            dy.VanillaLSTMBuilder)
-            embedding_dim += 2 * char_lstm_dim
+            self.char_lstm = dy.LSTMBuilder(
+                1,
+                char_embedding_dim,
+                char_lstm_dim,
+                self.model)
+            embedding_dim += char_lstm_dim
+            # self.char_lstm = dy.BiRNNBuilder(
+            # 1,
+            # char_embedding_dim,
+            # 2 * char_lstm_dim,
+            # self.model,
+            # dy.VanillaLSTMBuilder)
+            # embedding_dim += 2 * char_lstm_dim
 
         self.enc_lstm = dy.BiRNNBuilder(
             lstm_layers,
@@ -538,7 +539,7 @@ class MyParser(object):
         use_dropout = is_train and not is_dev
 
         if self.use_char_lstm:
-            # char_lstm = self.char_lstm.initial_state()
+            char_lstm = self.char_lstm.initial_state()
             if use_dropout:
                 self.char_lstm.set_dropout(self.dropouts.lstm)
             else:
@@ -569,7 +570,7 @@ class MyParser(object):
                     char_embedding = self.char_embeddings[self.char_vocab.index(c)]
                     char_embedding = dy.dropout(char_embedding, dropouts)
                     chars_embedding.append(char_embedding)
-                word_char_embedding = self.char_lstm.transduce(chars_embedding)[-1]
+                word_char_embedding = char_lstm.transduce(chars_embedding)[-1]
                 embeddings.append(dy.concatenate([tag_embedding, word_embedding, word_char_embedding]))
             else:
                 embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
