@@ -636,11 +636,13 @@ class MyParser(object):
 
                 grid = {}
                 for left, (leaf_hyps, leaf) in enumerate(zip(hyps, sentence)):
-                    for rank, hyp in enumerate(leaf_hyps):
+                    rank = 0
+                    for hyp in leaf_hyps:
                         labels = [self.label_vocab.value(h) for h in hyp[0]]
                         partial_tree = trees.LeafMyParseNode(left, *leaf).deserialize(labels)
                         if partial_tree is not None:
                             grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
+                            rank += 1
 
                 nodes, seen = astar_search(grid, self.keep_valence_value, astar_parms)
                 if nodes != []:

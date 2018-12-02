@@ -156,7 +156,6 @@ class Solver(AStar):
             if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, nb.tree,  node.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
-        # if len(node.rank) == 1 and node.rank[0] + 1 < len(self.grid[node.left]):
         rank = node.rank[0] + 1
         if len(node.rank) == 1 and (node.left, rank) in self.grid:
             nb_node = AstarNode(node.left, node.right, [rank], self.grid[node.left, rank].tree)
@@ -172,12 +171,8 @@ class Solver(AStar):
 
 def astar_search(grid, keep_valence_value, astar_parms):
 
-    # n_words = len(grid)
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
-    try:
-        start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
-    except:
-        import pdb; pdb.set_trace()
+    start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
     goal = AstarNode(0, n_words)
     # let's solve it
     solver = Solver(grid, keep_valence_value)
