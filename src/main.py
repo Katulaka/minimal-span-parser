@@ -442,17 +442,10 @@ def run_test(args):
         if args.parser_type == "my":
             test_rank.append(ranks)
 
+    import pdb; pdb.set_trace()
+
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
-
-    # if args.parser_type == "my":
-    #     test_rank_fname = 'test_rank_{}'.format(args.n_trees)
-    #     with open(test_rank_fname, 'wb') as f:
-    #         pickle.dump(test_rank, f)
-    #
-    # test_predicted_fname = 'test_predicted_{}'.format(args.n_trees)
-    # with open(test_predicted_fname ,'wb') as f:
-    #     pickle.dump(test_predicted, f)
 
     print(
         "test-fscore {} "
