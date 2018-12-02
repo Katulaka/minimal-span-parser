@@ -174,7 +174,10 @@ def astar_search(grid, keep_valence_value, astar_parms):
 
     # n_words = len(grid)
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
-    start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
+    try:
+        start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
+    except:
+        import pdb; pdb.set_trace()
     goal = AstarNode(0, n_words)
     # let's solve it
     solver = Solver(grid, keep_valence_value)
