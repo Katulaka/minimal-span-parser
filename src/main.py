@@ -153,7 +153,7 @@ def run_train(args):
                 'attention-dim({})_'
                 'projection-dim({})_'
                 'dropouts({})_'
-                'bidi_char'
+                'keep_valence_value_'
                 ).format(
                     args.char_embedding_dim,
                     args.tag_embedding_dim,
