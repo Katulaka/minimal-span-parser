@@ -417,7 +417,7 @@ def run_test(args):
 
     # for i, tree in  enumerate(test_treebank):
     for i in [32, 59, 562, 2268]:
-        tree = test_treebank[i]
+        tree = test_treebank[i-1]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
