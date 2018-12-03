@@ -178,4 +178,6 @@ def astar_search(grid, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
+    import pdb; pdb.set_trace()
+
     return nodes, solver.seen
