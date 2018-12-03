@@ -444,7 +444,7 @@ def run_test(args):
         if args.parser_type == "my":
             test_rank.append(ranks)
 
-
+    import pdb; pdb.set_trace()
 
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
