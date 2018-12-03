@@ -5,7 +5,7 @@ n_gpus = 8
 tag_embedding = [100, 150, 200]
 word_embedding = [100, 150]
 char_embedding = [50, 100]
-label_embedding = [100, 150, 200]
+label_embedding = [250, 300]
 label_dim = [500, 600, 700]
 for i, dims in enumerate(itertools.product(label_embedding, label_dim)):
     if dims != (100, 600):
