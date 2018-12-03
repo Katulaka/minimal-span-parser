@@ -408,7 +408,6 @@ def run_test(args):
 
     print("Parsing test sentences...")
 
-    import pdb; pdb.set_trace()
 
     start_time = time.time()
     test_predicted = []
@@ -417,7 +416,9 @@ def run_test(args):
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : args.beam_size}
 
-    for i, tree in  enumerate(test_treebank):
+    # for i, tree in  enumerate(test_treebank):
+    for i in [59, 562, 2268]:
+        tree = test_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
