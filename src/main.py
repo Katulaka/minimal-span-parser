@@ -435,7 +435,7 @@ def run_test(args):
                 format_elapsed(start_time),
             )
         )
-        test_fscore = evaluate.evalb(args.evalb_dir, [tree], [predicted])
+        test_fscore = evaluate.evalb(args.evalb_dir, [tree], [predicted.convert()])
         if isinstance(predicted, list):
             test_predicted.append([p.convert() for p in predicted])
         else:
