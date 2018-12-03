@@ -1,20 +1,20 @@
 import argparse
 import itertools
-import math
+# import math
 import os.path
-import pickle
 import time
 from subprocess import Popen, DEVNULL, PIPE
 # from pycrayon import CrayonClient
 
 import dynet as dy
-import matplotlib.pyplot as plt
 import numpy as np
 
 import evaluate
 import parse
 import trees
 import vocabulary
+from plot_results import plot_results
+
 
 def format_elapsed(start_time):
     elapsed_time = int(time.time() - start_time)
@@ -456,183 +456,6 @@ def run_test(args):
             format_elapsed(start_time),
         )
     )
-    import pdb; pdb.set_trace()
-
-def run_print_results(args):
-    print("Loading test trees from {}...".format(args.test_path))
-    test_treebank = trees.load_trees(args.test_path)
-    print("Loaded {:,} test examples.".format(len(test_treebank)))
-
-    with open('predict_5_top_20', 'rb') as f:
-        predicted_5 = pickle.load(f)
-
-    with open('predict_top_20_chart', 'rb') as f:
-        predicted_chart = pickle.load(f)
-
-    def helper(predict, k):
-        if isinstance(predict, trees.InternalTreebankNode):
-            return [predict] * k
-        return predict + [predict[-1]] * (k - len(predict))
-
-    predicted_5 = list(zip(*[helper(p, 20) for p in predicted_5]))
-    beam_5_evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predicted_5[k]) for k in range(20)]
-
-    predicted_chart = list(zip(*predicted_chart))
-    chart_evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predicted_chart[k]) for k in range(20)]
-
-    beam_5_fscores = list(zip(*[[y.Fscore.fscore for y in x] for x in beam_5_evalb]))
-    beam_5_recall = [round(np.mean([int(100.0 in y[:(k+1)]) for y in beam_5_fscores]), 3)*100. for k in range(20)]
-    # beam_5_recall = [evaluate.recall(test_treebank, predicted_5, k) for k in range(1, 21)]
-
-    chart_fscores = list(zip(*[[y.Fscore.fscore for y in x] for x in chart_evalb]))
-    chart_recall = [round(np.mean([int(100.0 in y[:(k+1)]) for y in chart_fscores]), 3)*100. for k in range(20)]
-    # chart_recall = [evaluate.recall(test_treebank, predicted_chart, k) for k in range(1, 21)]
-
-    # plt.style.use('seaborn-pastel')
-    fig, ax = plt.subplots()
-    delta = 2
-    outline_b, = plt.plot(range(1, 21), beam_5_recall, ':', label='beam 5')
-    outline_c, = plt.plot(range(1, 21), chart_recall, label='chart')
-    min_y = min(chart_recall + beam_5_recall) - delta
-    max_y = max(chart_recall + beam_5_recall) + delta
-    plt.axis([0, 21, min_y, max_y])
-    ax.set_yticklabels(['{:0.2f}%'.format(x) for x in ax.get_yticks()])
-    plt.xlabel('Top-K')
-    plt.ylabel('Percentage excat match')
-    plt.title('Top-K by Percentage excat match')
-    plt.legend(loc='upper left')
-    plt.savefig('top_k_vs_match.png', bbox_inches='tight')
-
-    fig, ax = plt.subplots()
-    beam_5_max_fscore = [y[0] for y in beam_5_fscores]
-    chart_max_fscore = [y[0] for y in chart_fscores]
-    min_x = math.floor(min(beam_5_max_fscore+chart_max_fscore))
-    bins = np.linspace(min_x, 100, 40)
-    plt.hist([beam_5_max_fscore, chart_max_fscore],
-            bins = bins,
-            density = True,
-            cumulative = -1,
-            histtype = 'step',
-            linestyle = ':',
-            edgecolor=outline_b.get_color(),
-            label = 'beam 5')
-    plt.hist(chart_max_fscore,
-            bins = bins,
-            density = True,
-            cumulative = -1,
-            linestyle = 'solid',
-            histtype = 'step',
-            edgecolor=outline_c.get_color(),
-            label = 'chart')
-    # plt.xticks(bins, rotation='vertical', fontsize=6)
-    plt.legend(loc='lower left')
-    plt.xlabel('F-score')
-    plt.ylabel('Density')
-    plt.ylim((0,1.05))
-    plt.title('F-Scores by Density')
-    plt.savefig('fscore_vs_density.png', bbox_inches='tight')
-
-    hist_5 = {}
-    test_predicted_5 = sorted(beam_5_evalb[0], key = lambda x: x.length)
-    for key, value in itertools.groupby(test_predicted_5, lambda x: int(x.length/10) * 10):
-        value = list(value)
-        match_bracket = sum((h.match_bracket for h in value))
-        gold_bracket = sum((h.gold_bracket for h in value))
-        test_bracket = sum((h.test_bracket for h in value))
-        hist_5[key] = evaluate.Bracket(key, match_bracket, gold_bracket, test_bracket).Fscore.fscore
-
-    hist_chart = {}
-    test_predicted_chart = sorted(chart_evalb[0], key = lambda x: x.length)
-    for key, value in itertools.groupby(test_predicted_chart, lambda x: int(x.length/10) * 10):
-        value = list(value)
-        match_bracket = sum((h.match_bracket for h in value))
-        gold_bracket = sum((h.gold_bracket for h in value))
-        test_bracket = sum((h.test_bracket for h in value))
-        hist_chart[key] = evaluate.Bracket(key, match_bracket, gold_bracket, test_bracket).Fscore.fscore
-
-    def autolabel(ax, rects):
-        for rect in rects:
-            h = rect.get_height()
-            ax.text(rect.get_x()+rect.get_width()/2., 1.01 * h, '%.2f'%float(h),
-                ha='center', va='bottom', fontsize=6)
-
-    fig, ax = plt.subplots()
-
-    xvals, yvals = zip(*sorted(hist_5.items()))
-    _, zvals = zip(*sorted(hist_chart.items()))
-    xvals = np.array(xvals) + 10
-
-    width = 4.5
-    opacity = 0.8
-
-    rects1 = plt.bar(xvals,
-                    yvals,
-                    width,
-                    alpha = opacity,
-                    facecolor = 'none',
-                    label = 'Beam 5',
-                    hatch = '\\\\',
-                    edgecolor = outline_b.get_color())
-    rects2 = plt.bar(xvals + width,
-                    zvals,
-                    width,
-                    alpha = opacity,
-                    facecolor = 'none',
-                    label = 'Chart',
-                    hatch = '//',
-                    edgecolor=outline_c.get_color())
-
-    plt.xlabel('Sentence length')
-    plt.ylabel('F-score')
-    plt.title('F-Scores by Sentence length')
-    plt.xticks(xvals + 1.5 * width, xvals)
-    plt.legend(loc='lower left')
-
-    autolabel(ax, rects1)
-    autolabel(ax, rects2)
-
-    plt.tight_layout()
-    plt.savefig('fscore_vs_sentence_len.png', bbox_inches='tight')
-
-    # with open('predict_5', 'rb') as f:
-    #     test_predicted_5 = pickle.load(f)
-    #
-    # with open('predict_chart', 'rb') as f:
-    #     test_predicted_chart = pickle.load(f)
-    #
-    # hist_5, hist_chart = {}, {}
-    # ranges = [(l,u) for l, u in zip(range(0,70,10), range(10,80,10))]
-    # for gold, tree_5, tree_chart in zip(test_treebank, test_predicted_5, test_predicted_chart):
-    #     num_leaves = len(list(tree_5.leaves()))
-    #     for key in ranges:
-    #         if num_leaves in range(*key):
-    #             hist_5.setdefault(key[1],[]).append((gold, tree_5))
-    #             hist_chart.setdefault(key[1],[]).append((gold, tree_chart))
-    #             break
-    #
-    # xvals = np.array(sorted(hist_5.keys()))
-    # yvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_5.items())]
-    # zvals = [evaluate.evalb(args.evalb_dir, *zip(*v)).fscore for k, v in sorted(hist_chart.items())]
-    #
-    # fig, ax = plt.subplots()
-    #
-    # rects1 = plt.bar(xvals, yvals, width, alpha=opacity, label='Beam 5')
-    # rects2 = plt.bar(xvals + width, zvals, width, alpha=opacity, label='Chart')
-    #
-    # plt.xlabel('Sentence length')
-    # plt.ylabel('F-score')
-    # plt.title('F-Scores by Sentence length')
-    # plt.xticks(xvals + 1.5 * width, xvals)
-    # plt.legend(loc='lower left')
-    #
-    # autolabel(ax, rects1)
-    # autolabel(ax, rects2)
-    #
-    # plt.tight_layout()
-    # # plt.savefig('foo3.png', bbox_inches='tight')
-
-    # plt.show()
-    # import pdb; pdb.set_trace()
 
 
 def main():
@@ -695,7 +518,7 @@ def main():
     subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
 
     subparser = subparsers.add_parser("print")
-    subparser.set_defaults(callback=run_print_results)
+    subparser.set_defaults(callback=plot_results)
     # subparser.add_argument("--predict-path", required=True)
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--evalb-dir", default="EVALB/")
