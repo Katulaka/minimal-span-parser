@@ -441,7 +441,6 @@ def run_test(args):
         if args.parser_type == "my":
             test_rank.append(ranks)
 
-        import pdb; pdb.set_trace()
 
     import pdb; pdb.set_trace()
 
