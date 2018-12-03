@@ -167,10 +167,10 @@ class Solver(AStar):
     def is_goal_reached(self, node, goal):
         # if (node.left, node.right) == (goal.left, goal.right):
         node_leaves = list(node.leaves())
+        goal_leaves = list(goal.tree.leaves())
         if all(
-            goal_leaf == (node_leaf.tag, node_leaf.word)
-            for goal_leaf, node_leaf in zip(goal, node_leaves)):
-            # import pdb; pdb.set_trace()
+            (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
+            for goal_leaf, node_leaf in zip(goal_leaves, node_leaves)):
                 return not len(list(node.tree.missing_leaves()))
         return False
 
@@ -179,7 +179,9 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
     # goal = AstarNode(0, n_words)
-    goal = sentence
+    children = [trees.LeafMyParseNode(left, *leaf) for left, leaf in enumerate(sentence)]
+    goal_tree = trees.InternalMyParseNode('', children)
+    goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
