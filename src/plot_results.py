@@ -82,7 +82,7 @@ def plot_results(args):
     chart_0_fscore = [y[0] for y in chart_fscores]
     min_x = math.floor(min(beam_5_0_fscore+chart_0_fscore))
     bins = np.linspace(min_x, 100, 40)
-    plt.hist([beam_5_0_fscore, chart_0_fscore],
+    plt.hist(beam_5_0_fscore,
             bins = bins,
             density = True,
             cumulative = -1,
