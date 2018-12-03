@@ -171,9 +171,13 @@ class Solver(AStar):
             and not len(list(node.tree.missing_leaves())):
             node_leaves = list(node.tree.leaves())
             goal_leaves = list(goal.tree.leaves())
-            return all(
+            if all(
                 (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
+                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves)):
+                    import pdb; pdb.set_trace()
+                    return True
+            else:
+                return False
         return False
 
 def astar_search(grid, sentence, keep_valence_value, astar_parms):
