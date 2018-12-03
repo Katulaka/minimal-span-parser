@@ -180,7 +180,7 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
     # goal = AstarNode(0, n_words)
     children = [trees.LeafMyParseNode(left, *leaf) for left, leaf in enumerate(sentence)]
-    goal_tree = trees.InternalMyParseNode('', children)
+    goal_tree = trees.InternalMyParseNode('.', children)
     goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
     solver = Solver(grid, keep_valence_value)
