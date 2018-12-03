@@ -416,8 +416,10 @@ def run_test(args):
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : args.beam_size}
 
     # for i, tree in  enumerate(test_treebank):
+    gold = []
     for i in [32, 59, 562, 2268]:
         tree = test_treebank[i-1]
+        gold.append(tree)
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
@@ -443,7 +445,7 @@ def run_test(args):
         if args.parser_type == "my":
             test_rank.append(ranks)
 
-
+    test_fscore = evaluate.evalb(args.evalb_dir, gold, test_predicted)
     import pdb; pdb.set_trace()
 
     if args.n_trees == 1:
