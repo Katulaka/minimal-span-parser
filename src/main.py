@@ -408,6 +408,8 @@ def run_test(args):
 
     print("Parsing test sentences...")
 
+    import pdb; pdb.set_trace()
+
     start_time = time.time()
     test_predicted = []
     if args.parser_type == "my":
@@ -415,9 +417,7 @@ def run_test(args):
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : args.beam_size}
 
-    # for i, tree in  enumerate(test_treebank):
-    for i in [32, 59, 562, 2268]:
-        tree = test_treebank[i-1]
+    for i, tree in  enumerate(test_treebank):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
@@ -435,7 +435,6 @@ def run_test(args):
                 format_elapsed(start_time),
             )
         )
-        test_fscore = evaluate.evalb(args.evalb_dir, [tree], [predicted.convert()])
         if isinstance(predicted, list):
             test_predicted.append([p.convert() for p in predicted])
         else:
@@ -445,7 +444,6 @@ def run_test(args):
             test_rank.append(ranks)
 
 
-    import pdb; pdb.set_trace()
 
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
