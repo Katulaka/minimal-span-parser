@@ -165,16 +165,21 @@ class Solver(AStar):
         return neighbors
 
     def is_goal_reached(self, node, goal):
-        if (node.left, node.right) == (goal.left, goal.right):
-            import pdb; pdb.set_trace()
-            return not len(list(node.tree.missing_leaves()))
+        # if (node.left, node.right) == (goal.left, goal.right):
+        node_leaves = list(node.leaves())
+        if all(
+            goal_leaf == (node_leaf.tag, node_leaf.word)
+            for goal_leaf, node_leaf in zip(goal, node_leaves)):
+            # import pdb; pdb.set_trace()
+                return not len(list(node.tree.missing_leaves()))
         return False
 
-def astar_search(grid, keep_valence_value, astar_parms):
+def astar_search(grid, sentence, keep_valence_value, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
-    goal = AstarNode(0, n_words)
+    # goal = AstarNode(0, n_words)
+    goal = sentence
     # let's solve it
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
