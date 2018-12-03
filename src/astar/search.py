@@ -75,7 +75,6 @@ class AstarNode(object):
 
         #Trying to combine Left Tree --> Right Tree
         if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
-            import pdb; pdb.set_trace()
             leaves = helper([left_tree, right_tree], trees.CR, trees.L)
             if leaves != []:
                 self.tree = right_tree.combine(left_tree.children[0], leaves[-1])
@@ -83,7 +82,6 @@ class AstarNode(object):
 
         #Trying to combine Right Tree --> Left Tree
         if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
-            import pdb; pdb.set_trace()
             leaves = helper([right_tree, left_tree], trees.CL, trees.R)
             if leaves != []:
                 self.tree = left_tree.combine(right_tree.children[0], leaves[0])
@@ -168,6 +166,7 @@ class Solver(AStar):
 
     def is_goal_reached(self, node, goal):
         if (node.left, node.right) == (goal.left, goal.right):
+            import pdb; pdb.set_trace()
             return not len(list(node.tree.missing_leaves()))
         return False
 
