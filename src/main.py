@@ -433,7 +433,6 @@ def run_test(args):
                 format_elapsed(start_time),
             )
         )
-        import pdb; pdb.set_trace()
         if isinstance(predicted, list):
             test_predicted.append([p.convert() for p in predicted])
         else:
@@ -441,6 +440,8 @@ def run_test(args):
 
         if args.parser_type == "my":
             test_rank.append(ranks)
+
+        import pdb; pdb.set_trace()
 
     import pdb; pdb.set_trace()
 
