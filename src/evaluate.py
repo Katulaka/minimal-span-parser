@@ -29,6 +29,7 @@ class Bracket(object):
         self.Fscore = FScore(round(recall, 2), round(precision, 2), round(fscore, 2))
 
 def evalb(evalb_dir, gold_trees, predicted_trees):
+    import pdb; pdb.set_trace()
     assert os.path.exists(evalb_dir)
     evalb_program_path = os.path.join(evalb_dir, "evalb")
     evalb_param_path = os.path.join(evalb_dir, "COLLINS.prm")

@@ -659,8 +659,6 @@ class MyParser(object):
                     for l in node.tree.missing_leaves():
                         l.parent.children = list(filter(lambda x: x != l, l.parent.children))
             else:
-                import pdb; pdb.set_trace()
-                # nodes = sorted(seen, key = lambda x: abs(len(list(x.tree.leaves())) - len(sentence)))
                 nodes = sorted(seen, key = lambda x: x.right - x.left, reverse = True)
                 nodes = nodes[:astar_parms[0]]
                 for node in nodes:
