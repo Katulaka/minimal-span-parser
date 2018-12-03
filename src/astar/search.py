@@ -166,8 +166,13 @@ class Solver(AStar):
 
     def is_goal_reached(self, node, goal):
         if (node.left, node.right) == (goal.left, goal.right):
-            import pdb; pdb.set_trace()
-            return not len(list(node.tree.missing_leaves()))
+            if not len(list(node.tree.missing_leaves())):
+                node.tree.children = sorted(node.tree.children, key=lambda x: x.left)
+                return True
+            else:
+                return False    
+            # import pdb; pdb.set_trace()
+            # return not len(list(node.tree.missing_leaves()))
         return False
 
 def astar_search(grid, keep_valence_value, astar_parms):
