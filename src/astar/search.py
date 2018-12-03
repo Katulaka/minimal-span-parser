@@ -166,7 +166,7 @@ class Solver(AStar):
 
     def is_goal_reached(self, node, goal):
         # if (node.left, node.right) == (goal.left, goal.right):
-        node_leaves = list(node.leaves())
+        node_leaves = list(node.tree.leaves())
         goal_leaves = list(goal.tree.leaves())
         if all(
             (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
