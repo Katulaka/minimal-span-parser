@@ -191,9 +191,16 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     else:
         nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), solver.seen)
         nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
-        for node in nodes:
+        if len(nodes):
             import pdb; pdb.set_trace()
-            node.tree = node.tree.filter_missing()
+            for node in nodes:
+                node.tree = node.tree.filter_missing()
+         else:
+             import pdb; pdb.set_trace()
+             nodes = sorted(solver.seen, key = lambda x: x.right - x.left, reverse = True)
+             for node in nodes:
+                 node.tree = node.tree.filter_missing()
+
         print("No nodes")
     return nodes, solver.seen
 
