@@ -61,6 +61,7 @@ class AstarNode(object):
             #TODO fix combination order --> incorrect order
             leaves = []
             label = _trees[0].children[-1].bracket_label()
+            import pdb; pdb.set_trace()
             for leaf in _trees[1].missing_leaves(miss_side):
                 # if leaf.label.startswith(miss_side):
                 missing_label = leaf.label.split(miss_side)[-1]
