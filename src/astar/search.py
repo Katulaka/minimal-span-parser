@@ -50,7 +50,7 @@ class AstarNode(object):
         assert isinstance(right_tree, trees.InternalMyParseNode)
 
         # @functools.lru_cache(maxsize=None)
-        def helper(_trees, comb_side, miss_side):
+        def helper(_trees, miss_side):
 
             assert (_trees[0].label in [trees.CR, trees.CL])
             assert len(_trees[0].children) == 1
@@ -59,15 +59,12 @@ class AstarNode(object):
             if leaves != []:
                 leaves = leaves[::-1] if miss_side == trees.L else leaves
                 if not keep_valence_value:
-                    # leaf = leaves[-1] if miss_side == trees.L else leaves[0]
                     return _trees[1].combine(_trees[0].children[0], leaves[0])
 
                 label = _trees[0].children[-1].bracket_label()
                 for leaf in leaves:
                     if label == leaf.label.split(miss_side)[-1]:
                         return _trees[1].combine(_trees[0].children[0], leaf)
-                # if (keep_valence_value and missing_label == label) or not keep_valence_value:
-                #     return _trees[1].combine(_trees[0].children[0], leaf)
             return None
 
         if not len(list(right_tree.missing_leaves())) and \
@@ -76,14 +73,14 @@ class AstarNode(object):
 
         #Trying to combine Left Tree --> Right Tree
         if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
-            tree = helper([left_tree, right_tree], trees.CR, trees.L)
+            tree = helper([left_tree, right_tree], trees.L)
             if tree is not None:
                 self.tree = tree
                 return True
 
         #Trying to combine Right Tree --> Left Tree
         if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
-            tree = helper([right_tree, left_tree], trees.CL, trees.R)
+            tree = helper([right_tree, left_tree], trees.R)
             if tree is not None:
                 self.tree = tree
                 return True
