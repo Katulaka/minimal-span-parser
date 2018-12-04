@@ -180,16 +180,17 @@ def fix_partial_nodes(seen, goal, n_goals):
         for l in tree.missing_leaves():
             l.parent.children = list(filter(lambda x: x!=l, l.parent.children))
 
-    nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
+    nodes = filter(lambda x: (x.left, x.right) == (goal.left, goal.right), seen)
     nodes = sorted(nodes, key = lambda x: x.score, reverse = True)[:n_goals]
-    if len(nodes):
-        for node in nodes:
-            filter_missing(node.tree)
-            if node.tree.label in [trees.CL, trees.CR]:
-                node.tree.label = 'S'
-    else:
-        nodes = sorted(seen, key = lambda x: x.right - x.left, reverse = True)[:n_goals]
-        for node in nodes:
+    for node in nodes:
+        filter_missing(node.tree)
+        if node.tree.label in [trees.CL, trees.CR]:
+            node.tree.label = 'S'
+
+    if len(nodes) < n_goals:
+        n_nodes = n_goals - len(nodes)
+        nodes_p = sorted(seen, key = lambda x: x.right - x.left, reverse = True)[:n_nodes]
+        for node in nodes_p:
             filter_missing(node.tree)
             children = goal.tree.children[:node.left] \
                             + list(node.tree.children) \
@@ -197,7 +198,7 @@ def fix_partial_nodes(seen, goal, n_goals):
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
             node.tree = trees.InternalMyParseNode(node.tree.label, children)
-    return nodes
+    return nodes + nodes_p
 
 def astar_search(grid, sentence, keep_valence_value, astar_parms):
 
@@ -211,6 +212,6 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
-    if len(nodes)<astar_parms[0]:
+    if len(nodes)< astar_parms[0]:
         nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
     return nodes
