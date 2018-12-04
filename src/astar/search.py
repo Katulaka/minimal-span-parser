@@ -41,14 +41,11 @@ class AstarNode(object):
 
         for i, tree in enumerate(self.trees):
             pair = '({},{})'.format(tree.left, tree.right)
-            # ptb = tree.convert().linearize()
             node_string = '{} tree[{}]: {: <8}'.format(node_string, i, pair)
 
         return node_string
 
     def is_valid(self, keep_valence_value, left_tree, right_tree):
-        # assert isinstance(c_trees, list)
-        # assert len(c_trees) == 2
         assert isinstance(left_tree, trees.InternalMyParseNode)
         assert isinstance(right_tree, trees.InternalMyParseNode)
 
@@ -67,16 +64,6 @@ class AstarNode(object):
                     return _trees[1].combine(_trees[0].children[0], leaf)
             return None
 
-            # leaves = []
-            # label = _trees[0].children[-1].bracket_label()
-            # for leaf in _trees[1].missing_leaves(miss_side):
-            #     missing_label = leaf.label.split(miss_side)[-1]
-            #     if not keep_valence_value:
-            #         leaves.append(leaf)
-            #     elif missing_label == label:
-            #         leaves.append(leaf)
-            # return leaves
-
         if not len(list(right_tree.missing_leaves())) and \
                 not len(list(left_tree.missing_leaves())):
             return False
@@ -87,10 +74,6 @@ class AstarNode(object):
             if tree is not None:
                 self.tree = tree
                 return True
-            # leaves = helper([left_tree, right_tree], trees.CR, trees.L)
-            # if leaves != []:
-            #     self.tree = right_tree.combine(left_tree.children[0], leaves[-1])
-            #     return True
 
         #Trying to combine Right Tree --> Left Tree
         if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
@@ -98,10 +81,6 @@ class AstarNode(object):
             if tree is not None:
                 self.tree = tree
                 return True
-            # leaves = helper([right_tree, left_tree], trees.CL, trees.R)
-            # if leaves != []:
-            #     self.tree = left_tree.combine(right_tree.children[0], leaves[0])
-            #     return True
         return False
 
 
