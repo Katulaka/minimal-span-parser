@@ -55,24 +55,22 @@ class AstarNode(object):
         # @functools.lru_cache(maxsize=None)
         def helper(_trees, comb_side, miss_side):
 
-            # assert isinstance(_trees[0], trees.InternalMyParseNode)
             assert (_trees[0].label in [trees.CR, trees.CL])
             assert len(_trees[0].children) == 1
 
-            leaf_idx = -1 if miss_side == trees.L else 0
-            leaf = list(_trees[1].missing_leaves(miss_side))[leaf_idx]
-            import pdb; pdb.set_trace()
-            missing_label = leaf.label.split(miss_side)[-1]
-            label = _trees[0].children[-1].bracket_label()
-            if (keep_valence_value and missing_label == label) or not keep_valence_value:
-                return _trees[1].combine(_trees[0].children[0], leaf)
+            leaves = list(_trees[1].missing_leaves(miss_side))
+            if leaves != []:
+                leaf = leaves[-1] if miss_side == trees.L else leaves[0]
+                import pdb; pdb.set_trace()
+                missing_label = leaf.label.split(miss_side)[-1]
+                label = _trees[0].children[-1].bracket_label()
+                if (keep_valence_value and missing_label == label) or not keep_valence_value:
+                    return _trees[1].combine(_trees[0].children[0], leaf)
             return None
 
             # leaves = []
             # label = _trees[0].children[-1].bracket_label()
-            # import pdb; pdb.set_trace()
             # for leaf in _trees[1].missing_leaves(miss_side):
-            #     # if leaf.label.startswith(miss_side):
             #     missing_label = leaf.label.split(miss_side)[-1]
             #     if not keep_valence_value:
             #         leaves.append(leaf)
@@ -80,7 +78,8 @@ class AstarNode(object):
             #         leaves.append(leaf)
             # return leaves
 
-        if not len(list(right_tree.missing_leaves())) and not len(list(left_tree.missing_leaves())):
+        if not len(list(right_tree.missing_leaves())) and \
+                not len(list(left_tree.missing_leaves())):
             return False
 
         #Trying to combine Left Tree --> Right Tree
