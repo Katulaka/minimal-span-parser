@@ -171,7 +171,7 @@ class Solver(AStar):
             goal_leaves = list(goal.tree.leaves())
             return all(
                 (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves)):
+                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
 def astar_search(grid, sentence, keep_valence_value, astar_parms):
