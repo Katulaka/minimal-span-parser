@@ -189,7 +189,7 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     if len(nodes):
         print([s[1] for s in sentence] == [l.word for l in nodes[0].tree.leaves()])
     else:
-        nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
+        nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), solver.seen)
         nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
         for node in nodes:
             import pdb; pdb.set_trace()
