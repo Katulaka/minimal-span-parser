@@ -57,11 +57,17 @@ class AstarNode(object):
 
             leaves = list(_trees[1].missing_leaves(miss_side))
             if leaves != []:
-                leaf = leaves[-1] if miss_side == trees.L else leaves[0]
-                missing_label = leaf.label.split(miss_side)[-1]
+                leaves = leaves[::-1] if miss_side == trees.L else leaves
+                if not keep_valence_value:
+                    # leaf = leaves[-1] if miss_side == trees.L else leaves[0]
+                    return _trees[1].combine(_trees[0].children[0], leaves[0])
+
                 label = _trees[0].children[-1].bracket_label()
-                if (keep_valence_value and missing_label == label) or not keep_valence_value:
-                    return _trees[1].combine(_trees[0].children[0], leaf)
+                for leaf in leaves:
+                    if label == leaf.label.split(miss_side)[-1]:
+                        return _trees[1].combine(_trees[0].children[0], leaf)
+                # if (keep_valence_value and missing_label == label) or not keep_valence_value:
+                #     return _trees[1].combine(_trees[0].children[0], leaf)
             return None
 
         if not len(list(right_tree.missing_leaves())) and \

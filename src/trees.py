@@ -256,7 +256,7 @@ class InternalMyParseNode(MyParseNode):
         children = []
         for child in tree.children:
             children.append(child.combine(node_to_merge, node_to_remove))
-        # children = sorted(children, key= lambda x: x.left)
+        children = sorted(children, key= lambda x: x.left)
         return InternalMyParseNode(tree.label, children)
 
 class LeafMyParseNode(MyParseNode):
