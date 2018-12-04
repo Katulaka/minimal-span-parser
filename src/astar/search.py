@@ -196,8 +196,8 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
             for node in nodes:
                 node.tree = node.tree.filter_missing()
         else:
-             import pdb; pdb.set_trace()
              nodes = sorted(solver.seen, key = lambda x: x.right - x.left, reverse = True)
+             import pdb; pdb.set_trace()
              for node in nodes:
                  node.tree = node.tree.filter_missing()
 
