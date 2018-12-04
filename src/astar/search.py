@@ -186,6 +186,8 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
-    import pdb; pdb.set_trace()
-
+    if len(nodes):
+        print([s[1] for s in sentence] == [l.word for l in nodes[0].tree.leaves()])
+    else:
+        print("No nodes")
     return nodes, solver.seen
