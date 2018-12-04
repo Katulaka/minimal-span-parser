@@ -263,7 +263,7 @@ class InternalMyParseNode(MyParseNode):
         tree = self
         children = []
         for child in self.children:
-            children.apppend(child.filter_missing())
+            children.append(child.filter_missing())
         return InternalMyParseNode(tree.label, children)
 
 class LeafMyParseNode(MyParseNode):
