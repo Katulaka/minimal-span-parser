@@ -1,5 +1,5 @@
 import collections.abc
-
+import math
 R = '}'
 L = '{'
 CR = '>'
@@ -324,8 +324,10 @@ class LeafMyParseNode(MyParseNode):
 class MissMyParseNode(MyParseNode):
     def __init__(self, label, index = 0):
         self.label = label
-        self.left = index
-        self.right = index + 1
+        self.left = -1 if label.startswith(L) else math.inf
+        self.right = -1 if label.startswith(L) else math.inf
+        # self.left = index
+        # self.right = index + 1
 
     def leaves(self):
         yield self
