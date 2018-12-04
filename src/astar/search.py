@@ -198,7 +198,8 @@ def fix_partial_nodes(seen, goal, n_goals):
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
             node.tree = trees.InternalMyParseNode(node.tree.label, list(children))
-    return nodes + nodes_p
+        nodes += nodes_p
+    return nodes
 
 def astar_search(grid, sentence, keep_valence_value, astar_parms):
 
