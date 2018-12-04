@@ -312,17 +312,20 @@ class LeafMyParseNode(MyParseNode):
             labels = labels[1:]
             while labels and (labels[0].startswith(R) or labels[0].startswith(L)):
                 if labels[0].startswith(R):
-                    index = children[-1].right
-                    children += [MissMyParseNode(labels[0], index)]
+                    # index = children[-1].right
+                    # children += [MissMyParseNode(labels[0], index)]
+                    children += [MissMyParseNode(labels[0])]
                 else:
-                    index = children[0].left - 1
-                    children = [MissMyParseNode(labels[0], index)] + children
+                    # index = children[0].left - 1
+                    # children = [MissMyParseNode(labels[0], index)] + children
+                    children = [MissMyParseNode(labels[0])] + children
                 labels = labels[1:]
             children = [InternalMyParseNode(p_label, children)]
         return children[-1]
 
 class MissMyParseNode(MyParseNode):
-    def __init__(self, label, index = 0):
+    # def __init__(self, label, index = 0):
+    def __init__(self, label):
         self.label = label
         self.left = -1 if label.startswith(L) else math.inf
         self.right = -1 if label.startswith(L) else math.inf
