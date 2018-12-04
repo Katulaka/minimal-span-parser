@@ -189,5 +189,39 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     if len(nodes):
         print([s[1] for s in sentence] == [l.word for l in nodes[0].tree.leaves()])
     else:
+        nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
+        nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
+        for node in nodes:
+            import pdb; pdb.set_trace()
+            node.tree = node.tree.filter_missing()
         print("No nodes")
     return nodes, solver.seen
+
+
+    # nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
+    # nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
+    # nodes = nodes[:astar_parms[0]]
+    # if nodes != []:
+    #     for node in nodes:
+    #         for l in node.tree.missing_leaves():
+    #             l.parent.children = list(filter(lambda x: x != l, l.parent.children))
+    # else:
+    #     nodes = sorted(seen, key = lambda x: x.right - x.left, reverse = True)
+    #     nodes = nodes[:astar_parms[0]]
+    #     for node in nodes:
+    #         for l in node.tree.missing_leaves():
+    #             l.parent.children = list(filter(lambda x: x != l, l.parent.children))
+    #         left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+    #                     zip(range(node.left), sentence[:node.left])]
+    #         right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
+    #                     zip(range(node.right, len(sentence)), sentence[node.right:])]
+    #         children =  left_leaves + list(node.tree.children) + right_leaves
+    #         node.tree = trees.InternalMyParseNode(node.tree.label, children)
+    #
+    #         left_rank = [predict_parms['beam_parms'][-1]] * node.left
+    #         right_rank = [predict_parms['beam_parms'][-1]]*(len(sentence)-node.right)
+    #         node.rank = left_rank + node.rank + right_rank
+    #
+    # for node in nodes:
+    #     if node.tree.label in [trees.CL, trees.CR]:
+    #         node.tree.label = 'S'
