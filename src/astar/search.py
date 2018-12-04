@@ -61,7 +61,6 @@ class AstarNode(object):
             leaves = list(_trees[1].missing_leaves(miss_side))
             if leaves != []:
                 leaf = leaves[-1] if miss_side == trees.L else leaves[0]
-                import pdb; pdb.set_trace()
                 missing_label = leaf.label.split(miss_side)[-1]
                 label = _trees[0].children[-1].bracket_label()
                 if (keep_valence_value and missing_label == label) or not keep_valence_value:
@@ -208,5 +207,7 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     # let's solve it
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
+
+    import pdb; pdb.set_trace()
 
     return nodes, solver.seen
