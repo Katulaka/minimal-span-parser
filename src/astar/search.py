@@ -193,11 +193,11 @@ def fix_partial_nodes(seen, goal, n_goals):
         for node in nodes_p:
             filter_missing(node.tree)
             children = goal.tree.children[:node.left] \
-                            + list(node.tree.children) \
+                            + node.tree.children \
                              + goal_tree.children[node.right:]
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
-            node.tree = trees.InternalMyParseNode(node.tree.label, children)
+            node.tree = trees.InternalMyParseNode(node.tree.label, list(children))
     return nodes + nodes_p
 
 def astar_search(grid, sentence, keep_valence_value, astar_parms):
