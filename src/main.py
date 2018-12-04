@@ -412,7 +412,6 @@ def run_test(args):
     start_time = time.time()
     test_predicted = []
     if args.parser_type == "my":
-        test_rank = []
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : args.beam_size}
 
@@ -423,7 +422,7 @@ def run_test(args):
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
         if args.parser_type == "my":
-            predicted, ranks = parser.parse(sentence, predict_parms=predict_parms)
+            predicted = parser.parse(sentence, predict_parms=predict_parms)
         else:
             predicted, _ = parser.parse(sentence, k = args.n_trees)
         print(
@@ -441,8 +440,6 @@ def run_test(args):
         else:
             test_predicted.append(predicted.convert())
 
-        if args.parser_type == "my":
-            test_rank.append(ranks)
 
     import pdb; pdb.set_trace()
 

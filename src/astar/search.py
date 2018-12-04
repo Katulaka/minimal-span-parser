@@ -174,6 +174,31 @@ class Solver(AStar):
                 for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
+def fix_partial_nodes(seen, goal, n_goals):
+
+    def filter_missing(tree):
+        for l in tree.missing_leaves():
+            l.parent.children = list(filter(lambda x: x!=l, l.parent.children))
+
+    nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
+    nodes = sorted(nodes, key = lambda x: x.score, reverse = True)[:n_goals]
+    if len(nodes):
+        for node in nodes:
+            filter_missing(node.tree)
+            if node.tree.label in [trees.CL, trees.CR]:
+                node.tree.label = 'S'
+    else:
+        nodes = sorted(seen, key = lambda x: x.right - x.left, reverse = True)[:n_goals]
+        for node in nodes:
+            filter_missing(node.tree)
+            children = goal.tree.children[:node.left] \
+                            + list(node.tree.children) \
+                             + goal_tree.children[node.right:]
+            if node.tree.label in [trees.CL, trees.CR]:
+                node.tree.label = 'S'
+            node.tree = trees.InternalMyParseNode(node.tree.label, children)
+    return nodes
+
 def astar_search(grid, sentence, keep_valence_value, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
@@ -186,54 +211,6 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
-
-    def filter_missing(tree):
-        for l in tree.missing_leaves():
-            l.parent.children = list(filter(lambda x: x!=l, l.parent.children))
-
-    if len(nodes):
-        print([s[1] for s in sentence] == [l.word for l in nodes[0].tree.leaves()])
-    else:
-        nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), solver.seen)
-        nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
-        if len(nodes):
-            import pdb; pdb.set_trace()
-            for node in nodes:
-                filter_missing(node.tree)
-        else:
-             nodes = sorted(solver.seen, key = lambda x: x.right - x.left, reverse = True)
-             import pdb; pdb.set_trace()
-             for node in nodes:
-                 filter_missing(node.tree)
-
-        print("No nodes")
-    return nodes, solver.seen
-
-
-    # nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
-    # nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
-    # nodes = nodes[:astar_parms[0]]
-    # if nodes != []:
-    #     for node in nodes:
-    #         for l in node.tree.missing_leaves():
-    #             l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-    # else:
-    #     nodes = sorted(seen, key = lambda x: x.right - x.left, reverse = True)
-    #     nodes = nodes[:astar_parms[0]]
-    #     for node in nodes:
-    #         for l in node.tree.missing_leaves():
-    #             l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-    #         left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-    #                     zip(range(node.left), sentence[:node.left])]
-    #         right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-    #                     zip(range(node.right, len(sentence)), sentence[node.right:])]
-    #         children =  left_leaves + list(node.tree.children) + right_leaves
-    #         node.tree = trees.InternalMyParseNode(node.tree.label, children)
-    #
-    #         left_rank = [predict_parms['beam_parms'][-1]] * node.left
-    #         right_rank = [predict_parms['beam_parms'][-1]]*(len(sentence)-node.right)
-    #         node.rank = left_rank + node.rank + right_rank
-    #
-    # for node in nodes:
-    #     if node.tree.label in [trees.CL, trees.CR]:
-    #         node.tree.label = 'S'
+    if len(nodes)<astar_parms[0]:
+        nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
+    return nodes

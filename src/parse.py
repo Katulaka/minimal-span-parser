@@ -644,42 +644,8 @@ class MyParser(object):
                             grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                             rank += 1
 
-                nodes, seen = astar_search(grid, sentence, self.keep_valence_value, astar_parms)
-                if nodes != []:
-                    if astar_parms[0] == 1:
-                        return nodes[0].tree, nodes[0].rank
-                    else:
-                        return [node.tree for node in nodes], [node.rank for node in nodes]
-
-            nodes = filter(lambda x: x.left == 0 and x.right == len(sentence), seen)
-            nodes = sorted(nodes, key = lambda x: x.score, reverse = True)
-            nodes = nodes[:astar_parms[0]]
-            if nodes != []:
-                for node in nodes:
-                    for l in node.tree.missing_leaves():
-                        l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-            else:
-                nodes = sorted(seen, key = lambda x: x.right - x.left, reverse = True)
-                nodes = nodes[:astar_parms[0]]
-                for node in nodes:
-                    for l in node.tree.missing_leaves():
-                        l.parent.children = list(filter(lambda x: x != l, l.parent.children))
-                    left_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                                zip(range(node.left), sentence[:node.left])]
-                    right_leaves = [trees.LeafMyParseNode(i, *leaf) for i, leaf in
-                                zip(range(node.right, len(sentence)), sentence[node.right:])]
-                    children =  left_leaves + list(node.tree.children) + right_leaves
-                    node.tree = trees.InternalMyParseNode(node.tree.label, children)
-
-                    left_rank = [predict_parms['beam_parms'][-1]] * node.left
-                    right_rank = [predict_parms['beam_parms'][-1]]*(len(sentence)-node.right)
-                    node.rank = left_rank + node.rank + right_rank
-
-            for node in nodes:
-                if node.tree.label in [trees.CL, trees.CR]:
-                    node.tree.label = 'S'
-
-            if astar_parms[0] == 1:
-                return nodes[0].tree, nodes[0].rank
-            else:
-                return [node.tree for node in nodes], [node.rank for node in nodes]
+                nodes = astar_search(grid, sentence, self.keep_valence_value, astar_parms)
+                if astar_parms[0] == 1:
+                    return nodes[0].tree
+                else:
+                    return [node.tree for node in nodes]
