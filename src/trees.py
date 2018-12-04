@@ -358,7 +358,8 @@ class MissMyParseNode(MyParseNode):
         tree = self
         if tree == node_to_remove:
             return node_to_merge.combine(node_to_merge, node_to_remove)
-        return MissMyParseNode(tree.label, tree.left)
+        # return MissMyParseNode(tree.label, tree.left)
+        return MissMyParseNode(tree.label)
 
 def load_trees(path, strip_top=True):
     with open(path) as infile:
