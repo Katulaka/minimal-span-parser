@@ -58,35 +58,52 @@ class AstarNode(object):
             # assert isinstance(_trees[0], trees.InternalMyParseNode)
             assert (_trees[0].label in [trees.CR, trees.CL])
             assert len(_trees[0].children) == 1
-            #TODO fix combination order --> incorrect order
-            leaves = []
-            label = _trees[0].children[-1].bracket_label()
+
+            leaf_idx = -1 if miss_side == trees.L else 0
+            leaf = list(_trees[1].missing_leaves(miss_side))[leaf_idx]
             import pdb; pdb.set_trace()
-            for leaf in _trees[1].missing_leaves(miss_side):
-                # if leaf.label.startswith(miss_side):
-                missing_label = leaf.label.split(miss_side)[-1]
-                if not keep_valence_value:
-                    leaves.append(leaf)
-                elif missing_label == label:
-                    leaves.append(leaf)
-            return leaves
+            missing_label = leaf.label.split(miss_side)[-1]
+            label = _trees[0].children[-1].bracket_label()
+            if (keep_valence_value and missing_label == label) or not keep_valence_value:
+                return _trees[1].combine(_trees[0].children[0], leaf)
+            return None
+
+            # leaves = []
+            # label = _trees[0].children[-1].bracket_label()
+            # import pdb; pdb.set_trace()
+            # for leaf in _trees[1].missing_leaves(miss_side):
+            #     # if leaf.label.startswith(miss_side):
+            #     missing_label = leaf.label.split(miss_side)[-1]
+            #     if not keep_valence_value:
+            #         leaves.append(leaf)
+            #     elif missing_label == label:
+            #         leaves.append(leaf)
+            # return leaves
 
         if not len(list(right_tree.missing_leaves())) and not len(list(left_tree.missing_leaves())):
             return False
 
         #Trying to combine Left Tree --> Right Tree
         if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
-            leaves = helper([left_tree, right_tree], trees.CR, trees.L)
-            if leaves != []:
-                self.tree = right_tree.combine(left_tree.children[0], leaves[-1])
+            tree = helper([left_tree, right_tree], trees.CR, trees.L)
+            if tree is not None:
+                self.tree = tree
                 return True
+            # leaves = helper([left_tree, right_tree], trees.CR, trees.L)
+            # if leaves != []:
+            #     self.tree = right_tree.combine(left_tree.children[0], leaves[-1])
+            #     return True
 
         #Trying to combine Right Tree --> Left Tree
         if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
-            leaves = helper([right_tree, left_tree], trees.CL, trees.R)
-            if leaves != []:
-                self.tree = left_tree.combine(right_tree.children[0], leaves[0])
+            tree = helper([right_tree, left_tree], trees.CL, trees.R)
+            if tree is not None:
+                self.tree = tree
                 return True
+            # leaves = helper([right_tree, left_tree], trees.CL, trees.R)
+            # if leaves != []:
+            #     self.tree = left_tree.combine(right_tree.children[0], leaves[0])
+            #     return True
         return False
 
 
