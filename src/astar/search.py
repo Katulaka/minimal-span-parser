@@ -186,6 +186,11 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
+
+    def filter_missing(tree):
+        for l in tree.missing_leaves():
+            l.parent.children = list(filter(lambda x: x!=l, l.parent.children))
+
     if len(nodes):
         print([s[1] for s in sentence] == [l.word for l in nodes[0].tree.leaves()])
     else:
@@ -194,12 +199,12 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
         if len(nodes):
             import pdb; pdb.set_trace()
             for node in nodes:
-                node.tree = node.tree.filter_missing()
+                filter_missing(node.tree)
         else:
              nodes = sorted(solver.seen, key = lambda x: x.right - x.left, reverse = True)
              import pdb; pdb.set_trace()
              for node in nodes:
-                 node.tree = node.tree.filter_missing()
+                 filter_missing(node.tree)
 
         print("No nodes")
     return nodes, solver.seen
