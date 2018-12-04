@@ -194,7 +194,7 @@ def fix_partial_nodes(seen, goal, n_goals):
             filter_missing(node.tree)
             children = goal.tree.children[:node.left] \
                             + node.tree.children \
-                             + goal_tree.children[node.right:]
+                             + goal.tree.children[node.right:]
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
             node.tree = trees.InternalMyParseNode(node.tree.label, list(children))
