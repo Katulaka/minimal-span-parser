@@ -262,7 +262,7 @@ class InternalMyParseNode(MyParseNode):
     def filter_missing(self):
         tree = self
         children = []
-        for child in self.childre:
+        for child in self.children:
             children.apppend(child.filter_missing())
         return InternalMyParseNode(tree.label, children)
 
