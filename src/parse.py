@@ -628,11 +628,11 @@ class MyParser(object):
             stop = self.label_vocab.index(STOP)
             astar_parms = predict_parms['astar_parms']
             # for beam_size in predict_parms['beam_parms']:
-            hyps = BeamSearch(start, stop, *predict_parms['beam_parms']).beam_search(
-                                                        encode_outputs_list,
-                                                        self.label_embeddings,
-                                                        self.dec_lstm,
-                                                        self.ws)
+            bs = BeamSearch(start, stop, *predict_parms['beam_parms'])
+            hyps = bs.beam_search(encode_outputs_list,
+                                self.label_embeddings,
+                                self.dec_lstm,
+                                self.ws)
 
             grid = {}
             for left, (leaf_hyps, leaf) in enumerate(zip(hyps, sentence)):

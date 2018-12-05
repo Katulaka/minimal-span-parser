@@ -510,7 +510,7 @@ def main():
     subparser.add_argument("--time-out", default=np.inf, type=float)
     subparser.add_argument("--n-discounts", default=1, type=int)
     subparser.add_argument("--discount-factor", default=0.2, type=float)
-    subparser.add_argument("--beam-size", nargs='+', default=[5], type=int)
+    subparser.add_argument("--beam-size", default=5, type=int)
     subparser.add_argument("--alpha", default=0.6, type=float)
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
