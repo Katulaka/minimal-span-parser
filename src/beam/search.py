@@ -50,7 +50,7 @@ class Hypothesis(object):
     def latest_token(self):
         return self.tokens[-1]
 
-    def lp(self, alpha=0.6, delta=5):
+    def lp(self, alpha, delta):
         return ((delta + len(self.tokens))**alpha)/((delta + 1)**alpha)
 
     def __str__(self):
@@ -61,7 +61,7 @@ class Hypothesis(object):
 class BeamSearch(object):
     """Beam search."""
 
-    def __init__(self, start_token, end_token, beam_size, max_steps=28):
+    def __init__(self, start_token, end_token, beam_size, max_steps=28, alpha=0.6, delta=5):
         """Creates BeamSearch object.
 
         Args:
@@ -74,6 +74,9 @@ class BeamSearch(object):
         self._start_token = start_token
         self._end_token = end_token
         self._max_steps = max_steps
+        self._alpha = alpha
+        self._delta = delta
+
 
     def beam_search(self, encode_outputs_list, label_embeddings, dec_lstm, ws):
         """Performs beam search for decoding.
@@ -139,12 +142,13 @@ class BeamSearch(object):
                             # Pull the hypothesis off the beam
                             #if the end token is reached.
                             # import pdb; pdb.set_trace()
-                            h.score = h.score/h.lp()
+                            h.score = h.score/h.lp(self._alpha, self._delta)
                             complete_hyps.append(h)
                         elif h.latest_token == self._end_token:
                             pass
                         elif len(complete_hyps) >= self._beam_size \
-                            and h.score/h.lp() > max(complete_hyps, key=lambda h: h.score).score:
+                            and h.score/h.lp(self._alpha, self._delta) > \
+                                max(complete_hyps, key=lambda h: h.score).score:
                             # and h.score < min(complete_hyps, key=lambda h: h.score).score:
                             pass
                         else:
