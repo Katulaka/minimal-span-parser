@@ -440,9 +440,6 @@ def run_test(args):
         else:
             test_predicted.append(predicted.convert())
 
-
-        import pdb; pdb.set_trace()
-
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
@@ -453,6 +450,8 @@ def run_test(args):
             format_elapsed(start_time),
         )
     )
+
+    import pdb; pdb.set_trace()
 
 
 def main():
