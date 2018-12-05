@@ -50,8 +50,8 @@ class Hypothesis(object):
     def latest_token(self):
         return self.tokens[-1]
 
-    def lp(self, alpha=0.6):
-        return ((5+len(self.tokens))**alpha/(6**alpha))
+    def lp(self, alpha=0.6, delta=5):
+        return ((delta + len(self.tokens))**alpha)/((delta + 1)**alpha)
 
     def __str__(self):
         return ('Hypothesis(prob = {:4f}, tokens = {})'.format(
@@ -139,12 +139,12 @@ class BeamSearch(object):
                             # Pull the hypothesis off the beam
                             #if the end token is reached.
                             # import pdb; pdb.set_trace()
-                            h.score = h.score/h.lp(0)
+                            h.score = h.score/h.lp()
                             complete_hyps.append(h)
                         elif h.latest_token == self._end_token:
                             pass
                         elif len(complete_hyps) >= self._beam_size \
-                            and h.score/h.lp(0) > max(complete_hyps, key=lambda h: h.score).score:
+                            and h.score/h.lp() > max(complete_hyps, key=lambda h: h.score).score:
                             # and h.score < min(complete_hyps, key=lambda h: h.score).score:
                             pass
                         else:
