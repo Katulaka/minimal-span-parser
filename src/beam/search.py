@@ -51,7 +51,7 @@ class Hypothesis(object):
         return self.tokens[-1]
 
     def lp(self, alpha=0.6):
-        return ((5+len(h.tokens))**alpha/(6**alpha))
+        return ((5+len(self.tokens))**alpha/(6**alpha))
 
     def __str__(self):
         return ('Hypothesis(prob = {:4f}, tokens = {})'.format(
