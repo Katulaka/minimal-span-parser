@@ -6,83 +6,41 @@ import numpy as np
 import math
 import itertools
 
+def helper(predict, k):
+    if isinstance(predict, trees.InternalTreebankNode):
+        return [predict] * k
+    return predict + [predict[-1]] * (k - len(predict))
 
-def plot_results(args):
-    print("Loading test trees from {}...".format(args.test_path))
-    test_treebank = trees.load_trees(args.test_path)
-    print("Loaded {:,} test examples.".format(len(test_treebank)))
+# def plot_ranks(beam_5_fscores):
+#
+#     with open('results/test_rank', 'rb') as f:
+#         test_rank = pickle.load(f)
+#
+#     fig, ax = plt.subplots()
+#     test_rank_sum_0 = [sum(r[0]) for r in test_rank]
+#     beam_5_fscores_0 = [b[0] for b in beam_5_fscores]
+#     plt.axis([-1, 101, -1, 30])
+#     plt.scatter( beam_5_fscores_0, test_rank_sum_0, s=0.2)
+#     plt.xlabel('F1 score')
+#     plt.ylabel('Rank sum')
+#     plt.title('F1 score by Rank sum')
+#     plt.savefig('fscore_vs_rank_sum.png', bbox_inches='tight')
+#
+#     fig, ax = plt.subplots()
+#     test_rank_avg_0 = [np.mean(r[0]) for r in test_rank]
+#     plt.axis([-1, 101, -0.02, 1])
+#     plt.scatter( beam_5_fscores_0, test_rank_avg_0, s=0.2)
+#     plt.xlabel('F1 score')
+#     plt.ylabel('Rank average')
+#     plt.title('F1 score by Rank average')
+#     plt.savefig('fscore_vs_rank_avg.png', bbox_inches='tight')
 
-    with open('results/predict_5_top_100', 'rb') as f:
-        predicted_5_100 = pickle.load(f)
-
-    with open('results/test_rank', 'rb') as f:
-        test_rank = pickle.load(f)
-
-    with open('results/test_predicted', 'rb') as f:
-        predicted_5 = pickle.load(f)
-
-
-    with open('results/predict_top_20_chart', 'rb') as f:
-        predicted_chart = pickle.load(f)
-
-    def helper(predict, k):
-        if isinstance(predict, trees.InternalTreebankNode):
-            return [predict] * k
-        return predict + [predict[-1]] * (k - len(predict))
-
-    predicted_5 = list(zip(*[helper(p, 20) for p in predicted_5]))
-    beam_5_evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predicted_5[k]) for k in range(20)]
-
-    predicted_chart = list(zip(*predicted_chart))
-    chart_evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predicted_chart[k]) for k in range(20)]
-
-    beam_5_fscores = list(zip(*[[y.Fscore.fscore for y in x] for x in beam_5_evalb]))
-    beam_5_recall = [round(np.mean([int(100.0 in y[:(k+1)]) for y in beam_5_fscores]), 3)*100. for k in range(20)]
-
-    chart_fscores = list(zip(*[[y.Fscore.fscore for y in x] for x in chart_evalb]))
-    chart_recall = [round(np.mean([int(100.0 in y[:(k+1)]) for y in chart_fscores]), 3)*100. for k in range(20)]
-
-    # plt.style.use('seaborn-pastel')
+def plot_density(our_fscore, chart_fscore, outline_b, outline_c):
     fig, ax = plt.subplots()
-    delta = 2
-    outline_b, = plt.plot(range(1, 21), beam_5_recall, ':', label='This work')
-    outline_c, = plt.plot(range(1, 21), chart_recall, label='Stern et al. \n (2017)')
-    min_y = min(chart_recall + beam_5_recall) - delta
-    max_y = max(chart_recall + beam_5_recall) + delta
-    plt.axis([0, 21, min_y, max_y])
-    ax.set_yticklabels(['{:d}%'.format(int(x)) for x in ax.get_yticks()])
-    plt.xlabel('Top-K')
-    plt.ylabel('Percentage excat match')
-    plt.title('Top-K by Percentage excat match')
-    plt.legend(loc='upper left')
-    plt.savefig('top_k_vs_match.png', bbox_inches='tight')
 
-
-    fig, ax = plt.subplots()
-    test_rank_sum_0 = [sum(r[0]) for r in test_rank]
-    beam_5_fscores_0 = [b[0] for b in beam_5_fscores]
-    plt.axis([-1, 101, -1, 30])
-    plt.scatter( beam_5_fscores_0, test_rank_sum_0, s=0.2)
-    plt.xlabel('F1 score')
-    plt.ylabel('Rank sum')
-    plt.title('F1 score by Rank sum')
-    plt.savefig('fscore_vs_rank_sum.png', bbox_inches='tight')
-
-    fig, ax = plt.subplots()
-    test_rank_avg_0 = [np.mean(r[0]) for r in test_rank]
-    plt.axis([-1, 101, -0.02, 1])
-    plt.scatter( beam_5_fscores_0, test_rank_avg_0, s=0.2)
-    plt.xlabel('F1 score')
-    plt.ylabel('Rank average')
-    plt.title('F1 score by Rank average')
-    plt.savefig('fscore_vs_rank_avg.png', bbox_inches='tight')
-
-    fig, ax = plt.subplots()
-    beam_5_0_fscore = [y[0] for y in beam_5_fscores]
-    chart_0_fscore = [y[0] for y in chart_fscores]
-    min_x = math.floor(min(beam_5_0_fscore+chart_0_fscore))
+    min_x = math.floor(np.min([our_fscore, chart_fscore]))
     bins = np.linspace(min_x, 100, 40)
-    plt.hist(beam_5_0_fscore,
+    plt.hist(our_fscore,
             bins = bins,
             density = True,
             cumulative = -1,
@@ -90,7 +48,7 @@ def plot_results(args):
             linestyle = ':',
             edgecolor=outline_b.get_color(),
             label = 'This work')
-    plt.hist(chart_0_fscore,
+    plt.hist(chart_fscore,
             bins = bins,
             density = True,
             cumulative = -1,
@@ -98,31 +56,14 @@ def plot_results(args):
             histtype = 'step',
             edgecolor=outline_c.get_color(),
             label = 'Stern et al. \n (2017)')
-    # plt.xticks(bins, rotation='vertical', fontsize=6)
     plt.legend(loc='lower left')
     plt.xlabel('F1 score')
     plt.ylabel('Density')
     plt.ylim((0,1.05))
-    plt.title('F1 scores by Density')
-    plt.savefig('fscore_vs_density.png', bbox_inches='tight')
+    plt.title('F1 scores vs. Density')
+    plt.savefig('plots/fscore_vs_density.png', bbox_inches='tight')
 
-    hist_5 = {}
-    test_predicted_5 = sorted(beam_5_evalb[0], key = lambda x: x.length)
-    for key, value in itertools.groupby(test_predicted_5, lambda x: int(x.length/10) * 10):
-        value = list(value)
-        match_bracket = sum((h.match_bracket for h in value))
-        gold_bracket = sum((h.gold_bracket for h in value))
-        test_bracket = sum((h.test_bracket for h in value))
-        hist_5[key] = evaluate.Bracket(key, match_bracket, gold_bracket, test_bracket).Fscore.fscore
-
-    hist_chart = {}
-    test_predicted_chart = sorted(chart_evalb[0], key = lambda x: x.length)
-    for key, value in itertools.groupby(test_predicted_chart, lambda x: int(x.length/10) * 10):
-        value = list(value)
-        match_bracket = sum((h.match_bracket for h in value))
-        gold_bracket = sum((h.gold_bracket for h in value))
-        test_bracket = sum((h.test_bracket for h in value))
-        hist_chart[key] = evaluate.Bracket(key, match_bracket, gold_bracket, test_bracket).Fscore.fscore
+def plot_bars(hist_5, hist_chart, outline_b, outline_c, y_label, f_name, loc='lower left'):
 
     def autolabel(ax, rects):
         for rect in rects:
@@ -156,20 +97,111 @@ def plot_results(args):
                     hatch = '//',
                     edgecolor=outline_c.get_color())
 
-    plt.xlabel('Sentence length')
-    plt.ylabel('F1 score')
-    plt.title('F1 scores by Sentence length')
-    plt.xticks(xvals + 1.5 * width, xvals)
-    plt.legend(loc='lower left')
-
     autolabel(ax, rects1)
     autolabel(ax, rects2)
+    ax.set_yticklabels(['{:d}%'.format(int(x)) for x in ax.get_yticks()])
+
+    plt.xlabel('Sentence length')
+    plt.ylabel(y_label)
+    plt.title('{} vs. Sentence length'.format(y_label))
+    plt.xticks(xvals + 1.5 * width, xvals)
+    plt.legend(loc=loc)
 
     plt.tight_layout()
-    plt.savefig('fscore_vs_sentence_len.png', bbox_inches='tight')
+    plt.savefig(f_name, bbox_inches='tight')
 
-    predicted_5_100 = list(zip(*[helper(p, 100) for p in predicted_5_100]))
-    beam_5_100_evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predicted_5_100[k]) for k in range(100)]
-    beam_5_100_fscores = list(zip(*[[y.Fscore.fscore for y in x] for x in beam_5_100_evalb]))
-    beam_5_100_recall = [round(np.mean([int(100.0 in y[:(k+1)]) for y in beam_5_100_fscores]), 3)*100. for k in range(100)]
+def plot_exact_match(beam_5_recall, chart_recall, n_trees):
+    fig, ax = plt.subplots()
+    delta = 2
+    ax.plot(range(1, n_trees+1), beam_5_recall, '>:', label='This work')
+    ax.plot(range(1, n_trees+1), chart_recall, '--d', label='Stern et al. \n (2017)')
+    min_y = np.min([chart_recall, beam_5_recall]) - delta
+    max_y = np.max([chart_recall, beam_5_recall]) + delta
+    ax.axis([0, n_trees+1, min_y, max_y])
+    ax.set_yticklabels(['{:d}%'.format(int(x)) for x in ax.get_yticks()])
+    plt.xlabel('Top-K')
+    plt.ylabel('Exact match')
+    plt.title('Exact match vs. Top-K')
+    plt.legend(loc='upper left')
+    plt.savefig('plots/top_k_vs_match.png', bbox_inches='tight')
+    return ax
+
+
+def compute(args, test_treebank, predicted, n_trees):
+
+    predict = np.array([helper(p, n_trees) for p in predicted])
+    evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predict[:,k]) \
+                                    for k in range(n_trees)]
+
+    fscores = np.array([[y.Fscore.fscore for y in x] for x in evalb]).transpose()
+
+    match = np.array([[100.0 in y[:(k+1)] for y in fscores].count(True) \
+                    for k in range(n_trees)])
+
+    recall = match/len(test_treebank)*100
+
+    hist_fscore = {}
+    pair_sort = sorted(zip(test_treebank, predict[:,0]),\
+                                    key = lambda x: len(list(x[1].leaves())))
+    iter = itertools.groupby(pair_sort, \
+            lambda x: int(len(list(x[1].leaves()))/10) * 10)
+    for key, value in iter:
+        hist_fscore[key] = evaluate.evalb(args.evalb_dir, *zip(*list(value))).fscore
+
+    hist_recall = {}
+    hist_recall_all = {}
+    evalb_sort = sorted(np.array(evalb).transpose() , key = lambda x: x[0].length)
+    iter = itertools.groupby(evalb_sort, lambda x: int(x[0].length/10) * 10)
+    for key, value in iter:
+        value = list(value)
+        match = [100.0 == y[0].Fscore.fscore for y in value]
+        hist_recall[key] = match.count(True)/len(match) * 100
+        match_all = [100.0 in [x.Fscore.fscore for x in y] for y in value]
+        hist_recall_all[key] = match_all.count(True)/len(match_all) * 100
+
+
+    hist = {'fscore': hist_fscore,
+            'recall': hist_recall,
+            'recall_all': hist_recall_all}
+    return fscores, recall, hist
+
+def plot_results(args):
+    print("Loading test trees from {}...".format(args.test_path))
+    test_treebank = trees.load_trees(args.test_path)
+    print("Loaded {:,} test examples.".format(len(test_treebank)))
+
+    # for i in ['beam_5','beam_10','beam_15','beam_20','beam_25','beam_32', 'chart']:
+    #     fname = 'results/predict_{}'.format(i)
+    #     with open(fname,  'rb') as f:
+    #         predicted = pickle.load(f)
+    #
+    #     fscore = evaluate.evalb(args.evalb_dir, test_treebank, predicted)
+    #     evalb = evaluate.evalb_full(args.evalb_dir, test_treebank, predicted)
+    #     match = [100 == x.Fscore.fscore for x in evalb]
+    #     recall = match.count(True)/len(match)*100
+    #     print('Parser:{}, fscore:{}, recall:{}'.format(i,fscore,recall))
+
+
+    with open('results/test_predicted', 'rb') as f:
+        our_predicted = pickle.load(f)
+
+    with open('results/predict_top_20_chart', 'rb') as f:
+        chart_predicted = pickle.load(f)
+
+    n_trees = 20
+    our_fscores, our_recall, hist_our = compute(args, test_treebank, our_predicted, n_trees)
+    chart_fscores, chart_recall, hist_chart = compute(args, test_treebank, chart_predicted, n_trees)
+
+    ax = plot_exact_match(our_recall, chart_recall, n_trees)
     import pdb; pdb.set_trace()
+    f_name = 'plots/fscore_vs_sentence_len.png'
+    y_label = 'F1 score'
+    plot_bars(hist_our['fscore'], hist_chart['fscore'], *ax.lines, y_label, f_name)
+    loc = 'upper right'
+    f_name = 'plots/match_vs_sentence_len.png'
+    y_label = 'Exact match Top-1'
+    plot_bars(hist_our['recall'], hist_chart['recall'], *ax.lines, y_label, f_name, loc)
+    f_name = 'plots/match_20_vs_sentence_len.png'
+    y_label = 'Exact match Top-20'
+    plot_bars(hist_our['recall_all'], hist_chart['recall_all'], *ax.lines, y_label, f_name, loc)
+    plot_density(our_fscores[:,0], chart_fscores[:,0], *ax.lines)
