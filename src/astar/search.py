@@ -57,14 +57,16 @@ class AstarNode(object):
 
             leaves = list(_trees[1].missing_leaves(miss_side))
             if leaves != []:
-                leaves = leaves[::-1] if miss_side == trees.L else leaves
+                # leaves = leaves[::-1] if miss_side == trees.L else leaves
+                leaf = leaves[-1] if miss_side == trees.L else leaves[0]
                 if not keep_valence_value:
-                    return _trees[1].combine(_trees[0].children[0], leaves[0])
+                    # return _trees[1].combine(_trees[0].children[0], leaves[0])
+                    return _trees[1].combine(_trees[0].children[0], leaf)
 
-                label = _trees[0].children[-1].bracket_label()
-                for leaf in leaves:
-                    if label == leaf.label.split(miss_side)[-1]:
-                        return _trees[1].combine(_trees[0].children[0], leaf)
+                # label = _trees[0].children[-1].bracket_label()
+                # for leaf in leaves:
+                #     if label == leaf.label.split(miss_side)[-1]:
+                #         return _trees[1].combine(_trees[0].children[0], leaf)
             return None
 
         if not len(list(right_tree.missing_leaves())) and \
@@ -163,15 +165,15 @@ class Solver(AStar):
         return neighbors
 
     def is_goal_reached(self, node, goal):
-        # if (node.left, node.right) == (goal.left, goal.right):
-        #     return not len(list(node.tree.missing_leaves()))
-        if (node.left, node.right) == (goal.left, goal.right) \
-            and not len(list(node.tree.missing_leaves())):
-            node_leaves = list(node.tree.leaves())
-            goal_leaves = list(goal.tree.leaves())
-            return all(
-                (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
+        if (node.left, node.right) == (goal.left, goal.right):
+            return not len(list(node.tree.missing_leaves()))
+        # if (node.left, node.right) == (goal.left, goal.right) \
+        #     and not len(list(node.tree.missing_leaves())):
+        #     node_leaves = list(node.tree.leaves())
+        #     goal_leaves = list(goal.tree.leaves())
+        #     return all(
+        #         (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
+        #         for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
 def fix_partial_nodes(seen, goal, n_goals):
@@ -213,6 +215,6 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
-    if len(nodes)< astar_parms[0]:
+    if len(nodes) < astar_parms[0]:
         nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
     return nodes
