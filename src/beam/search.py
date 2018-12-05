@@ -136,12 +136,13 @@ class BeamSearch(object):
                             # Pull the hypothesis off the beam
                             #if the end token is reached.
                             # import pdb; pdb.set_trace()
-                            h.score = h.score/(len(h.tokens))**0.6
+                            lp = (5+len(h.tokens))**0.6/(6**0.6)
+                            h.score = h.score/lp
                             complete_hyps.append(h)
                         elif h.latest_token == self._end_token:
                             pass
                         elif len(complete_hyps) >= self._beam_size \
-                            and h.score/(len(h.tokens))**0.6 > max(complete_hyps, key=lambda h: h.score).score:
+                            and h.score/((5+len(h.tokens))**0.6/(6**0.6)) > max(complete_hyps, key=lambda h: h.score).score:
                             # and h.score < min(complete_hyps, key=lambda h: h.score).score:
                             pass
                         else:
