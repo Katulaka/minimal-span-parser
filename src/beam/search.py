@@ -140,8 +140,8 @@ class BeamSearch(object):
                         elif h.latest_token == self._end_token:
                             pass
                         elif len(complete_hyps) >= self._beam_size \
-                            # and h.score < min(complete_hyps, key=lambda h: h.score).score:
                             and h.score > max(complete_hyps, key=lambda h: h.score).score:
+                            # and h.score < min(complete_hyps, key=lambda h: h.score).score:
                             pass
                         else:
                             # Otherwise continue to the extend the hypothesis.
