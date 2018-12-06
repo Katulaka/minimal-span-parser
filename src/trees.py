@@ -178,10 +178,7 @@ class InternalMyParseNode(MyParseNode):
         self.label = label
 
         assert isinstance(children, collections.abc.Sequence)
-        try:
-            assert all(isinstance(child, MyParseNode) for child in children)
-        except:
-            import pdb; pdb.set_trace()
+        assert all(isinstance(child, MyParseNode) for child in children)
         assert children
 
         assert all(
@@ -260,7 +257,7 @@ class InternalMyParseNode(MyParseNode):
         children = []
         for child in tree.children:
             children.append(child.combine(node_to_merge, node_to_remove))
-        children = sorted(children, key= lambda x: x.left)
+        # children = sorted(children, key= lambda x: x.left)
         return InternalMyParseNode(tree.label, children)
 
     def filter_missing(self):
@@ -268,6 +265,7 @@ class InternalMyParseNode(MyParseNode):
         children = []
         for child in tree.children:
             children.append(child.filter_missing())
+        children = list(filter(lambda x: isinstance(x, MyParseNode), children))
         return InternalMyParseNode(tree.label, children)
 
 class LeafMyParseNode(MyParseNode):
