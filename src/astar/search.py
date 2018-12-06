@@ -59,26 +59,26 @@ class AstarNode(object):
             if leaves != []:
                 if not keep_valence_value:
                     leaf = leaves[-1] if miss_side == trees.L else leaves[0]
-                else:
-                    leaves = leaves[::-1] if miss_side == trees.L else leaves
-                    label = _trees[0].children[-1].bracket_label()
+                # else:
+                #     leaves = leaves[::-1] if miss_side == trees.L else leaves
+                #     label = _trees[0].children[-1].bracket_label()
+                #     try:
+                #         leaf = leaves[leaves.index(miss_side+label)]
+                #     except:
+                #         return None
                     try:
-                        leaf = leaves[leaves.index(miss_side+label)]
+                        return _trees[1].combine(_trees[0].children[0], leaf)
                     except:
                         return None
-                try:
-                    return _trees[1].combine(_trees[0].children[0], leaf)
-                except:
-                    return None
 
-                # label = _trees[0].children[-1].bracket_label()
-                # leaves = leaves[::-1] if miss_side == trees.L else leaves
-                # for leaf in leaves:
-                #     if label == leaf.label.split(miss_side)[-1]:
-                #         try:
-                #             return _trees[1].combine(_trees[0].children[0], leaf)
-                #         except:
-                #             return None
+                label = _trees[0].children[-1].bracket_label()
+                leaves = leaves[::-1] if miss_side == trees.L else leaves
+                for leaf in leaves:
+                    if label == leaf.label.split(miss_side)[-1]:
+                        try:
+                            return _trees[1].combine(_trees[0].children[0], leaf)
+                        except:
+                            return None
             return None
 
         if not len(list(right_tree.missing_leaves())) and \
@@ -176,15 +176,15 @@ class Solver(AStar):
         return neighbors
 
     def is_goal_reached(self, node, goal):
-        # if (node.left, node.right) == (goal.left, goal.right):
-        #     return not len(list(node.tree.missing_leaves()))
-        if (node.left, node.right) == (goal.left, goal.right) \
-            and not len(list(node.tree.missing_leaves())):
-            node_leaves = list(node.tree.leaves())
-            goal_leaves = list(goal.tree.leaves())
-            return all(
-                (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
+        if (node.left, node.right) == (goal.left, goal.right):
+            return not len(list(node.tree.missing_leaves()))
+        # if (node.left, node.right) == (goal.left, goal.right) \
+        #     and not len(list(node.tree.missing_leaves())):
+        #     node_leaves = list(node.tree.leaves())
+        #     goal_leaves = list(goal.tree.leaves())
+        #     return all(
+        #         (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
+        #         for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
 def fix_partial_nodes(seen, goal, n_goals):
