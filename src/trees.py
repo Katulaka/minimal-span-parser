@@ -373,8 +373,7 @@ class MissMyParseNode(MyParseNode):
         return MissMyParseNode(tree.label)
 
     def filter_missing(self):
-        # yield from ()
-        return
+        yield from ()
 
 def load_trees(path, strip_top=True):
     with open(path) as infile:
