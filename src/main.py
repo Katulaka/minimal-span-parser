@@ -1,10 +1,8 @@
 import argparse
 import itertools
-# import math
 import os.path
 import time
 from subprocess import Popen, DEVNULL, PIPE
-# from pycrayon import CrayonClient
 
 import dynet as dy
 import numpy as np
@@ -325,20 +323,6 @@ def run_train(args):
             print("Saving new best model to {}...".format(best_dev_model_path))
             dy.save(best_dev_model_path, [parser])
 
-    # Connect to the server
-    # cc = CrayonClient()
-
-    # cc.remove_all_experiments()
-    # model_name = args.model_path_base.split('/')[-1]
-    # try:
-    #     for name in ['train-'+model_name, 'dev-'+model_name]:
-    #         cc.remove_experiment(name)
-    # except:
-    #     print('No experiments to remove')
-    # #Create a new experiment
-    # train_exp = cc.create_experiment('train-'+model_name)
-    # dev_exp = cc.create_experiment('dev-'+model_name)
-
     for epoch in itertools.count(start=1):
         if args.epochs is not None and epoch > args.epochs:
             break
@@ -366,7 +350,6 @@ def run_train(args):
 
             batch_loss = dy.average(batch_losses)
             batch_loss_value = batch_loss.scalar_value()
-            # train_exp.add_scalar_value("loss", batch_loss_value)
 
             batch_loss.backward()
             trainer.update()
@@ -392,15 +375,12 @@ def run_train(args):
                 current_processed -= check_every
                 if args.parser_type == "my":
                     dev_loss = my_check_dev()
-                    # step = int(np.ceil(total_processed/args.batch_size))
-                    # dev_exp.add_scalar_value("loss", dev_loss, step=step)
                 else:
                     check_dev()
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.test_path))
-    # test_treebank = trees.load_trees(args.test_path)
-    test_treebank = trees.load_trees('data/22.auto.clean')
+    test_treebank = trees.load_trees(args.test_path)
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
     print("Loading model from {}...".format(args.model_path_base))
@@ -516,11 +496,8 @@ def main():
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
 
-
-
     subparser = subparsers.add_parser("print")
     subparser.set_defaults(callback=plot_results)
-    # subparser.add_argument("--predict-path", required=True)
     subparser.add_argument("--test-path", default="data/23.auto.clean")
     subparser.add_argument("--evalb-dir", default="EVALB/")
 
