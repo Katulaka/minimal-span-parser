@@ -176,15 +176,15 @@ class Solver(AStar):
         return neighbors
 
     def is_goal_reached(self, node, goal):
-        if (node.left, node.right) == (goal.left, goal.right):
-            return not len(list(node.tree.missing_leaves()))
-        # if (node.left, node.right) == (goal.left, goal.right) \
-        #     and not len(list(node.tree.missing_leaves())):
-        #     node_leaves = list(node.tree.leaves())
-        #     goal_leaves = list(goal.tree.leaves())
-        #     return all(
-        #         (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-        #         for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
+        # if (node.left, node.right) == (goal.left, goal.right):
+        #     return not len(list(node.tree.missing_leaves()))
+        if (node.left, node.right) == (goal.left, goal.right) \
+            and not len(list(node.tree.missing_leaves())):
+            node_leaves = list(node.tree.leaves())
+            goal_leaves = list(goal.tree.leaves())
+            return all(
+                (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
+                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
 def fix_partial_nodes(seen, goal, n_goals):
