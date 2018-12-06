@@ -184,19 +184,6 @@ def run_train(args):
             args.keep_valence_value,
             args.dropouts
         )
-    elif args.parser_type == "top-down":
-        parser = parse.TopDownParser(
-            model,
-            tag_vocab,
-            word_vocab,
-            label_vocab,
-            args.tag_embedding_dim,
-            args.word_embedding_dim,
-            args.lstm_layers,
-            args.lstm_dim,
-            args.label_hidden_dim,
-            args.split_hidden_dim,
-            args.dropout,
         )
     else:
         parser = parse.ChartParser(
@@ -339,9 +326,6 @@ def run_train(args):
                 if args.parser_type == "my":
                     losses = parser.parse(sentence, tree)
                     batch_losses.extend(losses)
-                elif args.parser_type == "top-down":
-                    _, loss = parser.parse(sentence, tree, args.explore)
-                    batch_losses.append(loss)
                 else:
                     _, loss = parser.parse(sentence, tree)
                     batch_losses.append(loss)
@@ -453,7 +437,7 @@ def main():
     for arg in dynet_args:
         subparser.add_argument(arg)
     subparser.add_argument("--numpy-seed", type=int)
-    subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
+    subparser.add_argument("--parser-type", choices=["chart", "my"], required=True)
     subparser.add_argument("--tag-embedding-dim", type=int, default=150)
     subparser.add_argument("--word-embedding-dim", type=int, default=100)
     subparser.add_argument("--char-embedding-dim", type=int, default=50)
@@ -486,7 +470,7 @@ def main():
     subparser.add_argument("--model-path-base", required=True)
     subparser.add_argument("--evalb-dir", default="EVALB/")
     subparser.add_argument("--test-path", default="data/23.auto.clean")
-    subparser.add_argument("--parser-type", choices=["top-down", "chart", "my"], required=True)
+    subparser.add_argument("--parser-type", choices=["chart", "my"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
     subparser.add_argument("--time-out", default=np.inf, type=float)
     subparser.add_argument("--n-discounts", default=1, type=int)
