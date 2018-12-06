@@ -65,24 +65,12 @@ class AstarNode(object):
                     for leaf in leaves:
                         if label == leaf.label.split(miss_side)[-1]:
                             break
-
-                #     try:
-                #         leaf = leaves[leaves.index(miss_side+label)]
-                #     except:
-                #         return None
                 try:
+                    import pdb; pdb.set_trace()
                     return _trees[1].combine(_trees[0].children[0], leaf)
                 except:
                     return None
 
-                # label = _trees[0].children[-1].bracket_label()
-                # leaves = leaves[::-1] if miss_side == trees.L else leaves
-                # for leaf in leaves:
-                #     if label == leaf.label.split(miss_side)[-1]:
-                #         try:
-                #             return _trees[1].combine(_trees[0].children[0], leaf)
-                #         except:
-                #             return None
             return None
 
         if not len(list(right_tree.missing_leaves())) and \
