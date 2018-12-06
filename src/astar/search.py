@@ -66,12 +66,13 @@ class AstarNode(object):
                         if label == leaf.label.split(miss_side)[-1]:
                             break
                 try:
-                    self.tree = _trees[1].combine(_trees[0].children[0], leaf)
-                    return True
+                    tree = _trees[1].combine(_trees[0].children[0], leaf)
                     # return _trees[1].combine(_trees[0].children[0], leaf)
                 except:
                     import pdb; pdb.set_trace()
                     return False
+
+                self.tree = tree
 
             return False
 
