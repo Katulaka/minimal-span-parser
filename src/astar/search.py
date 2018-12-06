@@ -68,9 +68,7 @@ class AstarNode(object):
                 try:
                     self.tree = _trees[1].combine(_trees[0].children[0], leaf)
                     return True
-                    # return _trees[1].combine(_trees[0].children[0], leaf)
                 except:
-                    # import pdb; pdb.set_trace()
                     return False
 
             return False
@@ -82,18 +80,11 @@ class AstarNode(object):
         #Trying to combine Left Tree --> Right Tree
         if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
             return helper([left_tree, right_tree], trees.L)
-            # tree = helper([left_tree, right_tree], trees.L)
-            # if tree is not None:
-            #     self.tree = tree
-            #     return True
 
         #Trying to combine Right Tree --> Left Tree
         if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
             return helper([right_tree, left_tree], trees.R)
-            # tree = helper([right_tree, left_tree], trees.R)
-            # if tree is not None:
-            #     self.tree = tree
-            #     return True
+
         return False
 
 
@@ -174,20 +165,9 @@ class Solver(AStar):
     def is_goal_reached(self, node, goal):
         if (node.left, node.right) == (goal.left, goal.right):
             return not len(list(node.tree.missing_leaves()))
-        # if (node.left, node.right) == (goal.left, goal.right) \
-        #     and not len(list(node.tree.missing_leaves())):
-        #     node_leaves = list(node.tree.leaves())
-        #     goal_leaves = list(goal.tree.leaves())
-        #     return all(
-        #         (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-        #         for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
 def fix_partial_nodes(seen, goal, n_goals):
-
-    def filter_missing(tree):
-        for l in tree.missing_leaves():
-            l.parent.children = list(filter(lambda x: x!=l, l.parent.children))
 
     nodes = filter(lambda x: (x.left, x.right) == (goal.left, goal.right), seen)
     nodes = sorted(nodes, key = lambda x: x.score, reverse = True)[:n_goals]
