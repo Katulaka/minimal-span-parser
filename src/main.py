@@ -199,6 +199,7 @@ def run_train(args):
             args.lstm_layers,
             args.lstm_dim,
             args.char_lstm_dim,
+            args.dec_lstm_dim,
             args.label_hidden_dim,
             args.dropout,
         )
