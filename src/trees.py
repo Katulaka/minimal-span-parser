@@ -178,9 +178,12 @@ class InternalMyParseNode(MyParseNode):
         self.label = label
 
         assert isinstance(children, collections.abc.Sequence)
-        assert all(isinstance(child, MyParseNode) for child in children)
+        try:
+            assert all(isinstance(child, MyParseNode) for child in children)
+        except:
+            import pdb; pdb.set_trace()
         assert children
-        # import pdb; pdb.set_trace()
+
         assert all(
             left.right == right.left
             for left, right in zip(children, children[1:])
