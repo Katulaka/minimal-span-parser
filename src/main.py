@@ -416,9 +416,9 @@ def run_test(args):
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    for i, tree in  enumerate(test_treebank):
-    # for i in [1177, 1789, 1793, 2159, 2243]:
-        # tree = test_treebank[i]
+    # for i, tree in  enumerate(test_treebank):
+    for i in [1177, 1789, 1793, 2159, 2243]:
+        tree = test_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
