@@ -59,19 +59,26 @@ class AstarNode(object):
             if leaves != []:
                 if not keep_valence_value:
                     leaf = leaves[-1] if miss_side == trees.L else leaves[0]
+                else:
+                    leaves = leaves[::-1] if miss_side == trees.L else leaves
+                    label = _trees[0].children[-1].bracket_label()
                     try:
-                        return _trees[1].combine(_trees[0].children[0], leaf)
+                        leaf = leaves[leaves.index(miss_side+label)]
                     except:
                         return None
+                try:
+                    return _trees[1].combine(_trees[0].children[0], leaf)
+                except:
+                    return None
 
-                label = _trees[0].children[-1].bracket_label()
-                leaves = leaves[::-1] if miss_side == trees.L else leaves
-                for leaf in leaves:
-                    if label == leaf.label.split(miss_side)[-1]:
-                        try:
-                            return _trees[1].combine(_trees[0].children[0], leaf)
-                        except:
-                            return None
+                # label = _trees[0].children[-1].bracket_label()
+                # leaves = leaves[::-1] if miss_side == trees.L else leaves
+                # for leaf in leaves:
+                #     if label == leaf.label.split(miss_side)[-1]:
+                #         try:
+                #             return _trees[1].combine(_trees[0].children[0], leaf)
+                #         except:
+                #             return None
             return None
 
         if not len(list(right_tree.missing_leaves())) and \
@@ -92,7 +99,6 @@ class AstarNode(object):
                 self.tree = tree
                 return True
         return False
-
 
 
 class ClosedList(object):
@@ -170,15 +176,15 @@ class Solver(AStar):
         return neighbors
 
     def is_goal_reached(self, node, goal):
-        # if (node.left, node.right) == (goal.left, goal.right):
-        #     return not len(list(node.tree.missing_leaves()))
-        if (node.left, node.right) == (goal.left, goal.right) \
-            and not len(list(node.tree.missing_leaves())):
-            node_leaves = list(node.tree.leaves())
-            goal_leaves = list(goal.tree.leaves())
-            return all(
-                (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
-                for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
+        if (node.left, node.right) == (goal.left, goal.right):
+            return not len(list(node.tree.missing_leaves()))
+        # if (node.left, node.right) == (goal.left, goal.right) \
+        #     and not len(list(node.tree.missing_leaves())):
+        #     node_leaves = list(node.tree.leaves())
+        #     goal_leaves = list(goal.tree.leaves())
+        #     return all(
+        #         (goal_leaf.tag, goal_leaf.word) == (node_leaf.tag, node_leaf.word)
+        #         for goal_leaf, node_leaf in zip(goal_leaves, node_leaves))
         return False
 
 def fix_partial_nodes(seen, goal, n_goals):
@@ -190,7 +196,6 @@ def fix_partial_nodes(seen, goal, n_goals):
     nodes = filter(lambda x: (x.left, x.right) == (goal.left, goal.right), seen)
     nodes = sorted(nodes, key = lambda x: x.score, reverse = True)[:n_goals]
     for node in nodes:
-        # filter_missing(node.tree)
         tree = node.tree.filter_missing()
         if tree.label in [trees.CL, trees.CR]:
             tree.label = 'S'
@@ -201,17 +206,13 @@ def fix_partial_nodes(seen, goal, n_goals):
         nodes_p = filter(lambda x: (x.left, x.right) != (goal.left, goal.right), seen)
         nodes_p = sorted(nodes_p, key = lambda x: x.right - x.left, reverse = True)[:n_nodes]
         for node in nodes_p:
-            # filter_missing(node.tree)
             tree = node.tree.filter_missing()
             children = list(goal.tree.children[:node.left]) \
                             + list(tree.children) \
                              + list(goal.tree.children[node.right:])
             if tree.label in [trees.CL, trees.CR]:
                 tree.label = 'S'
-            try:
-                node.tree = trees.InternalMyParseNode(tree.label, children)
-            except:
-                import pdb; pdb.set_trace()
+            node.tree = trees.InternalMyParseNode(tree.label, children)
         nodes += nodes_p
     return nodes
 
