@@ -355,7 +355,6 @@ class MissMyParseNode(MyParseNode):
         else:
             yield from ()
 
-
     def siblings(self):
         for child in self.parent.children:
             if child != self:
@@ -376,7 +375,8 @@ class MissMyParseNode(MyParseNode):
         return MissMyParseNode(tree.label)
 
     def filter_missing(self):
-        yield from ()
+        # yield from ()
+        return
 
 def load_trees(path, strip_top=True):
     with open(path) as infile:
