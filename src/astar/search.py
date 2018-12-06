@@ -177,8 +177,6 @@ class Solver(AStar):
 
 def fix_partial_nodes(seen, goal, n_goals):
 
-    import pdb; pdb.set_trace()
-
     def filter_missing(tree):
         for l in tree.missing_leaves():
             l.parent.children = list(filter(lambda x: x!=l, l.parent.children))
@@ -192,7 +190,8 @@ def fix_partial_nodes(seen, goal, n_goals):
 
     if len(nodes) < n_goals:
         n_nodes = n_goals - len(nodes)
-        nodes_p = sorted(seen, key = lambda x: x.right - x.left, reverse = True)[:n_nodes]
+        nodes_p = filter(lambda x: (x.left, x.right) != (goal.left, goal.right), seen)
+        nodes_p = sorted(nodes_p, key = lambda x: x.right - x.left, reverse = True)[:n_nodes]
         for node in nodes_p:
             filter_missing(node.tree)
             children = list(goal.tree.children[:node.left]) \
