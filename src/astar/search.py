@@ -73,6 +73,7 @@ class AstarNode(object):
                     return False
 
                 self.tree = tree
+                return True
 
             return False
 
