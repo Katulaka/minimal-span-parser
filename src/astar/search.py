@@ -205,7 +205,10 @@ def fix_partial_nodes(seen, goal, n_goals):
                              + list(goal.tree.children[node.right:])
             if node.tree.label in [trees.CL, trees.CR]:
                 node.tree.label = 'S'
-            node.tree = trees.InternalMyParseNode(node.tree.label, children)
+            try:
+                node.tree = trees.InternalMyParseNode(node.tree.label, children)
+            except:
+                import pdb; pdb.set_trace()
         nodes += nodes_p
     return nodes
 
