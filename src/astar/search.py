@@ -66,12 +66,14 @@ class AstarNode(object):
                         if label == leaf.label.split(miss_side)[-1]:
                             break
                 try:
-                    import pdb; pdb.set_trace()
-                    return _trees[1].combine(_trees[0].children[0], leaf)
+                    self.tree = _trees[1].combine(_trees[0].children[0], leaf)
+                    return True
+                    # return _trees[1].combine(_trees[0].children[0], leaf)
                 except:
-                    return None
+                    import pdb; pdb.set_trace()
+                    return False
 
-            return None
+            return False
 
         if not len(list(right_tree.missing_leaves())) and \
                 not len(list(left_tree.missing_leaves())):
@@ -79,17 +81,19 @@ class AstarNode(object):
 
         #Trying to combine Left Tree --> Right Tree
         if left_tree.label == trees.CR and not len(list(left_tree.missing_leaves())):
-            tree = helper([left_tree, right_tree], trees.L)
-            if tree is not None:
-                self.tree = tree
-                return True
+            return helper([left_tree, right_tree], trees.L)
+            # tree = helper([left_tree, right_tree], trees.L)
+            # if tree is not None:
+            #     self.tree = tree
+            #     return True
 
         #Trying to combine Right Tree --> Left Tree
         if right_tree.label == trees.CL and not len(list(right_tree.missing_leaves())):
-            tree = helper([right_tree, left_tree], trees.R)
-            if tree is not None:
-                self.tree = tree
-                return True
+            return helper([right_tree, left_tree], trees.R)
+            # tree = helper([right_tree, left_tree], trees.R)
+            # if tree is not None:
+            #     self.tree = tree
+            #     return True
         return False
 
 
