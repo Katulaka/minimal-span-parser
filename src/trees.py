@@ -260,6 +260,13 @@ class InternalMyParseNode(MyParseNode):
         children = sorted(children, key= lambda x: x.left)
         return InternalMyParseNode(tree.label, children)
 
+    def filter_missing(self):
+        tree = self
+        children = []
+        for child in tree.children:
+            children.append(child.filter_missing())
+        return InternalMyParseNode(tree.label, children)
+
 class LeafMyParseNode(MyParseNode):
     def __init__(self, index, tag, word):
         assert isinstance(index, int)
@@ -291,6 +298,9 @@ class LeafMyParseNode(MyParseNode):
         return LeafTreebankNode(self.tag, self.word)
 
     def combine(self, node_to_merge, node_to_remove):
+        return LeafMyParseNode(self.left, self.tag, self.word)
+
+    def filter_missing(self):
         return LeafMyParseNode(self.left, self.tag, self.word)
 
     def siblings(self):
@@ -361,6 +371,9 @@ class MissMyParseNode(MyParseNode):
             return node_to_merge.combine(node_to_merge, node_to_remove)
         # return MissMyParseNode(tree.label, tree.left)
         return MissMyParseNode(tree.label)
+
+    def filter_missing(self):
+        yield from ()
 
 def load_trees(path, strip_top=True):
     with open(path) as infile:

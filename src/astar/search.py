@@ -190,23 +190,26 @@ def fix_partial_nodes(seen, goal, n_goals):
     nodes = filter(lambda x: (x.left, x.right) == (goal.left, goal.right), seen)
     nodes = sorted(nodes, key = lambda x: x.score, reverse = True)[:n_goals]
     for node in nodes:
-        filter_missing(node.tree)
-        if node.tree.label in [trees.CL, trees.CR]:
-            node.tree.label = 'S'
+        # filter_missing(node.tree)
+        tree = node.tree.filter_missing()
+        if tree.label in [trees.CL, trees.CR]:
+            tree.label = 'S'
+        node.tree = tree
 
     if len(nodes) < n_goals:
         n_nodes = n_goals - len(nodes)
         nodes_p = filter(lambda x: (x.left, x.right) != (goal.left, goal.right), seen)
         nodes_p = sorted(nodes_p, key = lambda x: x.right - x.left, reverse = True)[:n_nodes]
         for node in nodes_p:
-            filter_missing(node.tree)
+            # filter_missing(node.tree)
+            tree = node.tree.filter_missing()
             children = list(goal.tree.children[:node.left]) \
-                            + list(node.tree.children) \
+                            + list(tree.children) \
                              + list(goal.tree.children[node.right:])
-            if node.tree.label in [trees.CL, trees.CR]:
-                node.tree.label = 'S'
+            if tree.label in [trees.CL, trees.CR]:
+                tree.label = 'S'
             try:
-                node.tree = trees.InternalMyParseNode(node.tree.label, children)
+                node.tree = trees.InternalMyParseNode(tree.label, children)
             except:
                 import pdb; pdb.set_trace()
         nodes += nodes_p
