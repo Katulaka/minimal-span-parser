@@ -180,12 +180,12 @@ class InternalMyParseNode(MyParseNode):
         assert isinstance(children, collections.abc.Sequence)
         assert all(isinstance(child, MyParseNode) for child in children)
         assert children
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         assert all(
             left.right == right.left
             for left, right in zip(children, children[1:])
             if not (isinstance(left, MissMyParseNode)
-                    and isinstance(right, MissMyParseNode)))
+                    or isinstance(right, MissMyParseNode)))
         self.children = tuple(children)
 
         for child in self.children:
