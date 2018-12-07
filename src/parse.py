@@ -354,7 +354,8 @@ class MyParser(object):
             self.model)
 
         enc_out_dim = embedding_dim + 2 * lstm_dim
-        dec_attend_dim = 2 * dec_lstm_dim
+        # dec_attend_dim = 2 * dec_lstm_dim
+        dec_attend_dim = 4 * lstm_dim
         Weights = collections.namedtuple('Weights', 'name prev_dim next_dim')
         ws = []
         ws.append(Weights(name='c_dec', prev_dim=enc_out_dim, next_dim=dec_lstm_dim))
