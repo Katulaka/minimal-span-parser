@@ -140,18 +140,17 @@ def run_train(args):
     model = dy.ParameterCollection()
     if args.parser_type == "my":
         if args.model_path_base == 'run_exp':
-            args.model_path_base = ('models_grid_search/'
+            args.model_path_base = ('models_chart_enc_grid_search/'
                 'char-dim({})_'
                 'tag-dim({})_'
                 'word-dim({})_'
                 'label-dim({})_'
                 'char-h({})_'
                 'word-h({})_'
-                'label-h({})_'
+                # 'label-h({})_'
                 'attention-dim({})_'
                 'projection-dim({})_'
-                'dropouts({})_'
-                'keep_valence_value_'
+                'dropouts({})'
                 ).format(
                     args.char_embedding_dim,
                     args.tag_embedding_dim,
@@ -159,7 +158,7 @@ def run_train(args):
                     args.label_embedding_dim,
                     args.char_lstm_dim,
                     args.lstm_dim,
-                    args.dec_lstm_dim,
+                    # args.dec_lstm_dim,
                     args.attention_dim,
                     args.label_hidden_dim,
                     args.dropouts
@@ -448,7 +447,6 @@ def main():
     subparser.add_argument("--label-hidden-dim", type=int, default=100)
     subparser.add_argument("--attention-dim", type=int, default=200)
     subparser.add_argument("--lstm-layers", type=int, default=2)
-    subparser.add_argument("--split-hidden-dim", type=int, default=250)
     subparser.add_argument("--dropout", type=float, default=0.4)
     subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.4, 0.4])
     subparser.add_argument("--model-path-base", required=True)
