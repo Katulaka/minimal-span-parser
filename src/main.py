@@ -381,7 +381,7 @@ def run_test(args):
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    for i, tree in  enumerate(test_treebank):
+    for i, tree in  enumerate(test_treebank[args.range[0]:args.range[1]]):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
@@ -478,6 +478,8 @@ def main():
     subparser.add_argument("--alpha", default=0.6, type=float)
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
+    subparser.add_argument("--range", nargs=2, default=[0,2416], type=int)
+
 
     subparser = subparsers.add_parser("print")
     subparser.set_defaults(callback=plot_results)
