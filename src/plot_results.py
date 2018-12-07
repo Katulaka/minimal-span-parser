@@ -63,7 +63,7 @@ def plot_density(our_fscore, chart_fscore, outline_b, outline_c):
     plt.title('F1 scores vs. Density')
     plt.savefig('plots/fscore_vs_density.png', bbox_inches='tight')
 
-def plot_bars(hist_5, hist_chart, outline_b, outline_c, y_label, f_name, loc='lower left'):
+def plot_bars(hist_beam, hist_chart, outline_b, outline_c, y_label, f_name, loc='lower left'):
 
     def autolabel(ax, rects):
         for rect in rects:
@@ -73,7 +73,7 @@ def plot_bars(hist_5, hist_chart, outline_b, outline_c, y_label, f_name, loc='lo
 
     fig, ax = plt.subplots()
 
-    xvals, yvals = zip(*sorted(hist_5.items()))
+    xvals, yvals = zip(*sorted(hist_beam.items()))
     _, zvals = zip(*sorted(hist_chart.items()))
     xvals = np.array(xvals) + 10
 
@@ -110,13 +110,13 @@ def plot_bars(hist_5, hist_chart, outline_b, outline_c, y_label, f_name, loc='lo
     plt.tight_layout()
     plt.savefig(f_name, bbox_inches='tight')
 
-def plot_exact_match(beam_5_recall, chart_recall, n_trees):
+def plot_exact_match(beam_recall, chart_recall, n_trees):
     fig, ax = plt.subplots()
     delta = 2
-    ax.plot(range(1, n_trees+1), beam_5_recall, '>:', label='This work')
+    ax.plot(range(1, n_trees+1), beam_recall, '>:', label='This work')
     ax.plot(range(1, n_trees+1), chart_recall, '--d', label='Stern et al. \n (2017)')
-    min_y = np.min([chart_recall, beam_5_recall]) - delta
-    max_y = np.max([chart_recall, beam_5_recall]) + delta
+    min_y = np.min([chart_recall, beam_recall]) - delta
+    max_y = np.max([chart_recall, beam_recall]) + delta
     ax.axis([0, n_trees+1, min_y, max_y])
     ax.set_yticklabels(['{:d}%'.format(int(x)) for x in ax.get_yticks()])
     plt.xlabel('Top-K')
@@ -127,7 +127,7 @@ def plot_exact_match(beam_5_recall, chart_recall, n_trees):
     return ax
 
 
-def compute(args, test_treebank, predicted, n_trees):
+def compute(args, test_treebank, predicted, n_trees, s_len=10):
 
     predict = np.array([helper(p, n_trees) for p in predicted])
     evalb = [evaluate.evalb_full(args.evalb_dir, test_treebank, predict[:,k]) \
@@ -144,25 +144,21 @@ def compute(args, test_treebank, predicted, n_trees):
     pair_sort = sorted(zip(test_treebank, predict[:,0]),\
                                     key = lambda x: len(list(x[1].leaves())))
     iter = itertools.groupby(pair_sort, \
-            lambda x: int(len(list(x[1].leaves()))/10) * 10)
+                lambda x: int(len(list(x[1].leaves()))/s_len) * s_len)
     for key, value in iter:
         hist_fscore[key] = evaluate.evalb(args.evalb_dir, *zip(*list(value))).fscore
 
     hist_recall = {}
-    hist_recall_all = {}
     evalb_sort = sorted(np.array(evalb).transpose() , key = lambda x: x[0].length)
-    iter = itertools.groupby(evalb_sort, lambda x: int(x[0].length/10) * 10)
+    iter = itertools.groupby(evalb_sort, lambda x: int(x[0].length/s_len) * s_len)
     for key, value in iter:
-        value = list(value)
         match = [100.0 == y[0].Fscore.fscore for y in value]
         hist_recall[key] = match.count(True)/len(match) * 100
-        match_all = [100.0 in [x.Fscore.fscore for x in y] for y in value]
-        hist_recall_all[key] = match_all.count(True)/len(match_all) * 100
 
 
     hist = {'fscore': hist_fscore,
             'recall': hist_recall,
-            'recall_all': hist_recall_all}
+            }
     return fscores, recall, hist
 
 def plot_results(args):
@@ -170,8 +166,8 @@ def plot_results(args):
     test_treebank = trees.load_trees(args.test_path)
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
-    # for i in ['beam_5','beam_10','beam_15','beam_20','beam_25','beam_32', 'chart']:
-    #     fname = 'results/predict_{}'.format(i)
+    # for i in ['beam_5','beam_10','beam_15','beam_20','beam_25','beam_32']:
+    #     fname = 'results/lp_0_7_5/predicted_{}_lp_0.7_5_to_2'.format(i)
     #     with open(fname,  'rb') as f:
     #         predicted = pickle.load(f)
     #
@@ -180,10 +176,16 @@ def plot_results(args):
     #     match = [100 == x.Fscore.fscore for x in evalb]
     #     recall = match.count(True)/len(match)*100
     #     print('Parser:{}, fscore:{}, recall:{}'.format(i,fscore,recall))
+    #
 
+    # with open('results/lp_0_7_5/predicted_beam_10_lp_0.7_5_top_20', 'rb') as f:
+    #     our_predicted_lp = pickle.load(f)
 
-    with open('results/test_predicted', 'rb') as f:
-        our_predicted = pickle.load(f)
+    our_predicted = []
+    for i in range(8):
+        fname = 'results/predicted_beam_10/predicted_beam_10_top_20_{}_{}'.format(302*i, 302*(i+1))
+        with open(fname,  'rb') as f:
+            our_predicted.extend(pickle.load(f))
 
     with open('results/predict_top_20_chart', 'rb') as f:
         chart_predicted = pickle.load(f)
@@ -193,15 +195,14 @@ def plot_results(args):
     chart_fscores, chart_recall, hist_chart = compute(args, test_treebank, chart_predicted, n_trees)
 
     ax = plot_exact_match(our_recall, chart_recall, n_trees)
-    import pdb; pdb.set_trace()
     f_name = 'plots/fscore_vs_sentence_len.png'
     y_label = 'F1 score'
-    plot_bars(hist_our['fscore'], hist_chart['fscore'], *ax.lines, y_label, f_name)
+    hist_fscore = [hist_our['fscore'], hist_chart['fscore']]
+    plot_bars(*hist_fscore, *ax.lines, y_label, f_name)
     loc = 'upper right'
     f_name = 'plots/match_vs_sentence_len.png'
     y_label = 'Exact match Top-1'
-    plot_bars(hist_our['recall'], hist_chart['recall'], *ax.lines, y_label, f_name, loc)
-    f_name = 'plots/match_20_vs_sentence_len.png'
-    y_label = 'Exact match Top-20'
-    plot_bars(hist_our['recall_all'], hist_chart['recall_all'], *ax.lines, y_label, f_name, loc)
-    plot_density(our_fscores[:,0], chart_fscores[:,0], *ax.lines)
+    hist_recall = [hist_our['recall'], hist_chart['recall']]
+    plot_bars(*hist_recall, *ax.lines, y_label, f_name, loc)
+
+    import pdb; pdb.set_trace()
