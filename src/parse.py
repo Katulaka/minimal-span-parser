@@ -107,8 +107,8 @@ class ChartParser(object):
             dy.VanillaLSTMBuilder)
 
         self.f_label = Feedforward(
-            self.model, 2 * lstm_dim, [label_hidden_dim], label_vocab.size - 1)
-            # self.model, dec_lstm_dim, [label_hidden_dim], label_vocab.size - 1)
+            # self.model, 2 * lstm_dim, [label_hidden_dim], label_vocab.size - 1)
+            self.model, dec_lstm_dim, [label_hidden_dim], label_vocab.size - 1)
 
         self.dropout = dropout
         self.use_char_lstm = use_char_lstm
