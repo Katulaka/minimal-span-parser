@@ -107,17 +107,17 @@ class ChartParser(object):
             dy.VanillaLSTMBuilder)
 
         self.f_label = Feedforward(
-            # self.model, 2 * lstm_dim, [label_hidden_dim], label_vocab.size - 1)
-            self.model, dec_lstm_dim, [label_hidden_dim], label_vocab.size - 1)
+            self.model, 2 * lstm_dim, [label_hidden_dim], label_vocab.size - 1)
+            # self.model, dec_lstm_dim, [label_hidden_dim], label_vocab.size - 1)
 
         self.dropout = dropout
         self.use_char_lstm = use_char_lstm
 
 
-        enc_out_dim = embedding_dim + 2 * lstm_dim
-        weight = self.model.add_parameters((dec_lstm_dim, enc_out_dim))
-        bias = self.model.add_parameters((dec_lstm_dim))
-        self.ws = (bias, weight)
+        # enc_out_dim = embedding_dim + 2 * lstm_dim
+        # weight = self.model.add_parameters((dec_lstm_dim, enc_out_dim))
+        # bias = self.model.add_parameters((dec_lstm_dim))
+        # self.ws = (bias, weight)
 
     def param_collection(self):
         return self.model
@@ -166,19 +166,19 @@ class ChartParser(object):
 
         lstm_outputs = self.lstm.transduce(embeddings)
 
-        encode_output = [dy.affine_transform([*self.ws, dy.concatenate([e, l])])
-                                    for e, l in zip(embeddings, lstm_outputs)]
+        # encode_output = [dy.affine_transform([*self.ws, dy.concatenate([e, l])])
+        #                             for e, l in zip(embeddings, lstm_outputs)]
 
         @functools.lru_cache(maxsize=None)
         def get_span_encoding(left, right):
-            return (encode_output[right] - encode_output[left])
-            # forward = (
-            #     lstm_outputs[right][:self.lstm_dim] -
-            #     lstm_outputs[left][:self.lstm_dim])
-            # backward = (
-            #     lstm_outputs[left + 1][self.lstm_dim:] -
-            #     lstm_outputs[right + 1][self.lstm_dim:])
-            # return dy.concatenate([forward, backward])
+            # return (encode_output[right] - encode_output[left])
+            forward = (
+                lstm_outputs[right][:self.lstm_dim] -
+                lstm_outputs[left][:self.lstm_dim])
+            backward = (
+                lstm_outputs[left + 1][self.lstm_dim:] -
+                lstm_outputs[right + 1][self.lstm_dim:])
+            return dy.concatenate([forward, backward])
 
         @functools.lru_cache(maxsize=None)
         def get_label_scores(left, right):
