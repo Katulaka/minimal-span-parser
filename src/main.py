@@ -163,26 +163,30 @@ def run_train(args):
                     args.label_hidden_dim,
                     args.dropouts
                     )
-        parser = parse.MyParser(
-            model,
-            tag_vocab,
-            word_vocab,
-            char_vocab,
-            label_vocab,
-            args.use_char_lstm,
-            args.tag_embedding_dim,
-            args.word_embedding_dim,
-            args.char_embedding_dim,
-            args.label_embedding_dim,
-            args.lstm_layers,
-            args.lstm_dim,
-            args.char_lstm_dim,
-            args.dec_lstm_dim,
-            args.attention_dim,
-            args.label_hidden_dim,
-            args.keep_valence_value,
-            args.dropouts
-        )
+        if args.load:
+            model = dy.ParameterCollection()
+            [parser] = dy.load(args.model_path_base, model)
+        else:
+            parser = parse.MyParser(
+                model,
+                tag_vocab,
+                word_vocab,
+                char_vocab,
+                label_vocab,
+                args.use_char_lstm,
+                args.tag_embedding_dim,
+                args.word_embedding_dim,
+                args.char_embedding_dim,
+                args.label_embedding_dim,
+                args.lstm_layers,
+                args.lstm_dim,
+                args.char_lstm_dim,
+                args.dec_lstm_dim,
+                args.attention_dim,
+                args.label_hidden_dim,
+                args.keep_valence_value,
+                args.dropouts
+            )
     else:
         parser = parse.ChartParser(
             model,
@@ -459,6 +463,8 @@ def main():
     subparser.add_argument("--print-vocabs", action="store_true")
     subparser.add_argument("--keep-valence-value", action="store_true")
     subparser.add_argument("--use-char-lstm", action="store_true")
+    subparser.add_argument("--load", action="store_true")
+
 
     subparser = subparsers.add_parser("test")
     subparser.set_defaults(callback=run_test)
