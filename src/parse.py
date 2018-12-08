@@ -114,10 +114,10 @@ class ChartParser(object):
         self.use_char_lstm = use_char_lstm
 
 
-        # enc_out_dim = embedding_dim + 2 * lstm_dim
-        # weight = self.model.add_parameters((dec_lstm_dim, enc_out_dim))
-        # bias = self.model.add_parameters((dec_lstm_dim))
-        # self.ws = (bias, weight)
+        enc_out_dim = embedding_dim + 2 * lstm_dim
+        weight = self.model.add_parameters((dec_lstm_dim, enc_out_dim))
+        bias = self.model.add_parameters((dec_lstm_dim))
+        self.ws = (bias, weight)
 
     def param_collection(self):
         return self.model
@@ -166,19 +166,19 @@ class ChartParser(object):
 
         lstm_outputs = self.lstm.transduce(embeddings)
 
-        # encode_output = [dy.affine_transform([*self.ws, dy.concatenate([e, l])])
-        #                             for e, l in zip(embeddings, lstm_outputs)]
+        encode_output = [dy.affine_transform([*self.ws, dy.concatenate([e, l])])
+                                    for e, l in zip(embeddings, lstm_outputs)]
 
         @functools.lru_cache(maxsize=None)
         def get_span_encoding(left, right):
-            # return (encode_output[right] - encode_output[left])
-            forward = (
-                lstm_outputs[right][:self.lstm_dim] -
-                lstm_outputs[left][:self.lstm_dim])
-            backward = (
-                lstm_outputs[left + 1][self.lstm_dim:] -
-                lstm_outputs[right + 1][self.lstm_dim:])
-            return dy.concatenate([forward, backward])
+            return (encode_output[right] - encode_output[left])
+            # forward = (
+            #     lstm_outputs[right][:self.lstm_dim] -
+            #     lstm_outputs[left][:self.lstm_dim])
+            # backward = (
+            #     lstm_outputs[left + 1][self.lstm_dim:] -
+            #     lstm_outputs[right + 1][self.lstm_dim:])
+            # return dy.concatenate([forward, backward])
 
         @functools.lru_cache(maxsize=None)
         def get_label_scores(left, right):
@@ -443,7 +443,6 @@ class MyParser(object):
                     e = self.label_embeddings[self.label_vocab.index(label)]
                     label_embedding.append(dy.dropout(e, dropouts))
 
-                # c_dec = dy.affine_transform([*self.ws['c_dec'], encode_output])
                 c_dec = encode_output
                 h_dec = dy.zeros(c_dec.dim()[0])
                 decode_init = self.dec_lstm.initial_state([c_dec, h_dec])
