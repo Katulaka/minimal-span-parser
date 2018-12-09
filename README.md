@@ -1,22 +1,12 @@
-# Minimal Span-Based Neural Constituency Parser
+# Path-Based Neural Constituency Parsing
 
-This is a reference Python implementation of the top-down and chart-based constituency parsers described in [A Minimal Span-Based Neural Constituency Parser](https://arxiv.org/abs/1705.03919) from ACL 2017.
-
-The top-down parser is implemented as described in the paper.
-
-The chart parser includes the simplifications outlined in the ACL 2017 oral presentation, namely:
-
-  * Removing the unlabeled span-scoring terms from the model.
-  * Fixing the score of the empty label at 0.
-
-These changes improve speed and reduce memory usage without affecting final performance. Moreover, they result in the score of a tree decomposing directly into a sum of labeled span scores, eliminating score differences that arise due to different choices of binarization.
+This is a reference Python implementation of the path-based constituency parsers. 
 
 ## Requirements and Setup
 
 * Python 3.5 or higher.
 * [DyNet](https://github.com/clab/dynet). We recommend installing DyNet from source with MKL support for significantly faster run time.
 * [EVALB](http://nlp.cs.nyu.edu/evalb/). Before starting, run `make` inside the `EVALB/` directory to compile an `evalb` executable. This will be called from Python for evaluation.
-* Pre-trained models. Before starting, run `unzip zipped/top-down-model_dev=92.34.zip` and `unzip zipped/chart-model_dev=92.24.zip` in the `models/` directory to extract the pre-trained models.
 
 ## Training
 
@@ -25,7 +15,7 @@ A new model can be trained using the command `python3 src/main.py train ...` wit
 Argument | Description | Default
 --- | --- | ---
 `--numpy-seed` | NumPy random seed | Random
-`--parser-type` | `top-down` or `chart` | N/A
+`--parser-type` | `my` or `chart` | N/A
 `--tag-embedding-dim` | Tag embedding dimension | 50
 `--word-embedding-dim` | Word embedding dimension | 100
 `--lstm-layers` | Number of bidirectional LSTM layers | 2
@@ -49,12 +39,12 @@ Any of the DyNet command line options can also be specified.
 
 The training and development trees are assumed to have predicted part-of-speech tags.
 
-For each development evaluation, the F-score on the development set is computed and compared to the previous best. If the current model is better, the previous model will be deleted and the current model will be saved. The new filename will be derived from the provided model path base and the development F-score.
+For each development evaluation, the loss on the development set is computed and compared to the previous best. If the current model is better, the previous model will be deleted and the current model will be saved. The new filename will be derived from the provided model path base and the development loss.
 
-As an example, to train a top-down parser with exploration using the default hyperparameters, you can use the command:
+As an example, to train a path-based parser using the default hyperparameters, you can use the command:
 
 ```
-python3 src/main.py train --parser-type top-down --explore --model-path-base models/top-down-model
+python3 src/main.py train --parser-type my --explore --model-path-base models/path-model
 ```
 
 Alternatively, to train a chart parser using the default hyperparameters, you can use the command:
@@ -98,15 +88,5 @@ See the `run_test` function in `src/main.py` for an example of how a parser can 
 If you use this software for research, please cite our paper as follows:
 
 ```
-@InProceedings{Stern2017Minimal,
-  author    = {Stern, Mitchell and Andreas, Jacob and Klein, Dan},
-  title     = {A Minimal Span-Based Neural Constituency Parser},
-  booktitle = {Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
-  month     = {July},
-  year      = {2017},
-  address   = {Vancouver, Canada},
-  publisher = {Association for Computational Linguistics},
-  pages     = {818--827},
-  url       = {http://aclweb.org/anthology/P17-1076}
-}
+
 ```
