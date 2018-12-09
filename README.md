@@ -15,7 +15,7 @@ A new model can be trained using the command `python3 src/main.py train ...` wit
 Argument | Description | Default
 --- | --- | ---
 `--numpy-seed` | NumPy random seed | Random
-`--parser-type` | `my` or `chart` | N/A
+`--parser-type` | `path` or `chart` | N/A
 `--tag-embedding-dim` | Tag embedding dimension | 50
 `--word-embedding-dim` | Word embedding dimension | 100
 `--lstm-layers` | Number of bidirectional LSTM layers | 2
