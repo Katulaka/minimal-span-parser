@@ -21,9 +21,7 @@ Argument | Description | Default
 `--lstm-layers` | Number of bidirectional LSTM layers | 2
 `--lstm-dim` | Hidden dimension of each LSTM within each layer | 250
 `--label-hidden-dim` | Hidden dimension of label-scoring feedforward network | 250
-`--split-hidden-dim`* | Hidden dimension of split-scoring feedforward network | 250
 `--dropout` | Dropout rate for LSTMs | 0.4
-`--explore`* | Train with exploration using a dynamic oracle | Train using a static oracle
 `--model-path-base` | Path base to use for saving models | N/A
 `--evalb-dir` |  Path to EVALB directory | `EVALB/`
 `--train-path` | Path to training trees | `data/02-21.10way.clean`
@@ -32,8 +30,6 @@ Argument | Description | Default
 `--epochs` | Number of training epochs | No limit
 `--checks-per-epoch` | Number of development evaluations per epoch | 4
 `--print-vocabs` | Print the vocabularies before training | Do not print the vocabularies
-
-\*These arguments only apply to the top-down parser.
 
 Any of the DyNet command line options can also be specified.
 
