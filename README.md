@@ -40,7 +40,7 @@ For each development evaluation, the loss on the development set is computed and
 As an example, to train a path-based parser using the default hyperparameters, you can use the command:
 
 ```
-python3 src/main.py train --parser-type my --explore --model-path-base models/path-model
+python3 src/main.py train --parser-type path --model-path-base models/path-model
 ```
 
 Alternatively, to train a chart parser using the default hyperparameters, you can use the command:
