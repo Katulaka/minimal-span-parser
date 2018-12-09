@@ -331,7 +331,7 @@ def run_train(args):
                     batch_losses.extend(losses)
                 else:
                     _, loss = parser.parse(sentence, tree)
-                    batch_losses.append(loss)
+                    batch_losses.extend(loss)
                 total_processed += 1
                 current_processed += 1
 
