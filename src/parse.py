@@ -171,14 +171,14 @@ class ChartParser(object):
 
         @functools.lru_cache(maxsize=None)
         def get_span_encoding(left, right):
-            return (encode_output[right] - encode_output[left])
-            # forward = (
-            #     lstm_outputs[right][:self.lstm_dim] -
-            #     lstm_outputs[left][:self.lstm_dim])
-            # backward = (
-            #     lstm_outputs[left + 1][self.lstm_dim:] -
-            #     lstm_outputs[right + 1][self.lstm_dim:])
-            # return dy.concatenate([forward, backward])
+            # return (encode_output[right] - encode_output[left])
+            forward = (
+                lstm_outputs[right][:self.lstm_dim] -
+                lstm_outputs[left][:self.lstm_dim])
+            backward = (
+                lstm_outputs[left + 1][self.lstm_dim:] -
+                lstm_outputs[right + 1][self.lstm_dim:])
+            return dy.concatenate([forward, backward])
 
         @functools.lru_cache(maxsize=None)
         def get_label_scores(left, right):
@@ -284,7 +284,7 @@ class ChartParser(object):
             else:
                 return tree, score
 
-class MyParser(object):
+class PathParser(object):
     def __init__(
             self,
             model,
@@ -303,7 +303,7 @@ class MyParser(object):
             dec_lstm_dim,
             attention_dim,
             label_hidden_dim,
-            keep_valence_value,
+            # keep_valence_value,
             dropouts,
     ):
         self.spec = locals()
@@ -313,7 +313,7 @@ class MyParser(object):
         self.tag_vocab = tag_vocab
         self.word_vocab = word_vocab
         self.label_vocab = label_vocab
-        self.keep_valence_value = keep_valence_value
+        # self.keep_valence_value = keep_valence_value
         self.lstm_dim = lstm_dim
 
         self.use_char_lstm = use_char_lstm
@@ -487,12 +487,13 @@ class MyParser(object):
                 rank = 0
                 for hyp in leaf_hyps:
                     labels = [self.label_vocab.value(h) for h in hyp[0]]
-                    partial_tree = trees.LeafMyParseNode(left, *leaf).deserialize(labels)
+                    partial_tree = trees.LeafPathParseNode(left, *leaf).deserialize(labels)
                     if partial_tree is not None:
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
 
-            nodes = astar_search(grid, sentence, self.keep_valence_value, astar_parms)
+            # nodes = astar_search(grid, sentence, self.keep_valence_value, astar_parms)
+            nodes = astar_search(grid, sentence, astar_parms)
             if astar_parms[0] == 1:
                 return nodes[0].tree
             else:
