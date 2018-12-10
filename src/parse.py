@@ -171,14 +171,14 @@ class ChartParser(object):
 
         @functools.lru_cache(maxsize=None)
         def get_span_encoding(left, right):
-            # return (encode_output[right] - encode_output[left])
-            forward = (
-                lstm_outputs[right][:self.lstm_dim] -
-                lstm_outputs[left][:self.lstm_dim])
-            backward = (
-                lstm_outputs[left + 1][self.lstm_dim:] -
-                lstm_outputs[right + 1][self.lstm_dim:])
-            return dy.concatenate([forward, backward])
+            return (encode_output[right] - encode_output[left])
+            # forward = (
+            #     lstm_outputs[right][:self.lstm_dim] -
+            #     lstm_outputs[left][:self.lstm_dim])
+            # backward = (
+            #     lstm_outputs[left + 1][self.lstm_dim:] -
+            #     lstm_outputs[right + 1][self.lstm_dim:])
+            # return dy.concatenate([forward, backward])
 
         @functools.lru_cache(maxsize=None)
         def get_label_scores(left, right):
