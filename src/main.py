@@ -407,7 +407,7 @@ def run_test(args):
         else:
             test_predicted.append(predicted.convert())
 
-        import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
 
     if args.n_trees == 1:
