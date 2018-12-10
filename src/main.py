@@ -407,18 +407,26 @@ def run_test(args):
         else:
             test_predicted.append(predicted.convert())
 
-    import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+
 
     if args.n_trees == 1:
         test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
 
-    print(
-        "test-fscore {} "
-        "test-elapsed {}".format(
-            test_fscore,
-            format_elapsed(start_time),
+        print(
+            "test-fscore {} "
+            "test-elapsed {}".format(
+                test_fscore,
+                format_elapsed(start_time),
+            )
         )
-    )
+
+    else:
+        import pickle
+        fname = os.path.join('predicted', args.model_path_base)
+        with open(fname, 'wb') as f:
+            pickle.dump(test_predicted, f)
+    import pdb; pdb.set_trace()
 
 
 def main():
