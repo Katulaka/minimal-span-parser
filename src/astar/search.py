@@ -204,6 +204,6 @@ def astar_search(grid, sentence, keep_valence_value, astar_parms):
     solver = Solver(grid, keep_valence_value)
     nodes = solver.astar(start, goal, *astar_parms)
 
-    if len(nodes) < astar_parms[0]:
-        nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
+    # if len(nodes) < astar_parms[0]:
+    #     nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
     return nodes

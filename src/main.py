@@ -402,10 +402,11 @@ def run_test(args):
                 format_elapsed(start_time),
             )
         )
-        if isinstance(predicted, list):
-            test_predicted.append([p.convert() for p in predicted])
-        else:
-            test_predicted.append(predicted.convert())
+        test_predicted.append(predicted)
+        # if isinstance(predicted, list):
+        #     test_predicted.append([p.convert() for p in predicted])
+        # else:
+        #     test_predicted.append(predicted.convert())
 
     import pdb; pdb.set_trace()
 

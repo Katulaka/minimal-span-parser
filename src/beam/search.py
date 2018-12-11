@@ -27,8 +27,7 @@ class Hypothesis(object):
         self.tokens = tokens
         self.prob = prob
         self.state = state
-        # self.score = math.log(prob[-1]) if score is None else score
-        self.score = -math.log(prob[-1]) if score is None else score
+        self.score = math.log(prob[-1]) if score is None else score
 
     def extend_(self, token, prob, new_state):
         """Extend the hypothesis with result from latest step.
@@ -42,8 +41,7 @@ class Hypothesis(object):
         """
         tokens = self.tokens + [token]
         probs = self.prob + [prob]
-        # score = self.score + math.log(prob)
-        score = self.score - math.log(prob)
+        score = self.score + math.log(prob)
         return Hypothesis(tokens, probs, new_state, score)
 
     @property
@@ -141,15 +139,14 @@ class BeamSearch(object):
                         if h.latest_token == self._end_token and len(h.tokens)>2:
                             # Pull the hypothesis off the beam
                             #if the end token is reached.
-                            # import pdb; pdb.set_trace()
-                            h.score = h.score/h.lp(self._alpha, self._delta)
+                            # h.score = h.score/h.lp(self._alpha, self._delta)
                             complete_hyps.append(h)
                         elif h.latest_token == self._end_token:
                             pass
                         elif len(complete_hyps) >= self._beam_size \
-                            and h.score/h.lp(self._alpha, self._delta) > \
-                                max(complete_hyps, key=lambda h: h.score).score:
-                            # and h.score < min(complete_hyps, key=lambda h: h.score).score:
+                            and h.score < min(complete_hyps, key=lambda h: h.score).score:
+                            # and h.score/h.lp(self._alpha, self._delta) < \
+                            #     min(complete_hyps, key=lambda h: h.score).score:
                             pass
                         else:
                             # Otherwise continue to the extend the hypothesis.
@@ -166,5 +163,4 @@ class BeamSearch(object):
         Returns:
           hyps: A sub list of top <beam_size> hyps.
         """
-        # return sorted(hyps, key=lambda h: h.score, reverse=True)[:self._beam_size]
-        return sorted(hyps, key=lambda h: h.score)[:self._beam_size]
+        return sorted(hyps, key=lambda h: h.score, reverse=True)[:self._beam_size]
