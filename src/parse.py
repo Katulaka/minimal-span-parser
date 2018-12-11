@@ -303,7 +303,7 @@ class MyParser(object):
             dec_lstm_dim,
             attention_dim,
             label_hidden_dim,
-            # keep_valence_value,
+            keep_valence_value,
             dropouts,
     ):
         self.spec = locals()
@@ -313,7 +313,7 @@ class MyParser(object):
         self.tag_vocab = tag_vocab
         self.word_vocab = word_vocab
         self.label_vocab = label_vocab
-        # self.keep_valence_value = keep_valence_value
+        self.keep_valence_value = keep_valence_value
         self.lstm_dim = lstm_dim
 
         self.use_char_lstm = use_char_lstm
