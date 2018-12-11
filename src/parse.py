@@ -284,7 +284,7 @@ class ChartParser(object):
             else:
                 return tree, score
 
-class PathParser(object):
+class MyParser(object):
     def __init__(
             self,
             model,

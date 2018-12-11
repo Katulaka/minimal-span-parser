@@ -140,7 +140,7 @@ def run_train(args):
     print("Initializing model...")
     model = dy.ParameterCollection()
     if args.parser_type == "path":
-            parser = parse.PathParser(
+            parser = parse.MyParser(
                 model,
                 tag_vocab,
                 word_vocab,
