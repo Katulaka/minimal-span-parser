@@ -55,15 +55,17 @@ def run_train(args):
     print("Loaded {:,} development examples.".format(len(dev_treebank)))
 
     print("Processing trees for training...")
-    if args.parser_type != 'my':
+    if args.parser_type == "chart":
         train_parse = [tree.convert() for tree in train_treebank]
     else:
         dependancies = get_dependancies(args.train_path)
-        train_parse = [tree.myconvert(dep)(args.keep_valence_value)
+        # train_parse = [tree.myconvert(dep)(args.keep_valence_value)
+        train_parse = [tree.myconvert(dep)()
                             for tree, dep in zip(train_treebank, dependancies)]
         print("Processing trees for development...")
         dependancies = get_dependancies(args.dev_path)
-        dev_parse = [tree.myconvert(dep)(args.keep_valence_value)
+        # dev_parse = [tree.myconvert(dep)(args.keep_valence_value)
+        dev_parse = [tree.myconvert(dep)()
                             for tree, dep in zip(dev_treebank, dependancies)]
 
     print("Constructing vocabularies...")
@@ -77,7 +79,6 @@ def run_train(args):
     word_vocab.index(parse.STOP)
     word_vocab.index(parse.UNK)
 
-    # if args.parser_type == 'my':
     char_vocab = vocabulary.Vocabulary()
     char_vocab.index(parse.START)
     char_vocab.index(parse.STOP)
@@ -85,21 +86,21 @@ def run_train(args):
         char_vocab.index(c)
 
     label_vocab = vocabulary.Vocabulary()
-    if args.parser_type != 'my':
+    if args.parser_type == "chart":
         label_vocab.index(())
     else:
         label_vocab.index(parse.START)
         label_vocab.index(parse.STOP)
-        if args.keep_valence_value:
-            for tree in dev_parse:
-                nodes = [tree]
-                while nodes:
-                    node = nodes.pop()
-                    if isinstance(node, trees.InternalMyParseNode):
-                        nodes.extend(reversed(node.children))
-                    else:
-                        for l in node.labels:
-                            label_vocab.index(l)
+        # if args.keep_valence_value:
+        #     for tree in dev_parse:
+        #         nodes = [tree]
+        #         while nodes:
+        #             node = nodes.pop()
+        #             if isinstance(node, trees.InternalPathParseNode):
+        #                 nodes.extend(reversed(node.children))
+        #             else:
+        #                 for l in node.labels:
+        #                     label_vocab.index(l)
 
     for tree in train_parse:
         nodes = [tree]
@@ -108,14 +109,14 @@ def run_train(args):
             if isinstance(node, trees.InternalParseNode):
                 label_vocab.index(node.label)
                 nodes.extend(reversed(node.children))
-            elif isinstance(node, trees.InternalMyParseNode):
+            elif isinstance(node, trees.InternalPathParseNode):
                 nodes.extend(reversed(node.children))
             else:
                 tag_vocab.index(node.tag)
                 word_vocab.index(node.word)
                 for c in node.word:
                     char_vocab.index(c)
-                if args.parser_type == 'my':
+                if args.parser_type == "path":
                     for l in node.labels:
                         label_vocab.index(l)
 
@@ -138,36 +139,8 @@ def run_train(args):
 
     print("Initializing model...")
     model = dy.ParameterCollection()
-    if args.parser_type == "my":
-        if args.model_path_base == 'run_exp':
-            args.model_path_base = ('models_chart_enc_grid_search/'
-                'char-dim({})_'
-                'tag-dim({})_'
-                'word-dim({})_'
-                'label-dim({})_'
-                'char-h({})_'
-                'word-h({})_'
-                # 'label-h({})_'
-                'attention-dim({})_'
-                'projection-dim({})_'
-                'dropouts({})'
-                ).format(
-                    args.char_embedding_dim,
-                    args.tag_embedding_dim,
-                    args.word_embedding_dim,
-                    args.label_embedding_dim,
-                    args.char_lstm_dim,
-                    args.lstm_dim,
-                    # args.dec_lstm_dim,
-                    args.attention_dim,
-                    args.label_hidden_dim,
-                    args.dropouts
-                    )
-        if args.load:
-            model = dy.ParameterCollection()
-            [parser] = dy.load(args.model_path_base, model)
-        else:
-            parser = parse.MyParser(
+    if args.parser_type == "path":
+            parser = parse.PathParser(
                 model,
                 tag_vocab,
                 word_vocab,
@@ -184,7 +157,7 @@ def run_train(args):
                 args.dec_lstm_dim,
                 args.attention_dim,
                 args.label_hidden_dim,
-                args.keep_valence_value,
+                # args.keep_valence_value,
                 args.dropouts
             )
     else:
@@ -216,7 +189,7 @@ def run_train(args):
 
     start_time = time.time()
 
-    def my_check_dev():
+    def path_check_dev():
         nonlocal best_dev_loss
         nonlocal best_dev_model_path
 
@@ -271,9 +244,6 @@ def run_train(args):
             print("Saving new best model to {}...".format(best_dev_model_path))
             dy.save(best_dev_model_path, [parser])
 
-        return dev_loss
-
-
     def check_dev():
         nonlocal best_dev_fscore
         nonlocal best_dev_model_path
@@ -326,7 +296,7 @@ def run_train(args):
             batch_losses = []
             for tree in train_parse[start_index:start_index + args.batch_size]:
                 sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
-                if args.parser_type == "my":
+                if args.parser_type == "path":
                     losses = parser.parse(sentence, tree)
                     batch_losses.extend(losses)
                 else:
@@ -360,8 +330,8 @@ def run_train(args):
 
             if current_processed >= check_every:
                 current_processed -= check_every
-                if args.parser_type == "my":
-                    dev_loss = my_check_dev()
+                if args.parser_type == "path":
+                    path_check_dev()
                 else:
                     check_dev()
 
@@ -379,16 +349,16 @@ def run_test(args):
 
     start_time = time.time()
     test_predicted = []
-    if args.parser_type == "my":
+    if args.parser_type == "path":
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    for i, tree in  enumerate(test_treebank[args.range[0]:args.range[1]]):
+    for i, tree in  enumerate(test_treebank):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
-        if args.parser_type == "my":
+        if args.parser_type == "path":
             predicted = parser.parse(sentence, predict_parms=predict_parms)
         else:
             predicted, _ = parser.parse(sentence, k = args.n_trees)
@@ -449,17 +419,18 @@ def main():
     for arg in dynet_args:
         subparser.add_argument(arg)
     subparser.add_argument("--numpy-seed", type=int)
-    subparser.add_argument("--parser-type", choices=["chart", "my"], required=True)
+    subparser.add_argument("--parser-type", choices=["chart", "path"], required=True)
     subparser.add_argument("--tag-embedding-dim", type=int, default=150)
     subparser.add_argument("--word-embedding-dim", type=int, default=100)
     subparser.add_argument("--char-embedding-dim", type=int, default=50)
     subparser.add_argument("--label-embedding-dim", type=int, default=100)
+    subparser.add_argument("--use-char-lstm", action="store_true")
     subparser.add_argument("--char-lstm-dim", type=int, default=100)
     subparser.add_argument("--lstm-dim", type=int, default=350)
+    subparser.add_argument("--lstm-layers", type=int, default=2)
     subparser.add_argument("--dec-lstm-dim", type=int, default=600)
     subparser.add_argument("--label-hidden-dim", type=int, default=100)
     subparser.add_argument("--attention-dim", type=int, default=200)
-    subparser.add_argument("--lstm-layers", type=int, default=2)
     subparser.add_argument("--dropout", type=float, default=0.4)
     subparser.add_argument("--dropouts", nargs='+', type=float, default=[0.4, 0.4])
     subparser.add_argument("--model-path-base", required=True)
@@ -470,10 +441,7 @@ def main():
     subparser.add_argument("--epochs", type=int)
     subparser.add_argument("--checks-per-epoch", type=int, default=4)
     subparser.add_argument("--print-vocabs", action="store_true")
-    subparser.add_argument("--keep-valence-value", action="store_true")
-    subparser.add_argument("--use-char-lstm", action="store_true")
-    subparser.add_argument("--load", action="store_true")
-
+    # subparser.add_argument("--keep-valence-value", action="store_true")
 
     subparser = subparsers.add_parser("test")
     subparser.set_defaults(callback=run_test)
@@ -482,7 +450,7 @@ def main():
     subparser.add_argument("--model-path-base", required=True)
     subparser.add_argument("--evalb-dir", default="EVALB/")
     subparser.add_argument("--test-path", default="data/23.auto.clean")
-    subparser.add_argument("--parser-type", choices=["chart", "my"], required=True)
+    subparser.add_argument("--parser-type", choices=["chart", "path"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
     subparser.add_argument("--time-out", default=np.inf, type=float)
     subparser.add_argument("--n-discounts", default=1, type=int)
@@ -491,8 +459,6 @@ def main():
     subparser.add_argument("--alpha", default=0.6, type=float)
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
-    subparser.add_argument("--range", nargs=2, default=[0,2416], type=int)
-
 
     subparser = subparsers.add_parser("print")
     subparser.set_defaults(callback=plot_results)

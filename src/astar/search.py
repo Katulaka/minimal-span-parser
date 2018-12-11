@@ -45,9 +45,10 @@ class AstarNode(object):
 
         return node_string
 
-    def is_valid(self, keep_valence_value, left_tree, right_tree):
-        assert isinstance(left_tree, trees.InternalMyParseNode)
-        assert isinstance(right_tree, trees.InternalMyParseNode)
+    # def is_valid(self, keep_valence_value, left_tree, right_tree):
+    def is_valid(self, left_tree, right_tree):
+        assert isinstance(left_tree, trees.InternalPathParseNode)
+        assert isinstance(right_tree, trees.InternalPathParseNode)
 
         # @functools.lru_cache(maxsize=None)
         def helper(_trees, miss_side):
@@ -57,14 +58,14 @@ class AstarNode(object):
 
             leaves = list(_trees[1].missing_leaves(miss_side))
             if leaves != []:
-                if not keep_valence_value:
-                    leaf = leaves[-1] if miss_side == trees.L else leaves[0]
-                else:
-                    leaves = leaves[::-1] if miss_side == trees.L else leaves
-                    label = _trees[0].children[-1].bracket_label()
-                    for leaf in leaves:
-                        if label == leaf.label.split(miss_side)[-1]:
-                            break
+                # if not keep_valence_value:
+                leaf = leaves[-1] if miss_side == trees.L else leaves[0]
+                # else:
+                #     leaves = leaves[::-1] if miss_side == trees.L else leaves
+                #     label = _trees[0].children[-1].bracket_label()
+                #     for leaf in leaves:
+                #         if label == leaf.label.split(miss_side)[-1]:
+                #             break
                 try:
                     self.tree = _trees[1].combine(_trees[0].children[0], leaf)
                     return True
@@ -116,9 +117,10 @@ class ClosedList(object):
 
 class Solver(AStar):
 
-    def __init__(self, grid, keep_valence_value):
+    # def __init__(self, grid, keep_valence_value):
+    def __init__(self, grid):
         self.grid = grid
-        self.keep_valence_value = keep_valence_value
+        # self.keep_valence_value = keep_valence_value
         self.cl = ClosedList()
         self.seen = []
 
@@ -145,13 +147,14 @@ class Solver(AStar):
         neighbors = []
         for nb in self.cl.getl(node.right):
             nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
-            if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, node.tree, nb.tree):
+            # if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, node.tree, nb.tree):
+            if nb_node not in self.seen and nb_node.is_valid(node.tree, nb.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
         for nb in self.cl.getr(node.left):
-            # nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank, nb.trees + node.trees)
             nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
-            if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, nb.tree,  node.tree):
+            # if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, nb.tree,  node.tree):
+            if nb_node not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
         rank = node.rank[0] + 1
@@ -188,20 +191,22 @@ def fix_partial_nodes(seen, goal, n_goals):
                              + list(goal.tree.children[node.right:])
             if tree.label in [trees.CL, trees.CR]:
                 tree.label = 'S'
-            node.tree = trees.InternalMyParseNode(tree.label, children)
+            node.tree = trees.InternalPathParseNode(tree.label, children)
         nodes += nodes_p
     return nodes
 
-def astar_search(grid, sentence, keep_valence_value, astar_parms):
+# def astar_search(grid, sentence, keep_valence_value, astar_parms):
+def astar_search(grid, sentence, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
     # goal = AstarNode(0, n_words)
-    children = [trees.LeafMyParseNode(left, *leaf) for left, leaf in enumerate(sentence)]
-    goal_tree = trees.InternalMyParseNode('.', children)
+    children = [trees.LeafPathParseNode(left, *leaf) for left, leaf in enumerate(sentence)]
+    goal_tree = trees.InternalPathParseNode('.', children)
     goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
-    solver = Solver(grid, keep_valence_value)
+    # solver = Solver(grid, keep_valence_value)
+    solver = Solver(grid)
     nodes = solver.astar(start, goal, *astar_parms)
 
     # if len(nodes) < astar_parms[0]:
