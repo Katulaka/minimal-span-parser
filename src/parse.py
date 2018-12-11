@@ -466,11 +466,9 @@ class MyParser(object):
         else:
             Cell = collections.namedtuple('Cell', 'tree score')
 
-            start = self.label_vocab.index(START)
-            stop = self.label_vocab.index(STOP)
-            astar_parms = predict_parms['astar_parms']
-            # for beam_size in predict_parms['beam_parms']:
-            bs = BeamSearch(start, stop, *predict_parms['beam_parms'])
+            bs = BeamSearch(self.label_vocab.index(START),
+                            self.label_vocab.index(STOP), 
+                            *predict_parms['beam_parms'])
             hyps = bs.beam_search(encode_outputs_list,
                                 self.label_embeddings,
                                 self.dec_lstm,
@@ -486,7 +484,7 @@ class MyParser(object):
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
 
-            nodes = astar_search(grid, sentence, astar_parms)
+            nodes = astar_search(grid, sentence, predict_parms['astar_parms'])
             if astar_parms[0] == 1:
                 return nodes[0].tree
             else:

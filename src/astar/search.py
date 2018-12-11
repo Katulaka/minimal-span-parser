@@ -195,20 +195,16 @@ def fix_partial_nodes(seen, goal, n_goals):
         nodes += nodes_p
     return nodes
 
-# def astar_search(grid, sentence, keep_valence_value, astar_parms):
 def astar_search(grid, sentence, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
-    # goal = AstarNode(0, n_words)
     children = [trees.LeafPathParseNode(left, *leaf) for left, leaf in enumerate(sentence)]
     goal_tree = trees.InternalPathParseNode('.', children)
     goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
-    # solver = Solver(grid, keep_valence_value)
     solver = Solver(grid)
     nodes = solver.astar(start, goal, *astar_parms)
 
-    # if len(nodes) < astar_parms[0]:
-    #     nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
-    return nodes
+    if len(nodes) < astar_parms[0]:
+        nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
