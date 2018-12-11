@@ -57,6 +57,13 @@ class InternalTreebankNode(TreebankNode):
 
         return InternalPathParseNode(tree.label, children)
 
+    def normalize(self):
+        tree = self
+        children = []
+        for child in tree.children:
+            children.append(child.normalize())
+        return InternalTreebankNode('XX', children)
+
 
 class LeafTreebankNode(TreebankNode):
     def __init__(self, tag, word):
@@ -79,6 +86,9 @@ class LeafTreebankNode(TreebankNode):
 
     def myconvert(self, dependancy, index=0):
         return LeafPathParseNode(index, self.tag, self.word)(dependancy[index] - 1)
+
+    def normalize(self):
+        return LeafTreebankNode('XX', self.word)
 
 
 class ParseNode(object):

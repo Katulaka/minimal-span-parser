@@ -11,35 +11,11 @@ def helper(predict, k):
         return [predict] * k
     return predict + [predict[-1]] * (k - len(predict))
 
-# def plot_ranks(beam_5_fscores):
-#
-#     with open('results/test_rank', 'rb') as f:
-#         test_rank = pickle.load(f)
-#
-#     fig, ax = plt.subplots()
-#     test_rank_sum_0 = [sum(r[0]) for r in test_rank]
-#     beam_5_fscores_0 = [b[0] for b in beam_5_fscores]
-#     plt.axis([-1, 101, -1, 30])
-#     plt.scatter( beam_5_fscores_0, test_rank_sum_0, s=0.2)
-#     plt.xlabel('F1 score')
-#     plt.ylabel('Rank sum')
-#     plt.title('F1 score by Rank sum')
-#     plt.savefig('fscore_vs_rank_sum.png', bbox_inches='tight')
-#
-#     fig, ax = plt.subplots()
-#     test_rank_avg_0 = [np.mean(r[0]) for r in test_rank]
-#     plt.axis([-1, 101, -0.02, 1])
-#     plt.scatter( beam_5_fscores_0, test_rank_avg_0, s=0.2)
-#     plt.xlabel('F1 score')
-#     plt.ylabel('Rank average')
-#     plt.title('F1 score by Rank average')
-#     plt.savefig('fscore_vs_rank_avg.png', bbox_inches='tight')
-
 def plot_density(our_fscore, chart_fscore, outline_b, outline_c):
     fig, ax = plt.subplots()
 
     min_x = math.floor(np.min([our_fscore, chart_fscore]))
-    bins = np.linspace(min_x, 100, 40)
+    bins = np.linspace(min_x, 100, 51)
     plt.hist(our_fscore,
             bins = bins,
             density = True,
@@ -58,6 +34,7 @@ def plot_density(our_fscore, chart_fscore, outline_b, outline_c):
             label = 'Stern et al. \n (2017)')
     plt.legend(loc='lower left')
     plt.xlabel('F1 score')
+    plt.xlim(40, 105)
     plt.ylabel('Density')
     plt.ylim((0,1.05))
     plt.title('F1 scores vs. Density')
@@ -166,35 +143,24 @@ def plot_results(args):
     test_treebank = trees.load_trees(args.test_path)
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
-    # for i in ['beam_5','beam_10','beam_15','beam_20','beam_25','beam_32']:
-    #     fname = 'results/lp_0_7_5/predicted_{}_lp_0.7_5_to_2'.format(i)
-    #     with open(fname,  'rb') as f:
-    #         predicted = pickle.load(f)
-    #
-    #     fscore = evaluate.evalb(args.evalb_dir, test_treebank, predicted)
-    #     evalb = evaluate.evalb_full(args.evalb_dir, test_treebank, predicted)
-    #     match = [100 == x.Fscore.fscore for x in evalb]
-    #     recall = match.count(True)/len(match)*100
-    #     print('Parser:{}, fscore:{}, recall:{}'.format(i,fscore,recall))
-    #
-
-    # with open('results/lp_0_7_5/predicted_beam_10_lp_0.7_5_top_20', 'rb') as f:
-    #     our_predicted_lp = pickle.load(f)
-
     our_predicted = []
     for i in range(8):
         fname = 'results/predicted_beam_10/predicted_beam_10_top_20_{}_{}'.format(302*i, 302*(i+1))
         with open(fname,  'rb') as f:
             our_predicted.extend(pickle.load(f))
 
-    with open('results/predict_top_20_chart', 'rb') as f:
-        chart_predicted = pickle.load(f)
+    chart_predicted = []
+    for i in range(8):
+        fname = 'results/predicted_chart/predicted_chart_{}_{}'.format(302*i, 302*(i+1))
+        with open(fname,  'rb') as f:
+            chart_predicted.extend(pickle.load(f))
 
     n_trees = 20
     our_fscores, our_recall, hist_our = compute(args, test_treebank, our_predicted, n_trees)
     chart_fscores, chart_recall, hist_chart = compute(args, test_treebank, chart_predicted, n_trees)
 
     ax = plot_exact_match(our_recall, chart_recall, n_trees)
+    plot_density(our_fscores[:,0], chart_fscores[:,0], *ax.lines)
     f_name = 'plots/fscore_vs_sentence_len.png'
     y_label = 'F1 score'
     hist_fscore = [hist_our['fscore'], hist_chart['fscore']]
@@ -204,5 +170,3 @@ def plot_results(args):
     y_label = 'Exact match Top-1'
     hist_recall = [hist_our['recall'], hist_chart['recall']]
     plot_bars(*hist_recall, *ax.lines, y_label, f_name, loc)
-
-    import pdb; pdb.set_trace()

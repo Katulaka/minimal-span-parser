@@ -59,12 +59,10 @@ def run_train(args):
         train_parse = [tree.convert() for tree in train_treebank]
     else:
         dependancies = get_dependancies(args.train_path)
-        # train_parse = [tree.myconvert(dep)(args.keep_valence_value)
         train_parse = [tree.myconvert(dep)()
                             for tree, dep in zip(train_treebank, dependancies)]
         print("Processing trees for development...")
         dependancies = get_dependancies(args.dev_path)
-        # dev_parse = [tree.myconvert(dep)(args.keep_valence_value)
         dev_parse = [tree.myconvert(dep)()
                             for tree, dep in zip(dev_treebank, dependancies)]
 
@@ -91,16 +89,6 @@ def run_train(args):
     else:
         label_vocab.index(parse.START)
         label_vocab.index(parse.STOP)
-        # if args.keep_valence_value:
-        #     for tree in dev_parse:
-        #         nodes = [tree]
-        #         while nodes:
-        #             node = nodes.pop()
-        #             if isinstance(node, trees.InternalPathParseNode):
-        #                 nodes.extend(reversed(node.children))
-        #             else:
-        #                 for l in node.labels:
-        #                     label_vocab.index(l)
 
     for tree in train_parse:
         nodes = [tree]
@@ -157,7 +145,6 @@ def run_train(args):
                 args.dec_lstm_dim,
                 args.attention_dim,
                 args.label_hidden_dim,
-                # args.keep_valence_value,
                 args.dropouts
             )
     else:
@@ -373,10 +360,6 @@ def run_test(args):
             )
         )
         test_predicted.append(predicted)
-        # if isinstance(predicted, list):
-        #     test_predicted.append([p.convert() for p in predicted])
-        # else:
-        #     test_predicted.append(predicted.convert())
 
     import pdb; pdb.set_trace()
 
@@ -441,7 +424,6 @@ def main():
     subparser.add_argument("--epochs", type=int)
     subparser.add_argument("--checks-per-epoch", type=int, default=4)
     subparser.add_argument("--print-vocabs", action="store_true")
-    # subparser.add_argument("--keep-valence-value", action="store_true")
 
     subparser = subparsers.add_parser("test")
     subparser.set_defaults(callback=run_test)
