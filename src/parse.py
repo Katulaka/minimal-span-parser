@@ -486,10 +486,8 @@ class MyParser(object):
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
 
-            # nodes = astar_search(grid, sentence, self.keep_valence_value, astar_parms)
-            return astar_search(grid, sentence, astar_parms)
-            # nodes = astar_search(grid, sentence, astar_parms)
-            # if astar_parms[0] == 1:
-            #     return nodes[0].tree
-            # else:
-            #     return [node.tree for node in nodes]
+            nodes = astar_search(grid, sentence, astar_parms)
+            if astar_parms[0] == 1:
+                return nodes[0].tree
+            else:
+                return [node.tree for node in nodes]
