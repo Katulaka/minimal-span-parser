@@ -20,8 +20,6 @@ class AstarNode(object):
         self.rank = rank
 
         self.tree = tree
-        # assert isinstance(trees, list)
-        # self.trees = trees
 
     def __eq__(self, other):
         return self.rank == other.rank and (self.left, self.right) == (other.left, other.right)
@@ -45,7 +43,6 @@ class AstarNode(object):
 
         return node_string
 
-    # def is_valid(self, keep_valence_value, left_tree, right_tree):
     def is_valid(self, left_tree, right_tree):
         assert isinstance(left_tree, trees.InternalPathParseNode)
         assert isinstance(right_tree, trees.InternalPathParseNode)
@@ -58,14 +55,7 @@ class AstarNode(object):
 
             leaves = list(_trees[1].missing_leaves(miss_side))
             if leaves != []:
-                # if not keep_valence_value:
                 leaf = leaves[-1] if miss_side == trees.L else leaves[0]
-                # else:
-                #     leaves = leaves[::-1] if miss_side == trees.L else leaves
-                #     label = _trees[0].children[-1].bracket_label()
-                #     for leaf in leaves:
-                #         if label == leaf.label.split(miss_side)[-1]:
-                #             break
                 try:
                     self.tree = _trees[1].combine(_trees[0].children[0], leaf)
                     return True
@@ -117,10 +107,8 @@ class ClosedList(object):
 
 class Solver(AStar):
 
-    # def __init__(self, grid, keep_valence_value):
     def __init__(self, grid):
         self.grid = grid
-        # self.keep_valence_value = keep_valence_value
         self.cl = ClosedList()
         self.seen = []
 
@@ -137,7 +125,6 @@ class Solver(AStar):
         real_cost = self.real_cost(node)
         heuristic_cost = self.heuristic_cost(node, goal, cost_coefficient)
         node.score = real_cost + heuristic_cost
-        # return real_cost + heuristic_cost
         return node.score
 
     def move_to_closed(self, node):
@@ -147,13 +134,11 @@ class Solver(AStar):
         neighbors = []
         for nb in self.cl.getl(node.right):
             nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
-            # if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, node.tree, nb.tree):
             if nb_node not in self.seen and nb_node.is_valid(node.tree, nb.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
         for nb in self.cl.getr(node.left):
             nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
-            # if nb_node not in self.seen and nb_node.is_valid(self.keep_valence_value, nb.tree,  node.tree):
             if nb_node not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
