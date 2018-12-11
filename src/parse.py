@@ -349,22 +349,16 @@ class PathParser(object):
         self.dec_lstm = dy.LSTMBuilder(
             1,
             label_embedding_dim,
-            # dec_lstm_dim,
-            2 * lstm_dim,
+            dec_lstm_dim,
             self.model)
 
-        # enc_out_dim = embedding_dim + 2 * lstm_dim
-        # dec_attend_dim = 2 * dec_lstm_dim
-        # dec_attend_dim = 4 * lstm_dim
+        enc_out_dim = embedding_dim + 2 * lstm_dim
         Weights = collections.namedtuple('Weights', 'name prev_dim next_dim')
         ws = []
-        # ws.append(Weights(name='c_dec', prev_dim=enc_out_dim, next_dim=dec_lstm_dim))
-        # ws.append(Weights(name='key', prev_dim=dec_lstm_dim, next_dim=attention_dim))
-        ws.append(Weights(name='key', prev_dim=2 * lstm_dim, next_dim=attention_dim))
-        # ws.append(Weights(name='query', prev_dim=dec_lstm_dim, next_dim=attention_dim))
-        ws.append(Weights(name='query', prev_dim=2 * lstm_dim, next_dim=attention_dim))
-        # ws.append(Weights(name='attention', prev_dim=dec_attend_dim, next_dim=label_hidden_dim))
-        ws.append(Weights(name='attention', prev_dim=4 * lstm_dim, next_dim=label_hidden_dim))
+        ws.append(Weights(name='c_dec', prev_dim=enc_out_dim, next_dim=dec_lstm_dim))
+        ws.append(Weights(name='key', prev_dim=dec_lstm_dim, next_dim=attention_dim))
+        ws.append(Weights(name='query', prev_dim=dec_lstm_dim, next_dim=attention_dim))
+        ws.append(Weights(name='attention', prev_dim=dec_attend_dim, next_dim=label_hidden_dim))
         ws.append(Weights(name='probs', prev_dim=label_hidden_dim, next_dim=label_vocab.size))
         self.ws = {}
         for w in ws:
@@ -424,9 +418,8 @@ class PathParser(object):
                 embeddings.append(dy.concatenate([tag_embedding, word_embedding]))
         lstm_outputs = self.enc_lstm.transduce(embeddings)
 
-        # encode_outputs_list = [dy.affine_transform([*self.ws['c_dec'], dy.concatenate([e, l])])
-        #                             for e, l in zip(embeddings[1:-1], lstm_outputs[1:-1])]
-        encode_outputs_list = lstm_outputs
+        encode_outputs_list = [dy.affine_transform([*self.ws['c_dec'], dy.concatenate([e, l])])
+                                    for e, l in zip(embeddings[1:-1], lstm_outputs[1:-1])]
 
         if is_train:
             decode_inputs = [(START,) + tuple(leaf.labels) + (STOP,) for leaf in gold.leaves()]
