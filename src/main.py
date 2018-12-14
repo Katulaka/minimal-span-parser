@@ -324,8 +324,8 @@ def run_train(args):
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.dev_path))
-    # test_treebank = trees.load_trees(args.test_path)
-    dev_treebank = trees.load_trees(args.dev_path)
+    test_treebank = trees.load_trees(args.test_path)
+    # dev_treebank = trees.load_trees(args.dev_path)
     print("Loaded {:,} test examples.".format(len(dev_treebank)))
 
     print("Loading model from {}...".format(args.model_path_base))
@@ -342,8 +342,8 @@ def run_test(args):
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    # for i, tree in  enumerate(test_treebank):
-    for i in range(*args.range):
+    for i, tree in  enumerate(test_treebank):
+    # for i in range(*args.range):
         tree = dev_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
