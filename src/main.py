@@ -449,7 +449,7 @@ def main():
     subparser.add_argument("--alpha", default=0.6, type=float)
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
-    subparser.add_argument("--range", nargs=2, default=[0,2416], type=int)
+    subparser.add_argument("--range", nargs=2, default=[0,1700], type=int)
 
 
     subparser = subparsers.add_parser("print")
