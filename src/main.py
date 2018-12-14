@@ -323,8 +323,9 @@ def run_train(args):
                     check_dev()
 
 def run_test(args):
-    print("Loading test trees from {}...".format(args.test_path))
-    test_treebank = trees.load_trees(args.test_path)
+    print("Loading test trees from {}...".format(args.dev_path))
+    # test_treebank = trees.load_trees(args.test_path)
+    dev_treebank = trees.load_trees(args.dev_path)
     print("Loaded {:,} test examples.".format(len(test_treebank)))
 
     print("Loading model from {}...".format(args.model_path_base))
@@ -341,7 +342,9 @@ def run_test(args):
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    for i, tree in  enumerate(test_treebank):
+    # for i, tree in  enumerate(test_treebank):
+    for i in range(*args.range):
+        tree = dev_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
@@ -354,7 +357,8 @@ def run_test(args):
             "prediction-elapsed {} "
             "total-elapsed {}".format(
                 i + 1,
-                len(test_treebank),
+                # len(test_treebank),
+                args.range[1],
                 format_elapsed(prediction_start_time),
                 format_elapsed(start_time),
             )
@@ -377,7 +381,11 @@ def run_test(args):
 
     else:
         import pickle
-        fname = os.path.join('predicted', args.model_path_base)
+        fname = 'predicted_beam_{}_lp_{}_{}_{}_{}'.format(args.beam_size,
+                                                            args.alpha,
+                                                            args.delta,
+                                                            *args.range)
+        # fname = os.path.join('predicted', args.model_path_base)
         with open(fname, 'wb') as f:
             pickle.dump(test_predicted, f)
     import pdb; pdb.set_trace()
@@ -432,6 +440,7 @@ def main():
     subparser.add_argument("--model-path-base", required=True)
     subparser.add_argument("--evalb-dir", default="EVALB/")
     subparser.add_argument("--test-path", default="data/23.auto.clean")
+    subparser.add_argument("--dev-path", default="data/22.auto.clean")
     subparser.add_argument("--parser-type", choices=["chart", "path"], required=True)
     subparser.add_argument("--n-trees", default=1, type=int)
     subparser.add_argument("--time-out", default=np.inf, type=float)
@@ -441,6 +450,8 @@ def main():
     subparser.add_argument("--alpha", default=0.6, type=float)
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
+    subparser.add_argument("--range", nargs=2, default=[0,2416], type=int)
+
 
     subparser = subparsers.add_parser("print")
     subparser.set_defaults(callback=plot_results)

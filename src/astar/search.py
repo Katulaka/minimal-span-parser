@@ -110,7 +110,8 @@ class Solver(AStar):
     def __init__(self, grid):
         self.grid = grid
         self.cl = ClosedList()
-        self.seen = []
+        # self.seen = []
+        self.seen = {}
 
     def heuristic_cost(self, node, goal, cost_coefficient):
         left = list(range(node.left))
@@ -135,6 +136,7 @@ class Solver(AStar):
         for nb in self.cl.getl(node.right):
             nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
             if nb_node not in self.seen and nb_node.is_valid(node.tree, nb.tree):
+                import pdb; pdb.set_trace()
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
         for nb in self.cl.getr(node.left):
@@ -193,3 +195,5 @@ def astar_search(grid, sentence, astar_parms):
 
     if len(nodes) < astar_parms[0]:
         nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
+
+    return nodes

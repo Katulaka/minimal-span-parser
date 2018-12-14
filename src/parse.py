@@ -467,7 +467,7 @@ class MyParser(object):
             Cell = collections.namedtuple('Cell', 'tree score')
 
             bs = BeamSearch(self.label_vocab.index(START),
-                            self.label_vocab.index(STOP), 
+                            self.label_vocab.index(STOP),
                             *predict_parms['beam_parms'])
             hyps = bs.beam_search(encode_outputs_list,
                                 self.label_embeddings,
@@ -488,4 +488,5 @@ class MyParser(object):
             if astar_parms[0] == 1:
                 return nodes[0].tree
             else:
-                return [node.tree for node in nodes]
+                # return [node.tree for node in nodes]
+                return nodes
