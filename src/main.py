@@ -369,7 +369,7 @@ def run_test(args):
 
 
     if args.n_trees == 1:
-        test_fscore = evaluate.evalb(args.evalb_dir, test_treebank, test_predicted)
+        test_fscore = evaluate.evalb(args.evalb_dir, dev_treebank, test_predicted)
 
         print(
             "test-fscore {} "
