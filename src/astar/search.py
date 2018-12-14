@@ -8,7 +8,7 @@ import trees
 
 class AstarNode(object):
 
-    def __init__(self, left, right, rank=[], tree=None):
+    def __init__(self, left, right, rank=tuple(), tree=None):
 
         assert isinstance(left, int)
         self.left = left
@@ -16,7 +16,7 @@ class AstarNode(object):
         assert isinstance(right, int)
         self.right = right
 
-        assert isinstance(rank, list)
+        assert isinstance(rank, tuple)
         self.rank = rank
 
         self.tree = tree
@@ -146,7 +146,7 @@ class Solver(AStar):
                 neighbors.append(nb_node)
         rank = node.rank[0] + 1
         if len(node.rank) == 1 and (node.left, rank) in self.grid:
-            nb_node = AstarNode(node.left, node.right, [rank], self.grid[node.left, rank].tree)
+            nb_node = AstarNode(node.left, node.right, (rank,), self.grid[node.left, rank].tree)
             if nb_node not in self.seen:
                 self.seen.append(nb_node)
                 neighbors.append(nb_node)
@@ -185,7 +185,7 @@ def fix_partial_nodes(seen, goal, n_goals):
 def astar_search(grid, sentence, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
-    start = [AstarNode(left, left + 1, [0], grid[left, 0].tree) for left in range(n_words)]
+    start = [AstarNode(left, left + 1, (0,), grid[left, 0].tree) for left in range(n_words)]
     children = [trees.LeafPathParseNode(left, *leaf) for left, leaf in enumerate(sentence)]
     goal_tree = trees.InternalPathParseNode('.', children)
     goal = AstarNode(0, len(sentence), tree = goal_tree)
