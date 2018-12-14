@@ -110,8 +110,8 @@ class Solver(AStar):
     def __init__(self, grid):
         self.grid = grid
         self.cl = ClosedList()
-        self.seen = []
-        self._seen = {}
+        # self.seen = []
+        self.seen = {}
 
     def heuristic_cost(self, node, goal, cost_coefficient):
         left = list(range(node.left))
@@ -134,21 +134,28 @@ class Solver(AStar):
     def neighbors(self, node):
         neighbors = []
         for nb in self.cl.getl(node.right):
-            nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
-            if nb_node not in self.seen and nb_node.is_valid(node.tree, nb.tree):
-                import pdb; pdb.set_trace()
-                self.seen.append(nb_node)
+            node_prop = (node.left, nb.right, node.rank + nb.rank)
+            # nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
+            nb_node = AstarNode(*node_prop)
+            if node_prop not in self.seen and nb_node.is_valid(node.tree, nb.tree):
+                self.seen[node_prop] = nb_node
                 neighbors.append(nb_node)
         for nb in self.cl.getr(node.left):
-            nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
-            if nb_node not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
-                self.seen.append(nb_node)
+            node_prop = (nb.left, node.right, nb.rank + node.rank)
+            nb_node = AstarNode(*node_prop)
+            # nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
+            if node_prop not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
+                # self.seen.append(nb_node)
+                self.seen[node_prop] = nb_node
                 neighbors.append(nb_node)
         rank = node.rank[0] + 1
         if len(node.rank) == 1 and (node.left, rank) in self.grid:
-            nb_node = AstarNode(node.left, node.right, (rank,), self.grid[node.left, rank].tree)
+            node_prop = (node.left, node.right, (rank,))
+            nb_node = AstarNode(*node_prop, self.grid[node.left, rank].tree)
+            # nb_node = AstarNode(node.left, node.right, (rank,), self.grid[node.left, rank].tree)
             if nb_node not in self.seen:
-                self.seen.append(nb_node)
+                # self.seen.append(nb_node)
+                self.seen[node_prop] = nb_node
                 neighbors.append(nb_node)
         return neighbors
 
@@ -159,7 +166,7 @@ class Solver(AStar):
 
 def fix_partial_nodes(seen, goal, n_goals):
 
-    nodes = filter(lambda x: (x.left, x.right) == (goal.left, goal.right), seen)
+    nodes = filter(lambda x: (x.left, x.right) == (goal.left, goal.right), seen.values())
     nodes = sorted(nodes, key = lambda x: x.score, reverse = True)[:n_goals]
     for node in nodes:
         tree = node.tree.filter_missing()
@@ -169,7 +176,7 @@ def fix_partial_nodes(seen, goal, n_goals):
 
     if len(nodes) < n_goals:
         n_nodes = n_goals - len(nodes)
-        nodes_p = filter(lambda x: (x.left, x.right) != (goal.left, goal.right), seen)
+        nodes_p = filter(lambda x: (x.left, x.right) != (goal.left, goal.right), seen.values())
         nodes_p = sorted(nodes_p, key = lambda x: x.right - x.left, reverse = True)[:n_nodes]
         for node in nodes_p:
             tree = node.tree.filter_missing()
