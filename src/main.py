@@ -324,8 +324,8 @@ def run_train(args):
 
 def run_test(args):
     print("Loading test trees from {}...".format(args.dev_path))
-    # test_treebank = trees.load_trees(args.test_path)
-    dev_treebank = trees.load_trees(args.dev_path)
+    dev_treebank = trees.load_trees(args.test_path)
+    # dev_treebank = trees.load_trees(args.dev_path)
     print("Loaded {:,} test examples.".format(len(dev_treebank)))
 
     print("Loading model from {}...".format(args.model_path_base))
