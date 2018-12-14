@@ -327,11 +327,11 @@ def run_test(args):
     if not args.use_dev:
         print("Loading test trees from {}...".format(args.test_path))
         treebank = trees.load_trees(args.test_path)
-        print("Loaded {:,} test examples.".format(len(test_treebank)))
+        # print("Loaded {:,} test examples.".format(len(test_treebank)))
     else:
         print("Loading test trees from {}...".format(args.dev_path))
         treebank = trees.load_trees(args.dev_path)
-        print("Loaded {:,} test examples.".format(len(dev_treebank)))
+    print("Loaded {:,} test examples.".format(len(treebank)))
 
 
     print("Loading model from {}...".format(args.model_path_base))
