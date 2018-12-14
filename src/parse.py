@@ -485,7 +485,7 @@ class MyParser(object):
                         rank += 1
 
             nodes = astar_search(grid, sentence, predict_parms['astar_parms'])
-            if astar_parms[0] == 1:
+            if predict_parms['astar_parms'][0] == 1:
                 return nodes[0].tree
             else:
                 # return [node.tree for node in nodes]
