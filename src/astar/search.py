@@ -110,8 +110,8 @@ class Solver(AStar):
     def __init__(self, grid):
         self.grid = grid
         self.cl = ClosedList()
-        # self.seen = []
-        self.seen = {}
+        self.seen = []
+        self._seen = {}
 
     def heuristic_cost(self, node, goal, cost_coefficient):
         left = list(range(node.left))
