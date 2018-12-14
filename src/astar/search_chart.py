@@ -21,6 +21,7 @@ class AstarNode(object):
         self.rank = rank
 
         left_rank, right_rank, label_rank = rank
+        import pdb; pdb.set_trace()
         left_trees, left_score = chart[left, split][left_rank]
         right_trees, right_score = chart[split, right][right_rank]
         children = left_trees + right_trees
