@@ -323,10 +323,16 @@ def run_train(args):
                     check_dev()
 
 def run_test(args):
-    print("Loading test trees from {}...".format(args.dev_path))
-    test_treebank = trees.load_trees(args.test_path)
-    # dev_treebank = trees.load_trees(args.dev_path)
-    print("Loaded {:,} test examples.".format(len(dev_treebank)))
+
+    if not args.use_dev:
+        print("Loading test trees from {}...".format(args.test_path))
+        treebank = trees.load_trees(args.test_path)
+        print("Loaded {:,} test examples.".format(len(test_treebank)))
+    else:
+        print("Loading test trees from {}...".format(args.dev_path))
+        treebank = trees.load_trees(args.dev_path)
+        print("Loaded {:,} test examples.".format(len(dev_treebank)))
+
 
     print("Loading model from {}...".format(args.model_path_base))
     model = dy.ParameterCollection()
@@ -342,8 +348,7 @@ def run_test(args):
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    for i, tree in  enumerate(test_treebank):
-    # for i in range(*args.range):
+    for i, tree in  enumerate(treebank):
         tree = dev_treebank[i]
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
@@ -368,7 +373,7 @@ def run_test(args):
 
 
     if args.n_trees == 1:
-        test_fscore = evaluate.evalb(args.evalb_dir, dev_treebank, test_predicted)
+        test_fscore = evaluate.evalb(args.evalb_dir, treebank, test_predicted)
 
         print(
             "test-fscore {} "
@@ -449,7 +454,8 @@ def main():
     subparser.add_argument("--alpha", default=0.6, type=float)
     subparser.add_argument("--delta", default=5, type=int)
     subparser.add_argument("--max_steps", default=28, type=int)
-    subparser.add_argument("--range", nargs=2, default=[0,1700], type=int)
+    # subparser.add_argument("--range", nargs=2, default=[0,1700], type=int)
+    subparser.add_argument("--use-dev", action="store_true")
 
 
     subparser = subparsers.add_parser("print")
