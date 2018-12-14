@@ -21,10 +21,7 @@ class AstarNode(object):
         self.rank = rank
 
         left_rank, right_rank, label_rank = rank
-        try:
-            left_trees, left_score = chart[left, split][left_rank]
-        except:
-            import pdb; pdb.set_trace()
+        left_trees, left_score = chart[left, split][left_rank]
         right_trees, right_score = chart[split, right][right_rank]
         children = left_trees + right_trees
         label, label_score = grid[left, right][label_rank]
@@ -76,7 +73,7 @@ class Solver(AStar):
     def neighbors(self, node):
 
         neighbors = []
-        for i, delta in enumerate(np.eye(3)):
+        for i, delta in enumerate(np.eye(3, dtype=int)):
             rank = tuple(np.array(node.rank) + delta)
             if rank[i] < len(self.chart[node.left, node.split]):
                 nb_key = (node.left, node.right, node.split, rank)
