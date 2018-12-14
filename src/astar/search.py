@@ -203,5 +203,4 @@ def astar_search(grid, sentence, astar_parms):
     if len(nodes) < astar_parms[0]:
         nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
 
-    import pdb; pdb.set_trace()
     return nodes
