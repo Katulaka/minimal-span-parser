@@ -23,11 +23,10 @@ class AStar:
 
         def __lt__(self, other):
             return self.fscore > other.fscore
-            # return self.fscore < other.fscore
 
-        def format_print(self, label):
-            node_string = self.data.format_print(label)
-            return '{} score: {}'.format(node_string, self.fscore)
+        # def format_print(self, label):
+        #     node_string = self.data.format_print(label)
+        #     return '{} score: {}'.format(node_string, self.fscore)
 
     class SearchNodeDict(dict):
 

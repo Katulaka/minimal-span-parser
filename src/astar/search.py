@@ -25,23 +25,24 @@ class AstarNode(object):
         return self.rank == other.rank and (self.left, self.right) == (other.left, other.right)
 
     def __hash__(self):
-        return id(self)
+        # return id(self)
+        return hash((self.rank, self.left, self.right))
 
-    def format_print(self, label):
-        pair = '({},{})'.format(self.left, self.right)
-
-        ranks_split = np.split(np.array(self.rank), np.where(np.diff(self.rank))[0] + 1)
-        ranks = ', '.join(['{{{}}}{}'.format(r[0], len(r)) for r in ranks_split])
-
-        MY_LENGTH_CONSTRAINT = len(ranks_split) * 7
-        node_string = '[{}:] node: {: <8} rank: [{: <{mlc}}]'.format(label, pair, ranks,
-                                                        mlc = MY_LENGTH_CONSTRAINT)
-
-        for i, tree in enumerate(self.trees):
-            pair = '({},{})'.format(tree.left, tree.right)
-            node_string = '{} tree[{}]: {: <8}'.format(node_string, i, pair)
-
-        return node_string
+    # def format_print(self, label):
+    #     pair = '({},{})'.format(self.left, self.right)
+    #
+    #     ranks_split = np.split(np.array(self.rank), np.where(np.diff(self.rank))[0] + 1)
+    #     ranks = ', '.join(['{{{}}}{}'.format(r[0], len(r)) for r in ranks_split])
+    #
+    #     MY_LENGTH_CONSTRAINT = len(ranks_split) * 7
+    #     node_string = '[{}:] node: {: <8} rank: [{: <{mlc}}]'.format(label, pair, ranks,
+    #                                                     mlc = MY_LENGTH_CONSTRAINT)
+    #
+    #     for i, tree in enumerate(self.trees):
+    #         pair = '({},{})'.format(tree.left, tree.right)
+    #         node_string = '{} tree[{}]: {: <8}'.format(node_string, i, pair)
+    #
+    #     return node_string
 
     def is_valid(self, left_tree, right_tree):
         assert isinstance(left_tree, trees.InternalPathParseNode)
