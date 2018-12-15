@@ -84,6 +84,7 @@ class AStar:
         goals = []
         for strt in start:
             cost = self.fscore(strt, goal, cost_coefficient)
+            import pdb; pdb.set_trace()
             startNode = searchNodes[strt] = AStar.SearchNode(strt, fscore=cost)
             heappush(openSet, startNode)
 
