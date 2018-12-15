@@ -84,7 +84,6 @@ class AStar:
         goals = []
         for strt in start:
             cost = self.fscore(strt, goal, cost_coefficient)
-            import pdb; pdb.set_trace()
             startNode = searchNodes[strt] = AStar.SearchNode(strt, fscore=cost)
             heappush(openSet, startNode)
 
@@ -92,19 +91,21 @@ class AStar:
         current_time = start_time = time.clock()
         while (time.clock() - start_time < total_time_out) and openSet and len(goals) < int(n_goals):
             current = heappop(openSet)
-            if (time.clock() - current_time >= time_out):
-                cost_coefficient *= cost_reduction_rate
-                for t in openSet:
-                    t.fscore = self.fscore(t.data, goal, cost_coefficient)
-                current_time = time.clock()
+            # if (time.clock() - current_time >= time_out):
+            #     cost_coefficient *= cost_reduction_rate
+            #     for t in openSet:
+            #         t.fscore = self.fscore(t.data, goal, cost_coefficient)
+            #     current_time = time.clock()
 
             if self.is_goal_reached(current.data, goal):
                 if current.data not in goals:
                     goals.append(current.data)
+
             current.out_openset = True
             current.closed = True
             self.move_to_closed(current.data)
             for neighbor in [searchNodes[n] for n in self.neighbors(current.data)]:
+                import pdb; pdb.set_trace()
                 if neighbor.closed:
                     continue
                 neighbor.fscore = self.fscore(neighbor.data, goal, cost_coefficient)
