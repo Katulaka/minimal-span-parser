@@ -81,7 +81,7 @@ class AStar:
         cost_coefficient = 1.
         searchNodes = AStar.SearchNodeDict()
         openSet = []
-        goals = []
+        goals = {}
         for strt in start:
             cost = self.fscore(strt, goal, cost_coefficient)
             startNode = searchNodes[strt] = AStar.SearchNode(strt, fscore=cost)
@@ -99,7 +99,8 @@ class AStar:
 
             if self.is_goal_reached(current.data, goal):
                 if current.data not in goals:
-                    goals.append(current.data)
+                    # goals.append(current.data)
+                    goals[current.data] = current.data
 
             current.out_openset = True
             current.closed = True
