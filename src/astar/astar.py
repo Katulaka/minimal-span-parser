@@ -98,6 +98,7 @@ class AStar:
             #     current_time = time.clock()
 
             if self.is_goal_reached(current.data, goal):
+                import pdb; pdb.set_trace()
                 if current.data not in goals:
                     # goals.append(current.data)
                     goals[current.data] = current.data
@@ -106,7 +107,6 @@ class AStar:
             current.closed = True
             self.move_to_closed(current.data)
             for neighbor in [searchNodes[n] for n in self.neighbors(current.data)]:
-                import pdb; pdb.set_trace()
                 if neighbor.closed:
                     continue
                 neighbor.fscore = self.fscore(neighbor.data, goal, cost_coefficient)
