@@ -98,7 +98,6 @@ class AStar:
             #     current_time = time.clock()
 
             if self.is_goal_reached(current.data, goal):
-                import pdb; pdb.set_trace()
                 if current.data not in goals:
                     # goals.append(current.data)
                     goals[current.data] = current.data
@@ -115,4 +114,5 @@ class AStar:
                     neighbor.out_openset = False
                     heappush(openSet, neighbor)
 
+        import pdb; pdb.set_trace()
         return goals
