@@ -135,28 +135,32 @@ class Solver(AStar):
     def neighbors(self, node):
         neighbors = []
         for nb in self.cl.getl(node.right):
-            node_prop = (node.left, nb.right, node.rank + nb.rank)
-            # nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
-            nb_node = AstarNode(*node_prop)
-            if node_prop not in self.seen and nb_node.is_valid(node.tree, nb.tree):
-                self.seen[node_prop] = nb_node
+            # node_prop = (node.left, nb.right, node.rank + nb.rank)
+            # nb_node = AstarNode(*node_prop)
+            nb_node = AstarNode(node.left, nb.right, node.rank + nb.rank)
+            # if node_prop not in self.seen and nb_node.is_valid(node.tree, nb.tree):
+            if nb_node not in self.seen and nb_node.is_valid(node.tree, nb.tree):
+                self.seen[nb_node] = nb_node
+                # self.seen[node_prop] = nb_node
                 neighbors.append(nb_node)
         for nb in self.cl.getr(node.left):
-            node_prop = (nb.left, node.right, nb.rank + node.rank)
-            nb_node = AstarNode(*node_prop)
-            # nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
-            if node_prop not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
-                # self.seen.append(nb_node)
-                self.seen[node_prop] = nb_node
+            # node_prop = (nb.left, node.right, nb.rank + node.rank)
+            # nb_node = AstarNode(*node_prop)
+            nb_node = AstarNode(nb.left, node.right, nb.rank + node.rank)
+            # if node_prop not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
+            if nb_node not in self.seen and nb_node.is_valid(nb.tree,  node.tree):
+                self.seen[nb_node] = nb_node
+                # self.seen[node_prop] = nb_node
                 neighbors.append(nb_node)
         rank = node.rank[0] + 1
         if len(node.rank) == 1 and (node.left, rank) in self.grid:
-            node_prop = (node.left, node.right, (rank,))
-            nb_node = AstarNode(*node_prop, self.grid[node.left, rank].tree)
-            # nb_node = AstarNode(node.left, node.right, (rank,), self.grid[node.left, rank].tree)
+            # node_prop = (node.left, node.right, (rank,))
+            # nb_node = AstarNode(*node_prop, self.grid[node.left, rank].tree)
+            nb_node = AstarNode(node.left, node.right, (rank,), self.grid[node.left, rank].tree)
+            # if nb_node not in self.seen:
             if nb_node not in self.seen:
-                # self.seen.append(nb_node)
-                self.seen[node_prop] = nb_node
+                self.seen[nb_node] = nb_node
+                # self.seen[node_prop] = nb_node
                 neighbors.append(nb_node)
         return neighbors
 
