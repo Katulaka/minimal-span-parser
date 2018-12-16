@@ -87,33 +87,32 @@ class ClosedList(object):
         self.rindex = {}
 
     def put(self, node):
-        self.lindex.setdefault(node.left, {}).update({node:node})
-        self.rindex.setdefault(node.right, {}).update({node:node})
+        # self.lindex.setdefault(node.left, {}).update({node:node})
+        # self.rindex.setdefault(node.right, {}).update({node:node})
 
-        # if node.left in self.lindex:
-        #     import pdb; pdb.set_trace()
-        #     if node not in self.lindex[node.left]:
-        #         # self.lindex[node.left].append(node)
-        #         self.lindex[node.left][node] = node
-        # else:
-        #     # self.lindex[node.left] = [node]
-        #     self.lindex[node.left][node] = [node]
+        if node.left in self.lindex:
+            if node not in self.lindex[node.left]:
+                self.lindex[node.left].append(node)
+                # self.lindex[node.left][node] = node
+        else:
+            self.lindex[node.left] = [node]
+            # self.lindex[node.left][node] = [node]
 
-        # if node.right in self.rindex:
-        #     if node not in self.rindex[node.right]:
-        #         # self.rindex[node.right].append(node)
-        #         self.rindex[node.right][node] = node
-        # else:
-        #     # self.rindex[node.right] = [node]
-        #     self.rindex[node.right][node] = node
+        if node.right in self.rindex:
+            if node not in self.rindex[node.right]:
+                self.rindex[node.right].append(node)
+                # self.rindex[node.right][node] = node
+        else:
+            self.rindex[node.right] = [node]
+            # self.rindex[node.right][node] = node
 
     def getr(self, idx):
-        # return self.rindex.get(idx, [])
-        return self.rindex.get(idx, {}).values()
+        return self.rindex.get(idx, [])
+        # return self.rindex.get(idx, {}).values()
 
     def getl(self, idx):
-        # return self.lindex.get(idx, [])
-        return self.lindex.get(idx, {}).values()
+        return self.lindex.get(idx, [])
+        # return self.lindex.get(idx, {}).values()
 
 
 class Solver(AStar):
