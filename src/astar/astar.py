@@ -114,5 +114,4 @@ class AStar:
                     neighbor.out_openset = False
                     heappush(openSet, neighbor)
 
-        import pdb; pdb.set_trace()
         return goals
