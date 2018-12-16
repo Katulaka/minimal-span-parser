@@ -200,9 +200,8 @@ def astar_search(grid, sentence, astar_parms):
     goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
     solver = Solver(grid)
-    nodes = solver.astar(start, goal, *astar_parms).values()
+    nodes = list(solver.astar(start, goal, *astar_parms).values())
 
     if len(nodes) < astar_parms[0]:
         nodes += fix_partial_nodes(solver.seen, goal, astar_parms[0]-len(nodes))
-    import pdb; pdb.set_trace()
     return nodes
