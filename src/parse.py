@@ -485,7 +485,7 @@ class MyParser(object):
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
 
-            rescorer = Rescorer("models/en_charlstm_dev=93.61.pt")
+            rescorer = Rescorer("models/en_charlstm_dev.93.61.pt")
             precomputed = rescorer.precompute(sentence)
 
             nodes = astar_search(grid, precomputed, sentence, predict_parms['astar_parms'])
