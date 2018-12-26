@@ -118,10 +118,11 @@ class Solver(AStar):
         self.cl = ClosedList()
         self.seen = {}
 
+
     def heuristic_cost(self, node, goal, cost_coefficient):
         left = list(range(node.left))
         right = list(range(node.right, goal.right))
-        return cost_coefficient * sum([self.grid[i,0].score for i in chain(left, right)])
+        return  cost_coefficient * sum([self.grid[i,0].score for i in chain(left, right)])
 
     def real_cost(self, node):
         position = zip(range(node.left, node.right), node.rank)
@@ -130,6 +131,11 @@ class Solver(AStar):
     def fscore(self, node, goal, cost_coefficient):
         real_cost = self.real_cost(node)
         heuristic_cost = self.heuristic_cost(node, goal, cost_coefficient)
+        import pdb; pdb.set_trace()
+        sub_trees = node.tree.subtrees()
+        # real_cost_span = sum([self.precomputed.inside_scores[left, right]
+        #             for left, right in zip(sub_trees[:-1], sub_trees[1:])])
+        # heuristic_cost_span =  self.precomputed.heuristic_1(sub_trees)
         node.score = real_cost + heuristic_cost
         return node.score
 
@@ -187,6 +193,9 @@ def fix_partial_nodes(seen, goal, n_goals):
     return nodes
 
 def astar_search(grid, sentence, astar_parms):
+
+    # rescorer = Rescorer("models/nk_base6_lstm_dev=93.61.pt")
+    # precomputed = rescorer.precompute(sentence)
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, (0,), grid[left, 0].tree) for left in range(n_words)]

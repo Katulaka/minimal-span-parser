@@ -282,6 +282,16 @@ class InternalPathParseNode(PathParseNode):
         children = list(filter(lambda x: isinstance(x, PathParseNode), children))
         return InternalPathParseNode(tree.label, children)
 
+    def subtrees(self):
+        tree = self
+        if not tree.missing_leaves():
+            return [tree.left, tree.right]
+        subtrees = []
+        for child in tree.children:
+            subtrees.append(child.subtrees())
+        return subtrees
+
+
 class LeafPathParseNode(PathParseNode):
     def __init__(self, index, tag, word):
         assert isinstance(index, int)
@@ -350,6 +360,9 @@ class LeafPathParseNode(PathParseNode):
             children = [InternalPathParseNode(p_label, children)]
         return children[-1]
 
+    def subtrees(self):
+        return [self.left, self.right]
+
 class MissPathParseNode(PathParseNode):
     # def __init__(self, label, index = 0):
     def __init__(self, label):
@@ -389,6 +402,9 @@ class MissPathParseNode(PathParseNode):
 
     def filter_missing(self):
         yield from ()
+
+    def subtrees(self):
+        return []
 
 def load_trees(path, strip_top=True):
     with open(path) as infile:
