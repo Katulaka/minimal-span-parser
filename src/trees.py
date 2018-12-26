@@ -201,8 +201,10 @@ class InternalPathParseNode(PathParseNode):
         for child in self.children:
             child.parent = self
 
-        self.left = children[0].left
-        self.right = children[-1].right
+        # self.left = children[0].left
+        # self.right = children[-1].right
+        self.left = min([child.left for child in children if child.left>-1])
+        self.right = max([child.right for child in children if child.right < math.inf])
 
         self.parent = None
 
