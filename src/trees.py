@@ -288,7 +288,7 @@ class InternalPathParseNode(PathParseNode):
             return [tree.left, tree.right]
         subtrees = []
         for child in tree.children:
-            subtrees.append(child.subtrees())
+            subtrees.extend(child.subtrees())
         return subtrees
 
 
