@@ -285,13 +285,12 @@ class InternalPathParseNode(PathParseNode):
         return InternalPathParseNode(tree.label, children)
 
     def subtrees(self):
-        tree = self
-        if not list(tree.missing_leaves()):
-            return [tree.left, tree.right]
+        if not list(self.missing_leaves()):
+            return [self.left, self.right]
         subtrees = []
-        for child in tree.children:
+        for child in self.children:
             subtrees.extend(child.subtrees())
-        return subtrees.extend([tree.right])
+        return subtrees
 
 
 class LeafPathParseNode(PathParseNode):
@@ -363,7 +362,7 @@ class LeafPathParseNode(PathParseNode):
         return children[-1]
 
     def subtrees(self):
-        return [self.left]
+        return [self.left, self.right]
 
 class MissPathParseNode(PathParseNode):
     # def __init__(self, label, index = 0):
