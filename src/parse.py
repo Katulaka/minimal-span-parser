@@ -378,7 +378,7 @@ class MyParser(object):
     def from_spec(cls, spec, model):
         return cls(model, **spec)
 
-    def parse(self, sentence, gold=None, is_dev=False, predict_parms=None):
+    def parse(self, rescorer, sentence, gold=None, is_dev=False, predict_parms=None):
         is_train = gold is not None
         use_dropout = is_train and not is_dev
 
@@ -485,7 +485,6 @@ class MyParser(object):
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
 
-            rescorer = Rescorer("models/en_charlstm_dev.93.61.pt")
             precomputed = rescorer.precompute(sentence)
 
             nodes = astar_search(grid, precomputed, sentence, predict_parms['astar_parms'])

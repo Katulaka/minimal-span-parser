@@ -340,6 +340,8 @@ def run_test(args):
 
     print("Parsing test sentences...")
 
+    rescorer = Rescorer("models/en_charlstm_dev.93.61.pt")
+
 
     start_time = time.time()
     test_predicted = []
@@ -353,9 +355,9 @@ def run_test(args):
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
         if args.parser_type == "path":
-            predicted = parser.parse(sentence, predict_parms=predict_parms)
+            predicted = parser.parse(rescorer, sentence, predict_parms=predict_parms)
         else:
-            predicted, _ = parser.parse(sentence, k = args.n_trees)
+            predicted, _ = parser.parse(rescorer, sentence, k = args.n_trees)
         print(
             "processed {:,}/{:,} "
             "prediction-elapsed {} "
