@@ -284,7 +284,7 @@ class InternalPathParseNode(PathParseNode):
 
     def subtrees(self):
         tree = self
-        if not tree.missing_leaves():
+        if not list(tree.missing_leaves()):
             return [tree.left, tree.right]
         subtrees = []
         for child in tree.children:
