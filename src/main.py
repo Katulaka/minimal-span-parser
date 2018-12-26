@@ -12,6 +12,7 @@ import parse
 import trees
 import vocabulary
 from plot_results import plot_results
+from rescore import Rescorer
 
 
 def format_elapsed(start_time):

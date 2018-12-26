@@ -8,7 +8,6 @@ import trees
 from beam.search import BeamSearch
 from astar.search import astar_search
 from astar.search_chart import AstarNode, Solver
-from rescore import Rescorer
 
 START = "<START>"
 STOP = "<STOP>"
