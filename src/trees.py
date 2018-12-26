@@ -290,7 +290,7 @@ class InternalPathParseNode(PathParseNode):
         subtrees = []
         for child in self.children:
             subtrees.extend(child.subtrees())
-        return list(set(subtrees))
+        return list(dict.fromkeys(subtrees))
 
 
 class LeafPathParseNode(PathParseNode):
