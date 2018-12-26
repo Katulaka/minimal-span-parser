@@ -291,7 +291,7 @@ class InternalPathParseNode(PathParseNode):
         subtrees = []
         for child in tree.children:
             subtrees.extend(child.subtrees())
-        return list(set(subtrees))
+        return subtrees.extend([tree.right])
 
 
 class LeafPathParseNode(PathParseNode):
@@ -363,7 +363,7 @@ class LeafPathParseNode(PathParseNode):
         return children[-1]
 
     def subtrees(self):
-        return [self.left, self.right]
+        return [self.left]
 
 class MissPathParseNode(PathParseNode):
     # def __init__(self, label, index = 0):
