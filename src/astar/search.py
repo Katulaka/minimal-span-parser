@@ -113,30 +113,35 @@ class ClosedList(object):
 
 class Solver(AStar):
 
-    def __init__(self, grid):
+    def __init__(self, grid, precomputed):
         self.grid = grid
+        self.precomputed = precomputed
         self.cl = ClosedList()
         self.seen = {}
 
 
-    def heuristic_cost(self, node, goal, cost_coefficient):
+    def heuristic_cost(self, node, goal):
         left = list(range(node.left))
         right = list(range(node.right, goal.right))
-        return  cost_coefficient * sum([self.grid[i,0].score for i in chain(left, right)])
+        return sum([self.grid[i,0].score for i in chain(left, right)])
 
     def real_cost(self, node):
         position = zip(range(node.left, node.right), node.rank)
         return sum([self.grid[i,rank].score for i, rank in position])
 
     def fscore(self, node, goal, cost_coefficient):
-        real_cost = self.real_cost(node)
-        heuristic_cost = self.heuristic_cost(node, goal, cost_coefficient)
-        import pdb; pdb.set_trace()
+
+        real_cost_path = self.real_cost(node)
+        heuristic_cost_path = self.heuristic_cost(node, goal)
+        score_path = real_cost_path + heuristic_cost_path
+
         sub_trees = node.tree.subtrees()
-        # real_cost_span = sum([self.precomputed.inside_scores[left, right]
-        #             for left, right in zip(sub_trees[:-1], sub_trees[1:])])
-        # heuristic_cost_span =  self.precomputed.heuristic_1(sub_trees)
-        node.score = real_cost + heuristic_cost
+        real_cost_span = sum([self.precomputed.inside_scores[left, right]
+            for left, right in zip(sub_trees[:-1], sub_trees[1:])])
+        heuristic_cost_span =  self.precomputed.heuristic_1(sub_trees)
+        score_span = real_cost_span + heuristic_cost_span
+
+        node.score = score_span + cost_coefficient*score_path
         return node.score
 
     def move_to_closed(self, node):
@@ -192,10 +197,7 @@ def fix_partial_nodes(seen, goal, n_goals):
         nodes += nodes_p
     return nodes
 
-def astar_search(grid, sentence, astar_parms):
-
-    # rescorer = Rescorer("models/nk_base6_lstm_dev=93.61.pt")
-    # precomputed = rescorer.precompute(sentence)
+def astar_search(grid, precomputed, sentence, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, (0,), grid[left, 0].tree) for left in range(n_words)]
@@ -203,7 +205,7 @@ def astar_search(grid, sentence, astar_parms):
     goal_tree = trees.InternalPathParseNode('.', children)
     goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
-    solver = Solver(grid)
+    solver = Solver(grid, precomputed)
     nodes = list(solver.astar(start, goal, *astar_parms).values())
 
     if len(nodes) < astar_parms[0]:

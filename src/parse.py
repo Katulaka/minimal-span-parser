@@ -8,6 +8,7 @@ import trees
 from beam.search import BeamSearch
 from astar.search import astar_search
 from astar.search_chart import AstarNode, Solver
+from rescores import Rescorer
 
 START = "<START>"
 STOP = "<STOP>"
@@ -484,7 +485,10 @@ class MyParser(object):
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
 
-            nodes = astar_search(grid, sentence, predict_parms['astar_parms'])
+            rescorer = Rescorer("models/en_charlstm_dev=93.61.pt")
+            precomputed = rescorer.precompute(sentence)
+
+            nodes = astar_search(grid, precomputed, sentence, predict_parms['astar_parms'])
             if predict_parms['astar_parms'][0] == 1:
                 return nodes[0].tree
             else:
