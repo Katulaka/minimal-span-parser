@@ -22,7 +22,7 @@ pyximport.install(setup_args={"include_dirs": np.get_include()})
 import chart_helper
 import nkutil
 
-import trees
+import trees_nk
 
 START = "<START>"
 STOP = "<STOP>"
