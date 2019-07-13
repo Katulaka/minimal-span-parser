@@ -491,9 +491,9 @@ class MyParser(object):
             #precomputed = rescorer.precompute(sentence)
 
             #nodes = astar_search(grid, precomputed, sentence, predict_parms['astar_parms'])
-            nodes = astar_search(grid, sentence, predict_parms['astar_parms'])
+            nodes, no_fix = astar_search(grid, sentence, predict_parms['astar_parms'])
             if predict_parms['astar_parms'][0] == 1:
-                return nodes[0].tree, beam_sentence_labels
+                return nodes[0].tree, no_fix, beam_sentence_labels
             else:
                 # return [node.tree for node in nodes]
                 return nodes, beam_sentence_labels

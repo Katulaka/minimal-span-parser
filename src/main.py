@@ -14,6 +14,7 @@ import vocabulary
 from plot_results import plot_results
 #from rescore import Rescorer
 
+import pickle
 import json
 
 def format_elapsed(start_time):
@@ -350,6 +351,7 @@ def run_test(args):
     start_time = time.time()
     test_predicted = []
     test_labels = []
+    test_no_fix = []
     if args.parser_type == "path":
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
@@ -362,7 +364,7 @@ def run_test(args):
         prediction_start_time = time.time()
         if args.parser_type == "path":
             #predicted = parser.parse(rescorer, sentence, predict_parms=predict_parms)
-            predicted, predicted_labels = parser.parse(sentence, predict_parms=predict_parms)
+            predicted, no_fix, predicted_labels = parser.parse(sentence, predict_parms=predict_parms)
         else:
             #predicted, _ = parser.parse(rescorer, sentence, k = args.n_trees)
             predicted, _ = parser.parse(sentence, k = args.n_trees)
@@ -377,11 +379,14 @@ def run_test(args):
             )
         )
         test_predicted.append(predicted)
+        test_no_fix.append((predicted, no_fix))
         test_labels.append((predicted_labels, gold_labels))
 
-        import pdb; pdb.set_trace()
     with open ('labels.txt', 'w') as outfile:
-        json.dumpu(test_labels, outfile) 
+        json.dump(test_labels, outfile)
+
+    with open('predicted.pkl', 'wb') as outfile:
+        pickle.dump(test_no_fix, f) 
     import pdb; pdb.set_trace()
 
 
@@ -397,7 +402,7 @@ def run_test(args):
         )
 
     else:
-        import pickle
+
         fname = 'predicted_beam_{}_lp_{}_{}_{}_{}'.format(args.beam_size,
                                                             args.alpha,
                                                             args.delta,
