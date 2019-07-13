@@ -113,9 +113,10 @@ class ClosedList(object):
 
 class Solver(AStar):
 
-    def __init__(self, grid, precomputed):
+    #def __init__(self, grid, precomputed):
+    def __init__(self, grid):
         self.grid = grid
-        self.precomputed = precomputed
+        #self.precomputed = precomputed
         self.cl = ClosedList()
         self.seen = {}
 
@@ -135,13 +136,14 @@ class Solver(AStar):
         heuristic_cost_path = self.heuristic_cost(node, goal)
         score_path = real_cost_path + heuristic_cost_path
 
-        sub_trees = node.tree.subtrees()
-        real_cost_span = sum([self.precomputed.inside_scores[left, right]
-            for left, right in zip(sub_trees[:-1], sub_trees[1:])])
-        heuristic_cost_span =  self.precomputed.heuristic_1(sub_trees)
-        score_span = real_cost_span + heuristic_cost_span
-
-        node.score = score_span + cost_coefficient*score_path
+#        sub_trees = node.tree.subtrees()
+#        real_cost_span = sum([self.precomputed.inside_scores[left, right]
+#            for left, right in zip(sub_trees[:-1], sub_trees[1:])])
+#        heuristic_cost_span =  self.precomputed.heuristic_1(sub_trees)
+#        score_span = real_cost_span + heuristic_cost_span
+#
+#        node.score = score_span + cost_coefficient*score_path
+        node.score = score_path
         return node.score
 
     def move_to_closed(self, node):
@@ -197,7 +199,8 @@ def fix_partial_nodes(seen, goal, n_goals):
         nodes += nodes_p
     return nodes
 
-def astar_search(grid, precomputed, sentence, astar_parms):
+#def astar_search(grid, precomputed, sentence, astar_parms):
+def astar_search(grid, sentence, astar_parms):
 
     n_words = max(grid.keys(), key = lambda x : x[0])[0] + 1
     start = [AstarNode(left, left + 1, (0,), grid[left, 0].tree) for left in range(n_words)]
@@ -205,7 +208,8 @@ def astar_search(grid, precomputed, sentence, astar_parms):
     goal_tree = trees.InternalPathParseNode('.', children)
     goal = AstarNode(0, len(sentence), tree = goal_tree)
     # let's solve it
-    solver = Solver(grid, precomputed)
+    #solver = Solver(grid, precomputed)
+    solver = Solver(grid)
     nodes = list(solver.astar(start, goal, *astar_parms).values())
 
     if len(nodes) < astar_parms[0]:

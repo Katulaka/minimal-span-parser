@@ -303,7 +303,7 @@ class MyParser(object):
             dec_lstm_dim,
             attention_dim,
             label_hidden_dim,
-            keep_valence_value,
+            #keep_valence_value,
             dropouts,
     ):
         self.spec = locals()
@@ -313,7 +313,7 @@ class MyParser(object):
         self.tag_vocab = tag_vocab
         self.word_vocab = word_vocab
         self.label_vocab = label_vocab
-        self.keep_valence_value = keep_valence_value
+        #self.keep_valence_value = keep_valence_value
         self.lstm_dim = lstm_dim
 
         self.use_char_lstm = use_char_lstm
@@ -377,7 +377,8 @@ class MyParser(object):
     def from_spec(cls, spec, model):
         return cls(model, **spec)
 
-    def parse(self, rescorer, sentence, gold=None, is_dev=False, predict_parms=None):
+    #def parse(self, rescorer, sentence, gold=None, is_dev=False, predict_parms=None):
+    def parse(self, sentence, gold=None, is_dev=False, predict_parms=None):
         is_train = gold is not None
         use_dropout = is_train and not is_dev
 
@@ -475,20 +476,24 @@ class MyParser(object):
                                 self.ws)
 
             grid = {}
+            beam_sentence_labels = []
             for left, (leaf_hyps, leaf) in enumerate(zip(hyps, sentence)):
                 rank = 0
+                beam_leaf_labels =[] 
                 for hyp in leaf_hyps:
                     labels = [self.label_vocab.value(h) for h in hyp[0]]
+                    beam_leaf_labels.append(labels) 
                     partial_tree = trees.LeafPathParseNode(left, *leaf).deserialize(labels)
                     if partial_tree is not None:
                         grid[left, rank] = Cell(tree = partial_tree, score = hyp[1])
                         rank += 1
+                beam_sentence_labels.append(beam_leaf_labels)
+            #precomputed = rescorer.precompute(sentence)
 
-            precomputed = rescorer.precompute(sentence)
-
-            nodes = astar_search(grid, precomputed, sentence, predict_parms['astar_parms'])
+            #nodes = astar_search(grid, precomputed, sentence, predict_parms['astar_parms'])
+            nodes = astar_search(grid, sentence, predict_parms['astar_parms'])
             if predict_parms['astar_parms'][0] == 1:
-                return nodes[0].tree
+                return nodes[0].tree, beam_sentence_labels
             else:
                 # return [node.tree for node in nodes]
-                return nodes
+                return nodes, beam_sentence_labels
