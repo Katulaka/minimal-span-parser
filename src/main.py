@@ -12,7 +12,7 @@ import parse
 import trees
 import vocabulary
 from plot_results import plot_results
-from rescore import Rescorer
+#from rescore import Rescorer
 
 
 def format_elapsed(start_time):
@@ -341,11 +341,12 @@ def run_test(args):
 
     print("Parsing test sentences...")
 
-    rescorer = Rescorer("models/en_charlstm_dev.93.61.pt")
+    #rescorer = Rescorer("models/en_charlstm_dev.93.61.pt")
 
 
     start_time = time.time()
     test_predicted = []
+    test_predicted_labels = []
     if args.parser_type == "path":
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
@@ -356,9 +357,11 @@ def run_test(args):
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
         prediction_start_time = time.time()
         if args.parser_type == "path":
-            predicted = parser.parse(rescorer, sentence, predict_parms=predict_parms)
+            #predicted = parser.parse(rescorer, sentence, predict_parms=predict_parms)
+            predicted, predited_labels = parser.parse(sentence, predict_parms=predict_parms)
         else:
-            predicted, _ = parser.parse(rescorer, sentence, k = args.n_trees)
+            #predicted, _ = parser.parse(rescorer, sentence, k = args.n_trees)
+            predicted, _ = parser.parse(sentence, k = args.n_trees)
         print(
             "processed {:,}/{:,} "
             "prediction-elapsed {} "
@@ -370,6 +373,7 @@ def run_test(args):
             )
         )
         test_predicted.append(predicted)
+        test_predicted_labels.append(predicted_labels)
 
     import pdb; pdb.set_trace()
 
