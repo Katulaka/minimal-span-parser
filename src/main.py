@@ -334,6 +334,9 @@ def run_test(args):
         treebank = trees.load_trees(args.dev_path)
     print("Loaded {:,} test examples.".format(len(treebank)))
 
+    dependancies = get_dependancies(args.test_path)
+    test_parse = [tree.myconvert(dep)() for tree, dep in zip(treebank, dependancies)]
+    import pdb; pdb.set_trace()
 
     print("Loading model from {}...".format(args.model_path_base))
     model = dy.ParameterCollection()
