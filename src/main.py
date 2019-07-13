@@ -14,6 +14,7 @@ import vocabulary
 from plot_results import plot_results
 #from rescore import Rescorer
 
+import json
 
 def format_elapsed(start_time):
     elapsed_time = int(time.time() - start_time)
@@ -336,7 +337,6 @@ def run_test(args):
 
     dependancies = get_dependancies(args.test_path)
     test_parse = [tree.myconvert(dep)() for tree, dep in zip(treebank, dependancies)]
-    import pdb; pdb.set_trace()
 
     print("Loading model from {}...".format(args.model_path_base))
     model = dy.ParameterCollection()
@@ -349,19 +349,20 @@ def run_test(args):
 
     start_time = time.time()
     test_predicted = []
-    test_predicted_labels = []
+    test_labels = []
     if args.parser_type == "path":
         astar_parms = [args.n_trees, args.time_out, args.n_discounts, args.discount_factor]
         beam_parms = [args.beam_size, args.max_steps, args.alpha, args.delta]
         predict_parms = {'astar_parms' : astar_parms, 'beam_parms' : beam_parms}
 
-    for i, tree in  enumerate(treebank):
+    for i, tree in  enumerate(test_parse):
         dy.renew_cg()
         sentence = [(leaf.tag, leaf.word) for leaf in tree.leaves()]
+        gold_labels = [leaf.labels for leaf in tree.leaves()]
         prediction_start_time = time.time()
         if args.parser_type == "path":
             #predicted = parser.parse(rescorer, sentence, predict_parms=predict_parms)
-            predicted, predited_labels = parser.parse(sentence, predict_parms=predict_parms)
+            predicted, predicted_labels = parser.parse(sentence, predict_parms=predict_parms)
         else:
             #predicted, _ = parser.parse(rescorer, sentence, k = args.n_trees)
             predicted, _ = parser.parse(sentence, k = args.n_trees)
@@ -376,8 +377,11 @@ def run_test(args):
             )
         )
         test_predicted.append(predicted)
-        test_predicted_labels.append(predicted_labels)
+        test_labels.append((predicted_labels, gold_labels))
 
+        import pdb; pdb.set_trace()
+    with open ('labels.txt', 'w') as outfile:
+        json.dumpu(test_labels, outfile) 
     import pdb; pdb.set_trace()
 
 
